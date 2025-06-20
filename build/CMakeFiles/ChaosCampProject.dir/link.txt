@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\ChaosCampProject.dir/objects.a
+C:\MinGW\bin\ar.exe qc CMakeFiles\ChaosCampProject.dir/objects.a @CMakeFiles\ChaosCampProject.dir\objects1
+C:\MinGW\bin\g++.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\ChaosCampProject.dir/objects.a -Wl,--no-whole-archive -o ChaosCampProject.exe -Wl,--out-implib,libChaosCampProject.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\ChaosCampProject.dir\linkLibs.rsp
