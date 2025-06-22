@@ -22,37 +22,7 @@ enum BaseColor {
 
     NumColors,
 };
-enum ShapeType {
-    Circle,
-    Triangle,
-    Rectangle
-};
-struct Shape {
-    std::vector<std::vector<int>> coordinates;
-    BaseColor color;
-    ShapeType type;
-};
 
-std::vector<int> generateRandomColorVariance(BaseColor color) {
-    std::vector<int> res_color = {0,0,0};
-    std::vector<int> ref_color = reference_colors[color];
-
-    float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    res_color[0] = static_cast<int>(static_cast<float>(ref_color[0]) * r);
-    res_color[1] = static_cast<int>(static_cast<float>(ref_color[1]) * r);
-    res_color[2] = static_cast<int>(static_cast<float>(ref_color[2]) * r);
-    return res_color;
-}
-std::vector<int> generateRandomColorVariance(std::vector<int> base_color) {
-    std::vector<int> res_color = {0,0,0};
-    //std::vector<int> ref_color = reference_colors[color];
-
-    float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    res_color[0] = static_cast<int>(static_cast<float>(base_color[0]) * r);
-    res_color[1] = static_cast<int>(static_cast<float>(base_color[1]) * r);
-    res_color[2] = static_cast<int>(static_cast<float>(base_color[2]) * r);
-    return res_color;
-}
 
 int main() {
 
@@ -60,7 +30,7 @@ int main() {
     const int width = 1920;
     const int height = 1080;
     const int maxColorValue = 255;
-    const int gridX = 2;
+    const int gridX = 4;
     const int gridY = 4;
     //init randomness
     srand(time(NULL));
@@ -70,7 +40,7 @@ int main() {
 
     image.configureGrid(gridX, gridY);
     
-    image.render();
+    image.renderRandomizedBackground();
     image.storeImageToFile();
     
 /*

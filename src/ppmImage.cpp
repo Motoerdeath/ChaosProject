@@ -5,6 +5,7 @@
 #include <fstream>
 
 
+
 std::vector<int> PPMImage::generateRandomColorVariance(std::vector<int> baseColor) {
     std::vector<int> res_color = {0,0,0};
     //std::vector<int> ref_color = reference_colors[color];
@@ -16,7 +17,7 @@ std::vector<int> PPMImage::generateRandomColorVariance(std::vector<int> baseColo
     return res_color;
 }
 void PPMImage::configureGrid(int x, int y) {
-
+    grid.clear();
     grid.resize(y,std::vector<GridCell>(x));
 
     for (int i = 0; i < y; i++) {
@@ -34,7 +35,7 @@ void PPMImage::configureGrid(int x, int y) {
     }
 }
 
-void PPMImage::render() {
+void PPMImage::renderRandomizedBackground() {
 
     for (int y = 0; y < imageHeight; y++) {
         for (int x = 0; x < imageWidth; x++) {
