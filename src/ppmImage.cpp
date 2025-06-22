@@ -19,8 +19,8 @@ void PPMImage::configureGrid(int x, int y) {
 
     grid.resize(y,std::vector<GridCell>(x));
 
-    for (int i = 0; i < x; i++) {
-        for (int j = 0; j < y; j++) {
+    for (int i = 0; i < y; i++) {
+        for (int j = 0; j < x; j++) {
             GridCell newCell;
             newCell.randomize = true;
             int primaryColor = (rand() % 3);
@@ -64,6 +64,7 @@ void PPMImage::storeImageToFile() {
     ostream << "P3\n";
     ostream << imageWidth << " " << imageHeight << "\n";
     ostream << maxColorValue << "\n";
+    
     for (int y = 0; y < imageHeight; y++) {
         for (int x = 0; x < imageWidth; x++) {
             std::vector<int> pixel_color = image[y][x];

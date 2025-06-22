@@ -60,7 +60,7 @@ int main() {
     const int width = 1920;
     const int height = 1080;
     const int maxColorValue = 255;
-    const int gridX = 4;
+    const int gridX = 2;
     const int gridY = 4;
     //init randomness
     srand(time(NULL));
@@ -69,6 +69,7 @@ int main() {
     PPMImage image(width,height);
 
     image.configureGrid(gridX, gridY);
+    
     image.render();
     image.storeImageToFile();
     
