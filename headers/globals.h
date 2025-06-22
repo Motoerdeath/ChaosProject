@@ -1,3 +1,5 @@
+#include "glm/glm.hpp"
+
 struct CRTVector {
     float x;
     float y;
@@ -13,6 +15,11 @@ struct CRTColor {
 struct CRTRay {
     CRTVector rayOrigin;
     CRTVector rayDirection;
+};
+
+struct GridCell {
+    glm::vec3 colorValue;
+    bool randomize;
 };
 
 

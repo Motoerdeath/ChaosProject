@@ -8,6 +8,7 @@
 #include <utility>
 #include <tuple>
 #include <random>
+#include "../headers/ppmImage.hpp"
 
 std::vector<std::vector<int>> reference_colors{ {255,0,0},{0,255,0},{0,0,255},{255,128,0},{255,255,0},{127,0,255},{255,0,127} };
 enum BaseColor {
@@ -30,10 +31,6 @@ struct Shape {
     std::vector<std::vector<int>> coordinates;
     BaseColor color;
     ShapeType type;
-};
-struct GridCell {
-    glm::vec3 colorValue;
-    bool randomize;
 };
 
 std::vector<int> generateRandomColorVariance(BaseColor color) {
@@ -65,47 +62,17 @@ int main() {
     const int maxColorValue = 255;
     const int gridX = 4;
     const int gridY = 4;
-
-    //create Image
-    std::vector<std::vector<std::vector<int>>> image;
-    image.resize(height,std::vector<std::vector<int>>(width,std::vector<int>(3)));
-
-    //initialize rand()
+    //init randomness
     srand(time(NULL));
+    //create Image
+    
+    PPMImage image(width,height);
 
-
-    //generate shapes
-    std::vector<Shape> objects;
-    Shape someCircle;
-    someCircle.coordinates = { std::vector<int>(width/2,height/2), std::vector<int>(50,0)};
-    someCircle.color = Red;
-    objects.push_back(someCircle);
-    std::vector<int> circleCoordinates = {width/2,height/2};
-    int circleRadius = 100;
-    int primaryColor2 = (rand() % 3);
-    glm::vec3 circleColor;
-    circleColor[primaryColor2] = (rand() % maxColorValue);
-    circleColor[(primaryColor2+1)%3] = (rand() % (maxColorValue/2));
-    circleColor[(primaryColor2+2)%3] = (rand() % (maxColorValue/3));
-
-
-    //generate Grid configuration
-    GridCell grid[gridY][gridX];
-    for (int i = 0; i < gridY; i++) {
-        for (int j = 0; j < gridX; j++) {
-            GridCell newCell;
-            newCell.randomize = true;
-            int primaryColor = (rand() % 3);
-            glm::vec3 color;
-            color[primaryColor] = (rand() % maxColorValue);
-            color[(primaryColor+1)%3] = (rand() % (maxColorValue/2));
-            color[(primaryColor+2)%3] = (rand() % (maxColorValue/3));
-            newCell.colorValue = color;
-            grid[i][j]= newCell;
-            //gridColorAssignments[i][j] = static_cast<BaseColor> (rand() % BaseColor::NumColors);
-        }
-    }
-
+    image.configureGrid(gridX, gridY);
+    image.render();
+    image.storeImageToFile();
+    
+/*
     //render to image, using selected grid configuration and shapes
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -131,22 +98,6 @@ int main() {
             image[y][x] = pixel_color;
         }
     }
-    
-
-    //store image to ppm file
-    std::cout << "start"<< std::endl;
-    std::ofstream ostream;
-    ostream.open("../outputs/output.ppm", std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
-    ostream << "P3\n";
-    ostream << width << " " << height << "\n";
-    ostream << maxColorValue << "\n";
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            std::vector<int> pixel_color = image[y][x];
-            ostream << " " << pixel_color[0] << " " << pixel_color[1] << " " << pixel_color[2] << " "; 
-        }
-        ostream << "\n";
-    }
-
+    */
     return 0;
 }

@@ -10,6 +10,8 @@ project(ChaosCampProject VERSION 1.0)
 set(CCP_SOURCE_FILES 
   ${CMAKE_SOURCE_DIR}/src/main.cpp
   ${CMAKE_SOURCE_DIR}/src/crtImage.cpp
+  ${CMAKE_SOURCE_DIR}/src/camera.cpp
+  ${CMAKE_SOURCE_DIR}/src/ppmImage.cpp
 )
 
 
