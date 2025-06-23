@@ -61,7 +61,7 @@ void PPMImage::renderRandomizedBackground() {
 void PPMImage::storeImageToFile() {
     std::cout << "Begin writing Image to File"<< std::endl;
     std::ofstream ostream;
-    ostream.open("../outputs/output.ppm", std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+    ostream.open("../outputs/02_Fundamentals/output.ppm", std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     ostream << "P3\n";
     ostream << imageWidth << " " << imageHeight << "\n";
     ostream << maxColorValue << "\n";
@@ -77,3 +77,4 @@ void PPMImage::storeImageToFile() {
     std::cout << "wrote Image to File"<< std::endl;
 }
 
+//TODO : support shape generation and rendering
