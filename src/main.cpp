@@ -11,7 +11,7 @@
 #include <random>
 #include "../headers/ppmImage.hpp"
 #include "glm/geometric.hpp"
-
+#include "../headers/crtVector.hpp"
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
@@ -67,6 +67,7 @@ int main() {
             y = 1.f - (2.f*y);
             x *= ((float) width / (float) height);
             //y *= ((float) width / (float) height);
+            CRTVector2 rayDir2(x,y,-1.f);
             CRTVector rayDirection;
             rayDirection.x = x;
             rayDirection.y = y;
@@ -83,13 +84,15 @@ int main() {
             normalizedRayDirection.x = rayDirection.x / rayLength;
             normalizedRayDirection.y = rayDirection.y / rayLength;
             normalizedRayDirection.z = rayDirection.z / rayLength;
-            CRTRay newRay;
+            CRTVector2 normalizedRayDir = rayDir2.normalize();
             CRTVector origin;
+            CRTVector2 o(0.f);
+            CRTRay newRay(o, normalizedRayDir);
             origin.x =0.f;
             origin.y= 0.f;
             origin.z = 0.f;
-            newRay.rayOrigin = origin;
-            newRay.rayDirection = normalizedRayDirection;
+            newRay.rayOrigin = o;
+            newRay.rayDirection = normalizedRayDir;
             image2[i][j] = newRay;
             /*
             CRTRay newRay;

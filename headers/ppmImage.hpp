@@ -1,4 +1,8 @@
+
+#ifndef PPMIMAGE
+#define PPMIMAGE
 #include <vector>
+#include <string>
 #include "../headers/globals.h"
 
 enum ShapeType {
@@ -40,7 +44,9 @@ class PPMImage{
         void renderShapes();
         void createShape();
         void storeImageToFile();
+        void storeImageToFile(std::string filePath);
         void configureGrid(int x, int y);
+        void reset();
         static std::vector<int> generateRandomColorVariance(std::vector<int> base_color);
 
     private:
@@ -51,3 +57,5 @@ class PPMImage{
         std::vector<std::vector<GridCell>> grid;
         std::vector<Shape> shapes;
 };
+
+#endif
