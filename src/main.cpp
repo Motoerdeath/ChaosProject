@@ -12,6 +12,8 @@
 #include "../headers/ppmImage.hpp"
 #include "glm/geometric.hpp"
 #include "../headers/crtVector.hpp"
+//#include "../headers/task.hpp"
+#include "../src/Tasks/task1.cpp"
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
@@ -31,15 +33,20 @@ enum BaseColor {
 
 
 int main() {
-
-    //basic config
+    srand(time(NULL));
     const int width = 1920;
     const int height = 1080;
     const int maxColorValue = 255;
     const int gridX = 4;
     const int gridY = 4;
+    Task1 task1;
+    task1.execute();
+
+    /*
+    //basic config
+
     //init randomness
-    srand(time(NULL));
+    
     //create Image
     
     PPMImage image(width,height);
@@ -48,7 +55,7 @@ int main() {
     
     image.renderRandomizedBackground();
     image.storeImageToFile();
-
+*/
 
     //init pinhole to screenspace Rays
     std::vector<std::vector<CRTRay>> image2;

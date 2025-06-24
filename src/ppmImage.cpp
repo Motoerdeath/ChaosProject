@@ -16,6 +16,10 @@ std::vector<int> PPMImage::generateRandomColorVariance(std::vector<int> baseColo
     res_color[2] = static_cast<int>(static_cast<float>(baseColor[2]) * r);
     return res_color;
 }
+void PPMImage::clear() {
+    image.clear();
+    grid.clear();
+}
 void PPMImage::configureGrid(int x, int y) {
     grid.clear();
     grid.resize(y,std::vector<GridCell>(x));
@@ -58,10 +62,11 @@ void PPMImage::renderRandomizedBackground() {
     }
     
 }
-void PPMImage::storeImageToFile() {
+
+void PPMImage::storeImageToFile(std::string filePathName) {
     std::cout << "Begin writing Image to File"<< std::endl;
     std::ofstream ostream;
-    ostream.open("../outputs/02_Fundamentals/output.ppm", std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
+    ostream.open(filePathName, std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     ostream << "P3\n";
     ostream << imageWidth << " " << imageHeight << "\n";
     ostream << maxColorValue << "\n";

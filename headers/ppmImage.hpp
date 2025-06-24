@@ -18,6 +18,15 @@ struct Shape {
 
 class PPMImage{
     public:
+        PPMImage() {
+            imageHeight = 1080;
+            imageWidth = 1920;
+            image.resize(imageHeight,std::vector<std::vector<int>>(imageWidth,std::vector<int>(3)));
+            grid.resize(1,std::vector<GridCell>(1));
+            grid[0][0].colorValue = glm::vec3(255);
+            grid[0][0].randomize = false;
+            maxColorValue = 255;
+        }
         PPMImage(int width, int height)
         {
             imageHeight = height;
@@ -47,6 +56,7 @@ class PPMImage{
         void storeImageToFile(std::string filePath);
         void configureGrid(int x, int y);
         void reset();
+        void clear();
         static std::vector<int> generateRandomColorVariance(std::vector<int> base_color);
 
     private:
