@@ -60,37 +60,17 @@ int main() {
 
             float x = (float) j +0.5f;
             float y = (float) (height-i) -0.5f;
-            //float y = (float) i +0.5f;
+
             x /= width;
             y /= height;
             x = (2.f*x)-1.0f;
             y = 1.f - (2.f*y);
             x *= ((float) width / (float) height);
-            //y *= ((float) width / (float) height);
-            CRTVector2 rayDir2(x,y,-1.f);
-            CRTVector rayDirection;
-            rayDirection.x = x;
-            rayDirection.y = y;
-            rayDirection.z = -1.f;
-            glm::vec3  rayDir = glm::vec3(x,y,-1.f);
-            /*
-            glm::vec3 norm = glm::normalize(rayDir);
-            rayDirection.x = norm.x;
-            rayDirection.y = norm.y;
-            rayDirection.z = norm.z;
-            */
-            float rayLength = std::sqrt(rayDirection.x*rayDirection.x + rayDirection.y *rayDirection.y + rayDirection.z * rayDirection.z);
-            CRTVector normalizedRayDirection;
-            normalizedRayDirection.x = rayDirection.x / rayLength;
-            normalizedRayDirection.y = rayDirection.y / rayLength;
-            normalizedRayDirection.z = rayDirection.z / rayLength;
-            CRTVector2 normalizedRayDir = rayDir2.normalize();
-            CRTVector origin;
-            CRTVector2 o(0.f);
+
+            CRTVector rayDir2(x,y,-1.f);
+            CRTVector normalizedRayDir = rayDir2.normalize();
+            CRTVector o(0.f);
             CRTRay newRay(o, normalizedRayDir);
-            origin.x =0.f;
-            origin.y= 0.f;
-            origin.z = 0.f;
             newRay.rayOrigin = o;
             newRay.rayDirection = normalizedRayDir;
             image2[i][j] = newRay;

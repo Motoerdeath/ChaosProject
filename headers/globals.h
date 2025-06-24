@@ -4,12 +4,6 @@
 #include "glm/glm.hpp"
 #include "../headers/crtVector.hpp"
 //TODO: change struct into class with mathematical support
-struct CRTVector {
-    float x;
-    float y;
-    float z;
-};
-
 struct CRTColor {
     int r;
     int g;
@@ -18,10 +12,10 @@ struct CRTColor {
 
 struct CRTRay {
     
-    CRTVector2 rayOrigin;
-    CRTVector2 rayDirection;
+    CRTVector rayOrigin;
+    CRTVector rayDirection;
     CRTRay() : rayOrigin(0.f),rayDirection(0.f) {}
-    CRTRay(CRTVector2 origin, CRTVector2 direction) :  rayOrigin(origin), rayDirection(direction) {}
+    CRTRay(CRTVector origin, CRTVector direction) :  rayOrigin(origin), rayDirection(direction) {}
 };
 
 struct GridCell {
