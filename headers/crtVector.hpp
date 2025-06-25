@@ -17,14 +17,16 @@ class CRTVector {
         float len = length();
         return CRTVector(x/len,y/len,z/len);
     }
-    CRTVector operator+ (const CRTVector& lhs) const {
-        return CRTVector(x+lhs.x,y+lhs.y,z+lhs.z);
+    CRTVector operator+ (const CRTVector& rhs) const {
+        return CRTVector(x+rhs.x,y+rhs.y,z+rhs.z);
     }
-    CRTVector operator- (const CRTVector& lhs) const {
-        return CRTVector(x-lhs.x,y-lhs.y,z-lhs.z);
+    CRTVector operator- (const CRTVector& rhs) const {
+        return CRTVector(x-rhs.x,y-rhs.y,z-rhs.z);
     }
-    CRTVector cross(const CRTVector& lhs) const {
-
+    CRTVector cross(const CRTVector& rhs) const {
+        return CRTVector(y*rhs.z-z*rhs.y,
+                         z*rhs.x-x*rhs.z,
+                         x*rhs.y-y*rhs.x);
     }  
 
     float x;

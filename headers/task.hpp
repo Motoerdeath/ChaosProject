@@ -1,3 +1,6 @@
+#ifndef TASK
+#define TASK
+
 class Task {
     public:
     void virtual execute() = 0;
@@ -7,3 +10,5 @@ class Task {
     void virtual run() = 0;
     void virtual cleanup() = 0;
 };
+
+#endif

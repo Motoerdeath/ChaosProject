@@ -57,6 +57,7 @@ class PPMImage{
         void configureGrid(int x, int y);
         void reset();
         void clear();
+        void setPixel(int r, int g, int b, int x, int y);
         static std::vector<int> generateRandomColorVariance(std::vector<int> base_color);
 
     private:

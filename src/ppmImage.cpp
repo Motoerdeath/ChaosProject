@@ -38,7 +38,9 @@ void PPMImage::configureGrid(int x, int y) {
         }
     }
 }
-
+void PPMImage::setPixel(int r, int g, int b, int x, int y) {
+    image[y][x] = {r,g,b};
+}
 void PPMImage::renderRandomizedBackground() {
 
     for (int y = 0; y < imageHeight; y++) {

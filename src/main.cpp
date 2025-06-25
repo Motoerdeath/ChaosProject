@@ -14,6 +14,7 @@
 #include "../headers/crtVector.hpp"
 //#include "../headers/task.hpp"
 #include "../src/Tasks/task1.cpp"
+#include "../src/Tasks/task2.cpp"
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
@@ -58,6 +59,7 @@ int main() {
 */
 
     //init pinhole to screenspace Rays
+    /*
     std::vector<std::vector<CRTRay>> image2;
     image2.resize(height,std::vector<CRTRay>(width));
 
@@ -81,28 +83,6 @@ int main() {
             newRay.rayOrigin = o;
             newRay.rayDirection = normalizedRayDir;
             image2[i][j] = newRay;
-            /*
-            CRTRay newRay;
-            CRTVector vector;
-            vector.x =0.f;
-            vector.y= 0.f;
-            vector.z = 0.f;
-            newRay.rayOrigin = vector;
-            CRTVector pixelpos;
-            pixelpos.x = (float)j +0.5f;
-            pixelpos.y = (float)(height-i) -0.5f;
-            pixelpos.x = -1.f;
-            newRay.rayDirection = pixelpos;
-            
-
-            //normalize;
-            float rayLength = std::sqrt(pixelpos.x*pixelpos.x + pixelpos.y +pixelpos.y + pixelpos.z + pixelpos.z);
-            CRTVector normalizedRayDirection;
-            normalizedRayDirection.x = pixelpos.x / rayLength;
-            normalizedRayDirection.y = pixelpos.y / rayLength;
-            normalizedRayDirection.z = pixelpos.z / rayLength;
-            */
-
         }
     }
     //render normalizedRays
@@ -131,6 +111,23 @@ int main() {
     std::cout << "wrote Image to File"<< std::endl;
     std::cout <<"did it" << std::endl;
     
+*/
 
+Task2 task2;
+task2.execute();
+
+
+
+
+//Task3
+    CRTVector a(0.56f,1.11f,1.23f);
+    CRTVector b(0.44f,-2.368f,-0.54f);
+    CRTVector c(-1.56f,0.15f,-1.92f);
+
+    CRTVector ab= b-a;
+    CRTVector ac= c-a;
+    CRTVector n = ab.cross(ac);
+    n = n.normalize();
+    std::cout << n.x << n.y << n.z <<std::endl;;
     return 0;
 }
