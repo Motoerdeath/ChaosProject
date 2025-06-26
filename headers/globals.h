@@ -10,13 +10,7 @@ struct CRTColor {
     int b;
 };
 
-struct CRTRay {
-    
-    CRTVector rayOrigin;
-    CRTVector rayDirection;
-    CRTRay() : rayOrigin(0.f),rayDirection(0.f) {}
-    CRTRay(CRTVector origin, CRTVector direction) :  rayOrigin(origin), rayDirection(direction) {}
-};
+
 
 struct GridCell {
     glm::vec3 colorValue;

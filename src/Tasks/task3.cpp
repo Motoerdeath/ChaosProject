@@ -3,6 +3,7 @@
 #include <time.h>
 #include <random>
 #include <string>
+#include <fstream>
 class Task3 : public Task {
     public:
         Task3() {setup();};
@@ -16,6 +17,9 @@ class Task3 : public Task {
     void setup() override {
     }
     void run() override {
+
+    std::ofstream ostream;
+    ostream.open(resultFilePath, std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
         /*
         Exercise 1
         a)Calculate the cross product (AxB) between two vectors:
@@ -32,18 +36,23 @@ class Task3 : public Task {
         CRTVector a(3.5,0.f,0.f);
         CRTVector b(1.75f,3.5f,0.f);
         CRTVector resultA = a.cross(b);
+        ostream << "a): (" << resultA.x << ";" << resultA.y << ";" << resultA.z << ")\n";
+
         //b)
         a = CRTVector(3.f,-3.f,1.f);
         b = CRTVector(4.f,9.f,3.f);
         CRTVector resultB = a.cross(b);
+        ostream << "b): (" << resultB.x << ";" << resultB.y << ";" << resultB.z << ")\n";
         //c)
         a = CRTVector(3.f,-3.f,1.f);
         b = CRTVector(4.f,9.f,3.f);
-        float resultC = a.length() * b.length();
+        float resultC = resultB.length();
+        ostream << "c): (" << resultC << ")\n";
         //d)
         a = CRTVector(3.f,-3.f,1.f);
         b = CRTVector(-12.f,12.f,-4.f);
-        float resultD = a.length() * b.length();
+        float resultD = a.cross(b).length();
+        ostream << "d): (" << resultD << ")\n";
     /*
         Exercise2:
         e)Find the normal vector for a triangle with the following vertices:
@@ -67,8 +76,9 @@ class Task3 : public Task {
         CRTVector c(0.f,1.75f,-3.f);
         CRTVector ab= b-a;
         CRTVector ac= c-a;
-        CRTVector n = ab.cross(ac);
-        n = n.normalize();
+        CRTVector resultE = ab.cross(ac);
+        resultE = resultE.normalize();
+        ostream << "e): (" << resultE.x << ";" << resultE.y << ";" << resultE.z << ")\n";
         float areaE = ab.length() * ac.length()/2.f;
     //f)
         a = CRTVector(0.f,0.f,-1.f);
@@ -76,8 +86,9 @@ class Task3 : public Task {
         c = CRTVector(-1.f,0.f,1.f);
         ab= b-a;
         ac= c-a;
-        n = ab.cross(ac);
-        n = n.normalize();
+        CRTVector resultF = ab.cross(ac);
+        resultF = resultF.normalize();
+        ostream << "f): (" << resultF.x << ";" << resultF.y << ";" << resultF.z << ")\n";
         float areaF = ab.length() * ac.length()/2.f;
     //g)
         a = CRTVector(0.56f,1.11f,1.23f);
@@ -85,11 +96,15 @@ class Task3 : public Task {
         c = CRTVector(-1.56f,0.15f,-1.92f);
         ab= b-a;
         ac= c-a;
-        n = ab.cross(ac);
-        n = n.normalize();
+        CRTVector resultG = ab.cross(ac);
+        resultG = resultG.normalize();
+        ostream << "g): (" << resultG.x << ";" << resultG.y << ";" << resultG.z << ")\n";
         float areaG = ab.length() * ac.length()/2.f;
 
     //h)
+    ostream << "h): (" << areaE << ";" << areaF << ";" << areaG << ")\n";
+
+    ostream.close();
     }
     void cleanup() override {
     }

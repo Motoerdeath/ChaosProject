@@ -1,11 +1,10 @@
 #ifndef CRTCAMERA
 #define CRTCAMERA
 
-#include "glm/glm.hpp"
-class CRTCamera {
-    glm::vec3 cameraPosition;
-    glm::vec3 cameraDirection;
-    
+#include "crtVector.hpp"
+struct CRTCamera {
+    CRTVector cameraPosition;
+    CRTVector cameraDirection;
 };
 
 #endif

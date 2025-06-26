@@ -66,7 +66,7 @@ void PPMImage::renderRandomizedBackground() {
 }
 
 void PPMImage::storeImageToFile(std::string filePathName) {
-    std::cout << "Begin writing Image to File"<< std::endl;
+    
     std::ofstream ostream;
     ostream.open(filePathName, std::ofstream::out | std::ofstream::trunc | std::ofstream::binary);
     ostream << "P3\n";
@@ -81,7 +81,27 @@ void PPMImage::storeImageToFile(std::string filePathName) {
         ostream << "\n";
     }
     ostream.close();
-    std::cout << "wrote Image to File"<< std::endl;
 }
 
+
+void PPMImage::generateCameraRays() {
+        for(int i = 0; i < imageHeight;i++) {
+            for(int j = 0; j < imageWidth;j++) {
+
+                float x = static_cast<float>(j) +0.5f;
+                float y = static_cast<float>(i) +0.5f;
+                
+                float ndcX = x/imageWidth;
+                float ndcY = y/imageHeight;
+
+                float screenX = ndcX *2.0f -1.0f;
+                float screenY = 1.0f - (2.0f*ndcY);
+                screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
+
+                CRTVector normalizedVector =CRTVector(screenX,screenY,-1.0f).normalize();
+                cameraRays[i][j] = CRTRay(CRTVector(0.f,0.f,0.f),normalizedVector);
+                
+            }
+        }
+}
 //TODO : support shape generation and rendering

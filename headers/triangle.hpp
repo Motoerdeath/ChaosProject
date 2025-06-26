@@ -3,14 +3,22 @@
 
 #include "../headers/crtVector.hpp"
 
-struct CRTTriangle {
-    CRTVector v1;
-    CRTVector v2;
-    CRTVector v3;
+class CRTTriangle {
+    public:
+        CRTTriangle() : v0(CRTVector(0.f)), v1(CRTVector(0.f)), v2(CRTVector(0.f)) {}
+        CRTTriangle(CRTVector vall) : v0(vall), v1(vall), v2(vall) {}
+        CRTTriangle(CRTVector v0,CRTVector v1,CRTVector v2) : v0(v0), v1(v1), v2(v2) {}
+        CRTVector calculateBarycentricCoordinates(CRTTriangle triangle, CRTVector position);
+        CRTVector calculateTriangleNormal() {
+            return (v1-v0).cross(v2-v0).normalize();
+        }
+        CRTVector v0;
+        CRTVector v1;
+        CRTVector v2;
+    private:
 
-    CRTTriangle() : v1(CRTVector(0.f)), v2(CRTVector(0.f)), v3(CRTVector(0.f)) {}
-    CRTTriangle(CRTVector vall) : v1(vall), v2(vall), v3(vall) {}
-    CRTTriangle(CRTVector v1,CRTVector v2,CRTVector v3) : v1(v1), v2(v2), v3(v3) {}
+
 };
+
 
 #endif
