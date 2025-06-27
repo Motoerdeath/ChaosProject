@@ -10,15 +10,14 @@ class CRTRay {
     CRTRay() : rayOrigin(0.f),rayDirection(0.f) {}
     CRTRay(CRTVector origin, CRTVector direction) :  rayOrigin(origin), rayDirection(direction) {}
     bool intersectTriangle(CRTTriangle triangle, float& t) {
-        CRTVector triangleNormal = triangle.calculateTriangleNormal();
 
         //check if Ray is not parallel and if ray hits it from the front
-        if(CRTVector::dot(rayDirection, triangleNormal) < 0) {
+        if(CRTVector::dot(rayDirection, triangle.normal) < 0) {
             //return true;
             
             //find intersection point
-            float rpLength = CRTVector::dot(triangle.v0,triangleNormal);
-            float t1 = rpLength/CRTVector::dot(rayDirection,triangleNormal);
+            float rpLength = std::abs(CRTVector::dot(triangle.v0-rayOrigin,triangle.normal));
+            float t1 = rpLength/std::abs(CRTVector::dot(rayDirection,triangle.normal));
             if(t1 < 0) {
                 return false;
             }
@@ -31,7 +30,7 @@ class CRTRay {
             CRTVector v1p = intersection-triangle.v1;
             CRTVector v2p = intersection-triangle.v2;
             //check if intersection point is in triangle
-            if(CRTVector::dot(triangleNormal,CRTVector::cross(e0,v0p)) >0 && CRTVector::dot(triangleNormal,CRTVector::cross(e1,v1p)) >0 && CRTVector::dot(triangleNormal,CRTVector::cross(e2,v2p)) >0 ) {
+            if(CRTVector::dot(triangle.normal,CRTVector::cross(e0,v0p)) >0 && CRTVector::dot(triangle.normal,CRTVector::cross(e1,v1p)) >0 && CRTVector::dot(triangle.normal,CRTVector::cross(e2,v2p)) >0 ) {
                 t = t1;
                 return true;
             }
