@@ -43,7 +43,7 @@ class Task4 : public Task {
     void run() override {  
 
         //Task1: render one triangle with specific coordinates
-        CRTTriangle triangle1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,-1.75f,-3.f));
+        CRTTriangle triangle1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,1.75f,-3.f));
         triangle1.color = {255,255,255};
         triangles.push_back(triangle1);
 

@@ -16,7 +16,7 @@ bool RAYS = true;
 
 
 int main() {
-    /*
+    
     Task1 task1;
     task1.execute();
 
@@ -28,10 +28,10 @@ int main() {
 
     Task4 task4;
     task4.execute();
-    */
+    
 
 
-    CRTTriangle triangle1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,-1.75f,-3.f));
+    CRTTriangle triangle1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,1.75f,-3.f));
     triangle1.color = {0,255,0};
     std::vector<CRTTriangle> triangles;
     triangles.push_back(triangle1);
@@ -48,7 +48,7 @@ int main() {
     //triangles.push_back(triangle2);
 
     std::vector<CRTTriangle> triangles2;
-    CRTTriangle tri1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,-1.75f,-3.f));
+    CRTTriangle tri1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,1.75f,-3.f));
     CRTTriangle tri5(CRTVector(0.f,0.0f,-3.f),CRTVector(1.f,0.f,-3.f),CRTVector(0.f,1.f,-3.f));
 
 
@@ -60,7 +60,7 @@ int main() {
     tri3.color = {0,0,255};
     tri4.color = {255,255,255};
 
-    triangles2.push_back(tri1);
+    triangles2.push_back(triangle1);
     //triangles2.push_back(tri5);
     //triangles2.push_back(triangle1);
     //triangles2.push_back(tri2);
