@@ -1,7 +1,7 @@
-#include "../src/Tasks/task1.cpp"
-#include "../src/Tasks/task2.cpp"
-#include "../src/Tasks/task3.cpp"
-#include "../src/Tasks/task4.cpp"
+#include "../src/Tasks/homework2.cpp"
+#include "../src/Tasks/homework3.cpp"
+#include "../src/Tasks/homework4.cpp"
+#include "../src/Tasks/homework5.cpp"
 
 #include "../headers/triangle.hpp"
 #include "../headers/camera.hpp"
@@ -17,20 +17,20 @@ bool RAYS = true;
 
 int main() {
     
-    Task1 task1;
+    Homework2 task1;
     task1.execute();
 
-    Task2 task2;
+    Homework3 task2;
     task2.execute();
 
-    Task3 task3;
+    Homework4 task3;
     task3.execute();
 
-    Task4 task4;
+    Homework5 task4;
     task4.execute();
     
 
-
+    /*
     CRTTriangle triangle1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,1.75f,-3.f));
     triangle1.color = {0,255,0};
     std::vector<CRTTriangle> triangles;
@@ -90,6 +90,6 @@ int main() {
         }
     }
     image.storeImageToFile("../outputs/05_Triangle/output.ppm");
-    
+    */
     return 0;
 }

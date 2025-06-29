@@ -20,6 +20,11 @@ void PPMImage::clear() {
     image.clear();
     grid.clear();
 }
+void PPMImage::resetImage() {
+    image.clear();
+    image.resize(imageHeight,std::vector<std::vector<int>>(imageWidth,std::vector<int>(3)));
+
+}
 void PPMImage::configureGrid(int x, int y) {
     grid.clear();
     grid.resize(y,std::vector<GridCell>(x));
