@@ -84,7 +84,7 @@ void PPMImage::storeImageToFile(std::string filePathName) {
 }
 
 
-void PPMImage::generateCameraRays() {
+void PPMImage::generateCameraRays(CRTVector cameraPosition) {
         for(int i = 0; i < imageHeight;i++) {
             for(int j = 0; j < imageWidth;j++) {
 
@@ -99,7 +99,7 @@ void PPMImage::generateCameraRays() {
                 screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
 
                 CRTVector normalizedVector =CRTVector(screenX,screenY,-1.0f).normalize();
-                cameraRays[i][j] = CRTRay(CRTVector(0.f,0.f,0.f),normalizedVector);
+                cameraRays[i][j] = CRTRay(cameraPosition,normalizedVector);
                 
             }
         }

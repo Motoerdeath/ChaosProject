@@ -27,8 +27,8 @@ class Task2 : public Task {
     void run() override {
         int height = 1080;
         int width = 1920;
-
-        image.generateCameraRays();
+        CRTVector cameraPosition(0.f,0.f,0.f);
+        image.generateCameraRays(cameraPosition);
 
         for(int i = 0; i < height;i++) {
             for(int j = 0; j < width;j++) {

@@ -5,6 +5,7 @@
 #include <string>
 #include "../headers/globals.h"
 #include "../headers/ray.hpp"
+#include "crtVector.hpp"
 
 enum ShapeType {
     Circle,
@@ -63,7 +64,7 @@ class PPMImage{
         void clear();
         void setPixel(int r, int g, int b, int x, int y);
         static std::vector<int> generateRandomColorVariance(std::vector<int> base_color);
-        void generateCameraRays();
+        void generateCameraRays(CRTVector cameraPosition);
         std::vector<std::vector<CRTRay>> cameraRays;
 
     private:

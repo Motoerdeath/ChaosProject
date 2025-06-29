@@ -12,12 +12,12 @@ class CRTRay {
     bool intersectTriangle(CRTTriangle triangle, float& t) {
 
         //check if Ray is not parallel and if ray hits it from the front
-        if(CRTVector::dot(rayDirection, triangle.normal) < 0) {
+        if(CRTVector::dot(rayDirection, triangle.normal) != 0) {
             //return true;
             
             //find intersection point
-            float rpLength = std::abs(CRTVector::dot(triangle.v0-rayOrigin,triangle.normal));
-            float t1 = rpLength/std::abs(CRTVector::dot(rayDirection,triangle.normal));
+            float rpLength = CRTVector::dot(triangle.v0-rayOrigin,triangle.normal);
+            float t1 = rpLength/CRTVector::dot(rayDirection,triangle.normal);
             if(t1 < 0) {
                 return false;
             }
