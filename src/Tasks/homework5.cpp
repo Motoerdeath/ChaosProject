@@ -75,9 +75,24 @@ class Homework5 : public Homework {
         //render a 3d shape (pyramid, etc.)
         triangles.clear();
         image.resetImage();
+        CRTTriangle tri1(CRTVector(-4.f,0.5f,-3.f),CRTVector(-1.f,0.5f,-2.f),CRTVector(-1.f,1.5f,-2.5f));
+        CRTTriangle tri2(CRTVector(-1.f,0.5f,-2.f),CRTVector(2.f,0.5f,-3.f),CRTVector(-1.f,1.5f,-2.5f));
+        CRTTriangle tri3(CRTVector(2.f,0.5f,-3.f),CRTVector(-4.f,0.5f,-3.f),CRTVector(-1.f,1.5f,-2.5f));
+        CRTTriangle tri4(CRTVector(-1.f,0.5f,-2.f),CRTVector(-4.f,0.5f,-3.f),CRTVector(2.f,0.5f,-3.f));
+        tri1.color = {255,0,0};
+        tri2.color = {0,255,0};
+        tri3.color = {0,0,255};
+        tri4.color = {255,255,255};
+        triangles.push_back(tri1);
+        triangles.push_back(tri2);
+        triangles.push_back(tri3);
+        triangles.push_back(tri4);
+        renderTriangles(triangles,image);
+        image.storeImageToFile(resultFilePath+"Task4.ppm");
     }
     void cleanup() override {
-
+        triangles.clear();
+        image.clear();
         //destroy
     }
 };
