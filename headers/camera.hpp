@@ -2,6 +2,7 @@
 #define CRTCAMERA
 
 #include "crtVector.hpp"
+#include "matrix.hpp"
 enum Axis{
     X,
     Y,
@@ -18,6 +19,7 @@ class CRTCamera {
         void truck(CRTVector movVector);
     private:
     CRTVector cameraPosition;
+    CRTMatrix rotationMatrix;
     CRTVector cameraDirection;
 };
 

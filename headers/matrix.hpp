@@ -1,7 +1,9 @@
-#ifndef CRTMACRO
-#define CRTMACRO
+#ifndef CRTMATRIX
+#define CRTMATRIX
 #include "crtVector.hpp"
 #include <cmath>
+#define M_PI 3.14159265358979323846
+#include <complex>
 class CRTMatrix{
     public:
     CRTMatrix(CRTVector vector1,CRTVector vector2,CRTVector vector3) {
@@ -15,40 +17,89 @@ class CRTMatrix{
         matrix[2][1] = vector3.y;
         matrix[2][2] = vector3.z;
     }
-    CRTMatrix rotate(float ang) {
-
-        //return this*getRotationMatrixAroundX( ang);
+    float getElement(int row, int column) const {
+        return matrix[row][column];
     }
-    CRTMatrix static getRotationMatrixAroundX(float ang) {
+    CRTMatrix static getRotationMatrixAroundX(float degs) {
+        const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
             CRTVector(1.0f,0.0f,0.0f),
-            CRTVector(0.0f,std::cos(ang),-std::sin(ang)),
-            CRTVector(0.0f,std::sin(ang),std::cos(ang))
+            CRTVector(0.0f,std::cos(degs),-std::sin(degs)),
+            CRTVector(0.0f,std::sin(degs),std::cos(degs))
         );
     }
-    CRTMatrix static getRotationMatrixAroundY(float ang) {
+    CRTMatrix static getRotationMatrixAroundY(float degs) {
+        const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
-            CRTVector(cos(ang),0.0f,-std::sin(ang)),
+            CRTVector(cos(rads),0.0f,-std::sin(rads)),
             CRTVector(0.0f,1.0f,0.0f),
-            CRTVector(std::sin(ang),0.0f,std::cos(ang))
+            CRTVector(std::sin(rads),0.0f,std::cos(rads))
         );
     }
-    CRTMatrix static getRotationMatrixAroundZ(float ang) {
+    CRTMatrix static getRotationMatrixAroundZ(float degs) {
+        const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
-            CRTVector(cos(ang),-std::sin(ang),0.0f),
-            CRTVector(sin(ang),std::cos(ang),0.0f),
+            CRTVector(cos(degs),-std::sin(degs),0.0f),
+            CRTVector(sin(degs),std::cos(degs),0.0f),
             CRTVector(0.0f,0.0f,1.0f)
         );
     }
     CRTMatrix transform(CRTVector movDir);
     CRTMatrix scale(float scalar);
 
-    CRTMatrix operator*(const float scalar);
-    CRTMatrix operator*(const CRTVector vector);
-    CRTMatrix operator*(const CRTMatrix matrix);
-    float matrix[3][3];
-    private:
+    CRTMatrix operator*(const float scalar) {
+        return CRTMatrix(CRTVector(matrix[0][0]*scalar,matrix[0][1]*scalar,matrix[0][2]*scalar),
+        CRTVector(matrix[1][0]*scalar,matrix[1][1]*scalar,matrix[1][2]*scalar),
+        CRTVector(matrix[2][0]*scalar,matrix[2][1]*scalar,matrix[2][2]*scalar));
+    }
+    CRTVector operator*(const CRTVector vector){
+
+        return 
+        CRTVector(vector.x*getElement(0, 0) + vector.y *getElement(1, 0) + vector.z *getElement(2, 0),
+                vector.x*getElement(0, 1) + vector.y *getElement(1, 1) + vector.z *getElement(2, 1),
+                vector.x*getElement(0, 2) + vector.y *getElement(1, 2) + vector.z *getElement(2, 2));
+
+        /*
+        return CRTVector(matrix[0][0]*vector.x+matrix[0][1]*vector.y+matrix[0][2]*vector.z,
+            matrix[1][0]*vector.x+matrix[1][1]*vector.y+matrix[1][2]*vector.z,
+            matrix[2][0]*vector.x+matrix[2][1]*vector.y+matrix[2][2]*vector.z
+        );
+        */
+        
+    }
+    /*
+    CRTVector operator*(const CRTVector lhs, const CRTMatrix rhs) const {
+    return 
+        CRTVector(lhs*rhs.getElement(0, 0) + y *rhs.getElement(1, 0) + z *rhs.getElement(2, 0),
+                x*rhs.getElement(0, 1) + y *rhs.getElement(1, 1) + z *rhs.getElement(2, 1),
+                x*rhs.getElement(0, 2) + y *rhs.getElement(1, 2) + z *rhs.getElement(2, 2)
     
+    );
+    }
+    */
+    CRTMatrix operator*(const CRTMatrix rhs) {
+        CRTVector v0(
+            matrix[0][0]*rhs.getElement(0,0)+matrix[0][1]*rhs.getElement(1,0)+matrix[0][2]*rhs.getElement(2,0),
+            matrix[0][0]*rhs.getElement(0,1)+matrix[0][1]*rhs.getElement(1,1)+matrix[0][2]*rhs.getElement(2,1),
+            matrix[0][0]*rhs.getElement(0,2)+matrix[0][1]*rhs.getElement(1,2)+matrix[0][2]*rhs.getElement(2,2)
+        );
+        CRTVector v1(
+            matrix[1][0]*rhs.getElement(0,0)+matrix[1][1]*rhs.getElement(1,0)+matrix[1][2]*rhs.getElement(2,0),
+            matrix[1][0]*rhs.getElement(0,1)+matrix[1][1]*rhs.getElement(1,1)+matrix[1][2]*rhs.getElement(2,1),
+            matrix[1][0]*rhs.getElement(0,2)+matrix[1][1]*rhs.getElement(1,2)+matrix[1][2]*rhs.getElement(2,2)
+        );
+        CRTVector v2(
+            matrix[2][0]*rhs.getElement(0,0)+matrix[2][1]*rhs.getElement(1,0)+matrix[2][2]*rhs.getElement(2,0),
+            matrix[2][0]*rhs.getElement(0,1)+matrix[2][1]*rhs.getElement(1,1)+matrix[2][2]*rhs.getElement(2,1),
+            matrix[2][0]*rhs.getElement(0,2)+matrix[2][1]*rhs.getElement(1,2)+matrix[2][2]*rhs.getElement(2,2)
+        );
+
+        return CRTMatrix(v0,v1,v2);
+            
+    }
+    
+    private:
+    float matrix[3][3];
 };
 
 #endif
