@@ -33,6 +33,6 @@ int main() {
     CRTMatrix matrix2(CRTVector(1.0f,0.0f,0.0f),CRTVector(0.0f,1.0f,0.0f),CRTVector(0.f,0.f,1.0f));
     CRTMatrix result = matrix*matrix;
     CRTVector vector(0.f,0.f,-1.f);
-    vector = CRTMatrix::getRotationMatrixAroundY(30.f)* vector;
+    vector = vector * CRTMatrix::getRotationMatrixAroundY(30.f);
     return 0;
 }

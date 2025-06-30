@@ -52,20 +52,11 @@ class CRTMatrix{
         CRTVector(matrix[1][0]*scalar,matrix[1][1]*scalar,matrix[1][2]*scalar),
         CRTVector(matrix[2][0]*scalar,matrix[2][1]*scalar,matrix[2][2]*scalar));
     }
-    CRTVector operator*(const CRTVector vector){
-
-        return 
-        CRTVector(vector.x*getElement(0, 0) + vector.y *getElement(1, 0) + vector.z *getElement(2, 0),
-                vector.x*getElement(0, 1) + vector.y *getElement(1, 1) + vector.z *getElement(2, 1),
-                vector.x*getElement(0, 2) + vector.y *getElement(1, 2) + vector.z *getElement(2, 2));
-
-        /*
-        return CRTVector(matrix[0][0]*vector.x+matrix[0][1]*vector.y+matrix[0][2]*vector.z,
-            matrix[1][0]*vector.x+matrix[1][1]*vector.y+matrix[1][2]*vector.z,
-            matrix[2][0]*vector.x+matrix[2][1]*vector.y+matrix[2][2]*vector.z
-        );
-        */
-        
+    friend CRTVector operator*(const CRTMatrix& lhs, const CRTVector& rhs) {
+            return CRTVector(lhs.getElement(0, 0)*rhs.x+lhs.getElement(0, 1)*rhs.y+lhs.getElement(0, 2)*rhs.z,
+                lhs.getElement(1, 0)*rhs.x+lhs.getElement(1, 1)*rhs.y+lhs.getElement(1, 2)*rhs.z,
+                lhs.getElement(2, 0)*rhs.x+lhs.getElement(2, 1)*rhs.y+lhs.getElement(2, 2)*rhs.z
+            );
     }
     /*
     CRTVector operator*(const CRTVector lhs, const CRTMatrix rhs) const {
@@ -97,7 +88,12 @@ class CRTMatrix{
         return CRTMatrix(v0,v1,v2);
             
     }
-    
+    friend CRTVector operator*(const CRTVector& lhs, const CRTMatrix& rhs) {
+        return 
+        CRTVector(lhs.x*rhs.getElement(0, 0) + lhs.y *rhs.getElement(1, 0) + lhs.z *rhs.getElement(2, 0),
+                lhs.x*rhs.getElement(0, 1) + lhs.y *rhs.getElement(1, 1) + lhs.z *rhs.getElement(2, 1),
+                lhs.x*rhs.getElement(0, 2) + lhs.y *rhs.getElement(1, 2) + lhs.z *rhs.getElement(2, 2));
+    };
     private:
     float matrix[3][3];
 };
