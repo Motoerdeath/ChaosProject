@@ -16,7 +16,7 @@ bool RAYS = true;
 
 
 int main() {
-    /*
+    
     Homework2 homework2;
     homework2.execute();
 
@@ -28,7 +28,7 @@ int main() {
 
     Homework5 homework5;
     homework5.execute();
-    */
+    
     CRTMatrix matrix(CRTVector(1.0f),CRTVector(1.0f),CRTVector(1.0f));
     CRTMatrix matrix2(CRTVector(1.0f,0.0f,0.0f),CRTVector(0.0f,1.0f,0.0f),CRTVector(0.f,0.f,1.0f));
     CRTMatrix result = matrix*matrix;

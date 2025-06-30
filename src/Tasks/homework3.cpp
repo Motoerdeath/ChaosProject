@@ -6,6 +6,7 @@
 #include <random>
 #include <string>
 #include "../headers/ray.hpp"
+#include "../headers/camera.hpp"
 class Homework3 : public Homework {
     public:
         Homework3() {setup();};
@@ -14,25 +15,30 @@ class Homework3 : public Homework {
             cleanup();
         }
     private:
+    int height = 1080;
+    int width = 1920;
     std::string resultFilePath = "../outputs/03_Rays/output.ppm";
     PPMImage image;
     std::vector<std::vector<CRTRay>> pixelRays;
+    CRTCamera camera = CRTCamera(CRTVector(0.f),CRTVector(0.f,0.f,-1.f),width,height);
 
     void setup() override {
-        int height = 1080;
-        int width = 1920;
+
         pixelRays.resize(height,std::vector<CRTRay>(width));
         image = PPMImage(width,height);
+        //camera = CRTCamera(CRTVector(0.f),CRTVector(0.f,0.f,-1.f),width,height);
+
     }
     void run() override {
         int height = 1080;
         int width = 1920;
         CRTVector cameraPosition(0.f,0.f,0.f);
-        image.generateCameraRays(cameraPosition);
+        //image.generateCameraRays(cameraPosition);
 
         for(int i = 0; i < height;i++) {
             for(int j = 0; j < width;j++) {
-                CRTRay normalRay = image.cameraRays[i][j];
+                CRTRay normalRay = camera.generateCameraRay(i, j);
+                //CRTRay normalRay = image.cameraRays[i][j];
                 int r = static_cast<int>(glm::clamp(std::abs(normalRay.rayDirection.x) * 255.f,0.f,255.0f));//(int) (rf*255.f);
                 int g = static_cast<int>(glm::clamp(std::abs(normalRay.rayDirection.y) * 255.f,0.0f,255.0f));//(int) (gf*255.f);
                 int b = static_cast<int>(glm::clamp(std::abs(normalRay.rayDirection.z) * 255.f,0.f,255.0f));//(int) (bf*255.f);
