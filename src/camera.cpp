@@ -33,8 +33,10 @@ void CRTCamera::roll(float degs) {
 
 void CRTCamera::lookAt(CRTVector target) {
     CRTVector cameraView = CRTVector(0.0f,0.0f,-1.f) * rotationMatrix;
+    CRTVector rotationVector = CRTVector::cross(target,cameraView);
     float angle = CRTVector::dot(cameraView.normalize(), target.normalize());
     
+
 }
 
 CRTRay CRTCamera::generateCameraRay(int row, int column) {

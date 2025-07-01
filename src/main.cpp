@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include "../headers/matrix.hpp"
+#include "rapidjson/rapidjson.h"
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
