@@ -32,7 +32,7 @@ class CRTRay {
             CRTVector v1p = intersection-triangle.v1;
             CRTVector v2p = intersection-triangle.v2;
             //check if intersection point is in triangle
-            if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >0 && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >0 && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >0 ) {
+            if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >=0 && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >=0 && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >=0 ) {
                 t = t1;
                 return true;
             }

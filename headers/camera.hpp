@@ -30,6 +30,7 @@ class CRTCamera {
         void move(CRTVector& movVector);
         void rotate(float degs,CRTVector rotationAxis);
         CRTRay generateCameraRay(int row, int column);
+        void lookAt(CRTVector target);
     private:
     CRTVector cameraPosition;
     CRTMatrix rotationMatrix;

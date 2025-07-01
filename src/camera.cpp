@@ -12,7 +12,7 @@
 */
 
 void CRTCamera::dolly(float movDistance) {
-    cameraPosition + CRTVector(movDistance,0.f,0.f);
+    cameraPosition + CRTVector(0.f,0.f,movDistance);
 }
 void CRTCamera::truck(float movDistance) {
     cameraPosition + CRTVector(movDistance,0.f,0.f);
@@ -29,6 +29,12 @@ void CRTCamera::tilt(float degs) {
 }
 void CRTCamera::roll(float degs) {
     rotationMatrix = rotationMatrix * CRTMatrix::getRotationMatrixAroundZ(degs);
+}
+
+void CRTCamera::lookAt(CRTVector target) {
+    CRTVector cameraView = CRTVector(0.0f,0.0f,-1.f) * rotationMatrix;
+    float angle = CRTVector::dot(cameraView.normalize(), target.normalize());
+    
 }
 
 CRTRay CRTCamera::generateCameraRay(int row, int column) {

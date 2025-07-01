@@ -1,5 +1,6 @@
 #include "../headers/homework.hpp"
 #include "../headers/ppmImage.hpp"
+#include "../headers/camera.hpp"
 #include <time.h>
 #include <random>
 #include <string>
@@ -17,6 +18,7 @@ class Homework5 : public Homework {
     int height = 1080;
     int width = 1920;
     std::vector<CRTTriangle> triangles = {};
+    CRTCamera camera = CRTCamera(CRTVector(0.f),CRTVector(0.f,0.f,-1.f),width,height);
 
     void renderTriangles(std::vector<CRTTriangle> triangles, PPMImage &image) {
         for(int i = 0; i < height;i++) {
@@ -24,7 +26,8 @@ class Homework5 : public Homework {
                 float lowestDistance = FLT_MAX;
                 for(CRTTriangle triangle : triangles) {
                     float t = 1.f;
-                    if(image.cameraRays[i][j].intersectTriangle(triangle, t)) {
+                    CRTRay ray = camera.generateCameraRay(i, j);
+                    if(ray.intersectTriangle(triangle, t)) {
                         if(t < lowestDistance) {
                             lowestDistance = t;
                             image.setPixel(triangle.color[0], triangle.color[1], triangle.color[2], j, i);
@@ -47,7 +50,7 @@ class Homework5 : public Homework {
         triangle1.color = {255,255,255};
         triangles.push_back(triangle1);
 
-        image.generateCameraRays(cameraPosition);
+        //image.generateCameraRays(cameraPosition);
         renderTriangles(triangles,image);
         image.storeImageToFile(resultFilePath+"Task1.ppm");
 
