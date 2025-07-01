@@ -30,13 +30,18 @@ void CRTCamera::tilt(float degs) {
 void CRTCamera::roll(float degs) {
     rotationMatrix = rotationMatrix * CRTMatrix::getRotationMatrixAroundZ(degs);
 }
-
+CRTMatrix generalRotationMatrix(const CRTVector& axis,const float degs) {
+    const float cosTheta = cos(degs);
+    const float sinTheta = sin(degs);
+    return CRTMatrix(CRTVector(cosTheta + axis.x*axis.x*(1-cosTheta),axis.x*axis.y*(1-cosTheta)-axis.z*sinTheta, axis.x*axis.z*(1-cosTheta)+axis.y*sinTheta),
+                    CRTVector(axis.x*axis.y*(1-cosTheta)+axis.z*sinTheta,cosTheta + axis.y*axis.y*(1-cosTheta),axis.y*axis.z*(1-cosTheta)-axis.x*sinTheta),
+                    CRTVector(axis.x*axis.z*(1-cosTheta)-axis.y*sinTheta,axis.y*axis.z*(1-cosTheta)+axis.x*sinTheta,cosTheta + axis.z*axis.z*(1-cosTheta)));
+}
 void CRTCamera::lookAt(CRTVector target) {
     CRTVector cameraView = CRTVector(0.0f,0.0f,-1.f) * rotationMatrix;
-    CRTVector rotationVector = CRTVector::cross(target,cameraView);
-    float angle = CRTVector::dot(cameraView.normalize(), target.normalize());
-    
-
+    CRTVector rotationVector = CRTVector::cross((target-cameraPosition),cameraView);
+    float angle = std::acos(CRTVector::dot(cameraView.normalize(), (target-cameraPosition).normalize()));
+    rotationMatrix = rotationMatrix * generalRotationMatrix(rotationVector.normalize(), angle);
 }
 
 CRTRay CRTCamera::generateCameraRay(int row, int column) {

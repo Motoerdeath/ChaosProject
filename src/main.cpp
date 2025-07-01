@@ -121,7 +121,7 @@ int main() {
             }
         }
         camera.move(c);
-        camera.tilt(10.f);  
+        camera.lookAt(CRTVector(0.f,0.f,-4.f));  
         std::string filestring = "../outputs/06_Camera/Task5/Frame" + std::to_string(i)+ ".ppm";
         image.storeImageToFile(filestring);
 
