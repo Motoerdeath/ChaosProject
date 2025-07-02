@@ -22,10 +22,11 @@ class Homework5 : public Homework {
     void renderTriangles(std::vector<CRTTriangle> triangles, PPMImage &image) {
         for(int i = 0; i < height;i++) {
             for(int j = 0; j < width;j++) {
+                CRTRay ray = camera.generateCameraRay(i, j);
                 float lowestDistance = FLT_MAX;
                 for(CRTTriangle triangle : triangles) {
                     float t = 1.f;
-                    CRTRay ray = camera.generateCameraRay(i, j);
+                    
                     if(ray.intersectTriangle(triangle, t)) {
                         if(t < lowestDistance) {
                             lowestDistance = t;

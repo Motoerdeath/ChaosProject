@@ -6,6 +6,7 @@ void CRTScene::render() {
     for(int i = 0; i < settings.imageHeight;i++) {
         for(int j = 0; j < settings.imageWidth;j++) {
             float closestIntersectionDistance = FLT_MAX;
+            CRTRay ray = camera.generateCameraRay(i, j);
             for(CRTMesh object : objects) {
                 for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
                     int triangleFirstIndex = object.triangleVertIndices[i];
@@ -14,7 +15,7 @@ void CRTScene::render() {
                                         object.triangleSoup[triangleFirstIndex+2]);
 
                     float t = 1.f;
-                    CRTRay ray = camera.generateCameraRay(i, j);
+                    
 
                     if(ray.intersectTriangle(triangle, t)) {
                         if(t < closestIntersectionDistance) {
