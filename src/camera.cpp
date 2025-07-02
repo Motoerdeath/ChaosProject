@@ -18,7 +18,7 @@ void CRTCamera::truck(float movDistance) {
     cameraPosition + CRTVector(movDistance,0.f,0.f);
 }
 void CRTCamera::move(CRTVector& movVector) {
-    CRTVector dirAdjustedMoveVec = movVector *rotationMatrix;
+    CRTVector dirAdjustedMoveVec = rotationMatrix * movVector;
     cameraPosition =cameraPosition+dirAdjustedMoveVec;
 }
 void CRTCamera::pan(float degs) {
@@ -38,8 +38,8 @@ CRTMatrix generalRotationMatrix(const CRTVector& axis,const float degs) {
                     CRTVector(axis.x*axis.z*(1-cosTheta)-axis.y*sinTheta,axis.y*axis.z*(1-cosTheta)+axis.x*sinTheta,cosTheta + axis.z*axis.z*(1-cosTheta)));
 }
 void CRTCamera::lookAt(CRTVector target) {
-    CRTVector cameraView = CRTVector(0.0f,0.0f,-1.f) * rotationMatrix;
-    CRTVector rotationVector = CRTVector::cross((target-cameraPosition),cameraView);
+    CRTVector cameraView =  rotationMatrix * CRTVector(0.0f,0.0f,-1.f);
+    CRTVector rotationVector = CRTVector::cross(cameraView,(target-cameraPosition));
     float angle = std::acos(CRTVector::dot(cameraView.normalize(), (target-cameraPosition).normalize()));
     rotationMatrix = rotationMatrix * generalRotationMatrix(rotationVector.normalize(), angle);
 }
@@ -55,6 +55,6 @@ CRTRay CRTCamera::generateCameraRay(int row, int column) {
     float screenY = 1.0f - (2.0f*ndcY);
     screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
 
-    CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f)*rotationMatrix).normalize();
+    CRTVector normalizedVector =(rotationMatrix * CRTVector(screenX,screenY,-1.0f)).normalize();
     return CRTRay(cameraPosition,normalizedVector);
 }
