@@ -19,7 +19,6 @@ class Homework5 : public Homework {
     int width = 1920;
     std::vector<CRTTriangle> triangles = {};
     CRTCamera camera = CRTCamera(CRTVector(0.f),CRTVector(0.f,0.f,-1.f),width,height);
-
     void renderTriangles(std::vector<CRTTriangle> triangles, PPMImage &image) {
         for(int i = 0; i < height;i++) {
             for(int j = 0; j < width;j++) {
@@ -32,9 +31,10 @@ class Homework5 : public Homework {
                             lowestDistance = t;
                             image.setPixel(triangle.color[0], triangle.color[1], triangle.color[2], j, i);
                         }
+                    } else {
+                        image.setPixel((int)(image.backgroundColor.x *255.f), (int)(image.backgroundColor.y *255.f), (int)(image.backgroundColor.z *255.f), j, i);
                     }
                 }
-
             }
         }
     }

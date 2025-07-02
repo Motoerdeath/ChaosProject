@@ -179,6 +179,7 @@ int main() {
         }
     }
     CRTSettings sceneSettings(bgColor,imageWidth,imageHeight);
-    
+    PPMImage testImage(imageWidth,imageHeight);
+    testImage.backgroundColor = bgColor;
     return 0;
 }

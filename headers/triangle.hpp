@@ -18,6 +18,7 @@ class CRTTriangle {
         CRTVector v2;
         CRTVector normal;
         std::vector<int> color;
+        CRTVector color2 = CRTVector(0.f);
     private:
 
 
