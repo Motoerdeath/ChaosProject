@@ -45,7 +45,8 @@ std::vector<int> loadIndices(const rapidjson::Value::ConstArray& indicesArr) {
     std::vector<int> indices;
     assert(indicesArr.Size() % 3 == 0);
     for(int i =0; i < indicesArr.Size();i++) {
-        indices.push_back(static_cast<int>(indicesArr[i].GetInt()));
+        int index = static_cast<int>(indicesArr[i].GetInt());
+        indices.push_back(index);
     }
     return indices;
 }

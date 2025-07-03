@@ -5,9 +5,14 @@
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "../headers/jsonUtilities.hpp"
+#include <iostream>
 
 void CRTScene::parse() {
-    
+    for(CRTMesh m : sceneObjects) {
+        for(CRTVector t : m.triangleSoup) {
+            std::cout << t.x << ","  << t.y << "," << t.z << std::endl;
+        }
+    }
 }
 void CRTScene::parseSceneFile(const std::string& sceneFileName){
 std::ifstream ifs(sceneFileName);
@@ -90,28 +95,32 @@ void CRTScene::render() {
         for(int j = 0; j < sceneSettings.imageWidth;j++) {
             float closestIntersectionDistance = FLT_MAX;
             CRTRay ray = sceneCamera.generateCameraRay(i, j);
+            bool foundIntersection = false;
             for(CRTMesh object : sceneObjects) {
-                for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
-                    int triangleFirstIndex = object.triangleVertIndices[i];
-                    CRTTriangle triangle(object.triangleSoup[triangleFirstIndex],
-                                        object.triangleSoup[triangleFirstIndex+1],
-                                        object.triangleSoup[triangleFirstIndex+2]);
+                for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
+                    int triangleFirstIndex = object.triangleVertIndices[k];
+                    CRTTriangle triangle(object.triangleSoup[object.triangleVertIndices[k]],
+                                        object.triangleSoup[object.triangleVertIndices[k+1]],
+                                        object.triangleSoup[object.triangleVertIndices[k+2]]);
 
                     float t = 1.f;
                     
 
                     if(ray.intersectTriangle(triangle, t)) {
+                        
                         if(t < closestIntersectionDistance) {
+                            foundIntersection = true;
                             closestIntersectionDistance = t;
-                            sceneImage.setPixel(triangle.color[0], triangle.color[1], triangle.color[2], j, i);
+                            sceneImage.setPixel(255, 255, 255, j, i);
                         }
-                    } else {
-                        sceneImage.setPixel((int)(sceneImage.backgroundColor.x *255.f), (int)(sceneImage.backgroundColor.y *255.f), (int)(sceneImage.backgroundColor.z *255.f), j, i);
-                    }             
+                    }            
                 }
             }
+            if(!foundIntersection) sceneImage.setPixel((int)(sceneImage.backgroundColor.x *255.f), (int)(sceneImage.backgroundColor.y *255.f), (int)(sceneImage.backgroundColor.z *255.f), j, i);
+
         }
     }
+    sceneImage.storeImageToFile("../output.ppm");
 }
 
 /*
