@@ -2,10 +2,13 @@
 #define CRTSCENE
 
 #include "camera.hpp"
+#include "crtVector.hpp"
 #include "mesh.hpp"
 #include "ppmImage.hpp"
 #include "settings.hpp"
 #include <string>
+
+
 
 class CRTScene {
     public:
@@ -25,5 +28,10 @@ class CRTScene {
     std::vector<int> lights;
     PPMImage sceneImage;
     CRTSettings sceneSettings;
+
+    std::vector<CRTVector> colors = {CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),
+                                CRTVector(0.f,0.f,1.f),CRTVector(1.f,1.f,1.f),
+                                CRTVector(1.f,1.f,0.f),CRTVector(0.f,1.f,1.f),
+                                CRTVector(1.f,0.f,1.f),CRTVector(0.f,0.f,0.f)};
 };
 #endif

@@ -99,6 +99,7 @@ void CRTScene::render() {
             for(CRTMesh object : sceneObjects) {
                 for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
                     int triangleFirstIndex = object.triangleVertIndices[k];
+                   
                     CRTTriangle triangle(object.triangleSoup[object.triangleVertIndices[k]],
                                         object.triangleSoup[object.triangleVertIndices[k+1]],
                                         object.triangleSoup[object.triangleVertIndices[k+2]]);
@@ -111,7 +112,8 @@ void CRTScene::render() {
                         if(t < closestIntersectionDistance) {
                             foundIntersection = true;
                             closestIntersectionDistance = t;
-                            sceneImage.setPixel(255, 255, 255, j, i);
+                            CRTVector color = colors[triangleFirstIndex % colors.size()];
+                            sceneImage.setPixel(color, j, i);
                         }
                     }            
                 }

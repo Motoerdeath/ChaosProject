@@ -46,6 +46,9 @@ void PPMImage::configureGrid(int x, int y) {
 void PPMImage::setPixel(int r, int g, int b, int x, int y) {
     image[y][x] = {r,g,b};
 }
+void PPMImage::setPixel(CRTVector color, int x, int y) {
+    image[y][x] = {(int) (color.x*255.f),(int) (color.y*255.f),(int) (color.z*255.f)};
+}
 void PPMImage::renderRandomizedBackground() {
 
     for (int y = 0; y < imageHeight; y++) {

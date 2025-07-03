@@ -64,6 +64,7 @@ class PPMImage{
         void clear();
         void resetImage();
         void setPixel(int r, int g, int b, int x, int y);
+        void setPixel(CRTVector color, int x, int y);
         static std::vector<int> generateRandomColorVariance(std::vector<int> base_color);
         void generateCameraRays(CRTVector cameraPosition);
         std::vector<std::vector<CRTRay>> cameraRays;
