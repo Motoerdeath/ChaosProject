@@ -7,7 +7,7 @@
 class CRTVector {
 
     public:
-
+    CRTVector() : x(0.f),y(0.f),z(0.f) {}
     CRTVector(float x, float y, float z) : x{x}, y{y}, z{z} {}
     CRTVector(float all) : x{all}, y{all}, z{all} {}
     float length() const {

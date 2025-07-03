@@ -88,6 +88,30 @@ std::ifstream ifs(sceneFileName);
         }
     }
     sceneObjects = objects;
+
+    std::vector<Light> lights;
+    //import light objects
+    if(doc.HasMember("lights")) {
+        const rapidjson::Value& lightsVal = doc.FindMember("lights")->value;
+        if(!lightsVal.IsNull() && lightsVal.IsArray()) {
+            for(int i = 0; i < lightsVal.Size();i++) {
+                const rapidjson::Value& lightVal = lightsVal[i];
+                assert(lightVal.HasMember("intensity"));
+                assert(lightVal.HasMember("position"));
+                const rapidjson::Value& posVal = lightVal.FindMember("position")->value;
+                float intensity;
+                CRTVector pos;
+                if(!posVal.IsNull() && posVal.IsArray()) {
+                    pos = loadVector(posVal.GetArray());
+                } 
+                const rapidjson::Value& intensitytVal = lightVal.FindMember("intensity")->value;
+                if(!intensitytVal.IsNull() ) {
+                    intensity = static_cast<float> (intensitytVal.GetDouble());
+                } 
+                lights.push_back(Light(pos,intensity));
+            }
+        }
+    }
 }
 void CRTScene::render() {
 

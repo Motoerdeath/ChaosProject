@@ -7,6 +7,7 @@
 #include "ppmImage.hpp"
 #include "settings.hpp"
 #include <string>
+#include "light.hpp"
 
 
 
@@ -25,7 +26,7 @@ class CRTScene {
     std::string sceneFilePath;
     CRTCamera sceneCamera;
     std::vector<CRTMesh> sceneObjects;
-    std::vector<int> lights;
+    std::vector<Light> sceneLights;
     PPMImage sceneImage;
     CRTSettings sceneSettings;
 
