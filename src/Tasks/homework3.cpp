@@ -20,7 +20,7 @@ class Homework3 : public Homework {
     std::string resultFilePath = "../outputs/03_Rays/output.ppm";
     PPMImage image;
     std::vector<std::vector<CRTRay>> pixelRays;
-    CRTCamera camera = CRTCamera(CRTVector(0.f),CRTVector(0.f,0.f,-1.f),width,height);
+    CRTCamera camera = CRTCamera(CRTVector(0.f),width,height);
 
     void setup() override {
 

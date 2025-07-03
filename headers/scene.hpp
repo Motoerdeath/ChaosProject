@@ -9,16 +9,21 @@
 
 class CRTScene {
     public:
-        CRTScene(std::string sceneFileName);
+        CRTScene(std::string sceneFileName){
+            sceneFilePath = sceneFileName;
+            sceneCamera = CRTCamera();
+            //parse();
+        }
 
         void parseSceneFile(const std::string& sceneFileName);
         void render();
+        void parse();
     private:
     std::string sceneFilePath;
-    CRTCamera camera;
-    std::vector<CRTMesh> objects;
+    CRTCamera sceneCamera;
+    std::vector<CRTMesh> sceneObjects;
     std::vector<int> lights;
-    PPMImage image;
-    CRTSettings settings;
+    PPMImage sceneImage;
+    CRTSettings sceneSettings;
 };
 #endif

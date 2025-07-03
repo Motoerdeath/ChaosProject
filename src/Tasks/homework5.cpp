@@ -18,7 +18,7 @@ class Homework5 : public Homework {
     int height = 1080;
     int width = 1920;
     std::vector<CRTTriangle> triangles = {};
-    CRTCamera camera = CRTCamera(CRTVector(0.f),CRTVector(0.f,0.f,-1.f),width,height);
+    CRTCamera camera = CRTCamera(CRTVector(0.f),width,height);
     void renderTriangles(std::vector<CRTTriangle> triangles, PPMImage &image) {
         for(int i = 0; i < height;i++) {
             for(int j = 0; j < width;j++) {

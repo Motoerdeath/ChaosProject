@@ -20,8 +20,9 @@
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/document.h"
 #include <iostream>
-#include "../src/jsonUtilities.cpp"
+//#include "../src/jsonUtilities.cpp"
 #include "../headers/mesh.hpp"
+#include "../headers/scene.hpp"
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
@@ -152,77 +153,12 @@ int main() {
 */
     
     
-    std::string filename = "../inputs/scene0.crtscene";
+    const std::string filename = "../inputs/scene0.crtscene";
 
-    std::ifstream ifs(filename);
-    assert(ifs.is_open());
-    rapidjson::IStreamWrapper isw(ifs);
-    rapidjson::Document doc;
-    doc.ParseStream(isw);
 
-    CRTVector bgColor(0.f);
-    int imageWidth = 0;
-    int imageHeight = 0;
-    assert(doc.HasMember("settings"));
-    const rapidjson::Value& settingsVal = doc.FindMember("settings")->value;
-    //load image settings
-    if(!settingsVal.IsNull() && settingsVal.IsObject()) 
-    {
-        assert(settingsVal.HasMember("background_color"));
-        const rapidjson::Value& bgColorVal = settingsVal.FindMember("background_color")->value;
-        if(!bgColorVal.IsNull() && bgColorVal.IsArray()) {
-            bgColor = loadVector(bgColorVal.GetArray());
-        }
-        assert(settingsVal.HasMember("image_settings") && settingsVal.FindMember("image_settings")->value.HasMember("width") && settingsVal.FindMember("image_settings")->value.HasMember("height"));
-        const rapidjson::Value& widthValue = settingsVal.FindMember("image_settings")->value.FindMember("width")->value;
-        const rapidjson::Value& heightValue = settingsVal.FindMember("image_settings")->value.FindMember("height")->value;
-        if(!widthValue.IsNull() && widthValue.IsInt() && !heightValue.IsNull() && heightValue.IsInt()) {
-            imageWidth = widthValue.GetInt();
-            imageHeight = heightValue.GetInt();
-        }
-    }
-    CRTSettings sceneSettings(bgColor,imageWidth,imageHeight);
-    PPMImage testImage(imageWidth,imageHeight);
-    testImage.backgroundColor = bgColor;
+CRTScene scene(filename);
+scene.parseSceneFile(filename);
 
-    CRTMatrix cameraRotationMatrix(CRTVector(1.f),CRTVector(1.f),CRTVector(1.f));
-    CRTVector cameraPosition(0.f);
-    //load camera information
-    assert(doc.HasMember("camera"));
-    const rapidjson::Value& cameraVal = doc.FindMember("camera")->value;
-    if(!cameraVal.IsNull() && cameraVal.IsObject()) {
-        assert(cameraVal.HasMember("matrix"));
-        assert(cameraVal.HasMember("position"));
-        const rapidjson::Value& cameraMatrixVal = cameraVal.FindMember("matrix")->value;
-        if(!cameraMatrixVal.IsNull() && cameraMatrixVal.IsArray()) {
-            cameraRotationMatrix = loadMatrix(cameraMatrixVal.GetArray());
-        }
-        const rapidjson::Value& cameraPosVal = cameraVal.FindMember("position")->value;
-        if(!cameraPosVal.IsNull() && cameraPosVal.IsArray()) {
-            cameraPosition = loadVector(cameraPosVal.GetArray());
-        }
-    }
-    std::vector<CRTMesh> objects;
-    assert(doc.HasMember("objects"));
-    const rapidjson::Value& objectsVal = doc.FindMember("objects")->value;
-    if(!objectsVal.IsNull() && objectsVal.IsArray()) {
-        for(int i = 0; i < objectsVal.Size();i++) {
-            const rapidjson::Value& objectVal = objectsVal[i];
-            std::vector<int> triangleVertIndices;
-            std::vector<CRTVector> triangleVertices;
-            assert(objectVal.HasMember("vertices"));
-            assert(objectVal.HasMember("triangles"));
-            const rapidjson::Value& verticesVal = objectVal.FindMember("vertices")->value;
-            if(!verticesVal.IsNull() && verticesVal.IsArray()) {
-                triangleVertices = loadVertices(verticesVal.GetArray());
-            }
-            const rapidjson::Value& indicesVal = objectVal.FindMember("triangles")->value;
-            if(!indicesVal.IsNull() && indicesVal.IsArray()) {
-                triangleVertIndices = loadIndices(indicesVal.GetArray());
-            }
-            objects.push_back(CRTMesh(triangleVertices,triangleVertIndices));
-        }
-    }
 /*
 
         const rapidjson::Value::ConstArray objectsArr = objectsVal.GetArray();

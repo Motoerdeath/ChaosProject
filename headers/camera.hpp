@@ -13,14 +13,14 @@ enum Axis{
 class CRTCamera {
 
     public:
-        CRTCamera();
+        CRTCamera() : cameraPosition(CRTVector(0.f)),rotationMatrix(CRTMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f))), imageWidth(1920), imageHeight(1080){}
 
-        CRTCamera(CRTVector pos, CRTVector dir,int width, int height) : 
+        CRTCamera(CRTVector pos, CRTMatrix rotMatrix,int width, int height) : 
         cameraPosition(pos),
-        cameraDirection(dir),
-        rotationMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f), CRTVector(0.f,0.f,1.f)
-    ) {imageWidth = width; imageHeight =height;};
-        
+        rotationMatrix(rotMatrix) {imageWidth = width; imageHeight =height;};
+        CRTCamera(CRTVector pos,int width, int height) : 
+        cameraPosition(pos),
+        rotationMatrix(CRTMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f))) {imageWidth = width; imageHeight =height;};
         void pan(float degs);
         void tilt(float degs);
         void roll(float degs);
@@ -34,7 +34,6 @@ class CRTCamera {
     private:
     CRTVector cameraPosition;
     CRTMatrix rotationMatrix;
-    CRTVector cameraDirection;
     int imageWidth;
     int imageHeight;
 };

@@ -1,5 +1,4 @@
-#ifndef JSONUTILITIES
-#define JSONUTILITIES
+#include "../headers/jsonUtilities.hpp"
 #include "../headers/crtVector.hpp"
 #include "../headers/matrix.hpp"
 #include "rapidjson/rapidjson.h"
@@ -7,9 +6,6 @@
 #include <cassert>
 #include <string>
 #include <vector>
-
-//Values
-std::string sceneSettings = "settings";
 CRTVector loadVector(const rapidjson::Value::ConstArray& bgColorArr) {
     assert(bgColorArr.Size() == 3);
     return CRTVector(static_cast<float>(bgColorArr[0].GetDouble()),
@@ -53,4 +49,4 @@ std::vector<int> loadIndices(const rapidjson::Value::ConstArray& indicesArr) {
     }
     return indices;
 }
-#endif
+
