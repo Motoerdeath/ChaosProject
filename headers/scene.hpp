@@ -20,12 +20,17 @@ class CRTScene {
 
         void parseSceneFile(const std::string& sceneFileName);
         void render();
+        void constantRender();
+        void flatRender();
         void parse();
         bool isShadowed(CRTVector pos,CRTVector lightDir);
+        void traceRay();
+        void traceShadowRay();
         CRTVector shade(CRTVector pos,CRTVector triangleNormal);
+        CRTCamera sceneCamera;
     private:
     std::string sceneFilePath;
-    CRTCamera sceneCamera;
+    
     std::vector<CRTMesh> sceneObjects;
     std::vector<Light> sceneLights;
     PPMImage sceneImage;

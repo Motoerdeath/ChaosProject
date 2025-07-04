@@ -15,6 +15,8 @@ set(CCP_SOURCE_FILES
   ${CMAKE_SOURCE_DIR}/src/camera.cpp
   ${CMAKE_SOURCE_DIR}/src/ppmImage.cpp
   ${CMAKE_SOURCE_DIR}/src/matrix.cpp
+  ${CMAKE_SOURCE_DIR}/src/mesh.cpp
+  ${CMAKE_SOURCE_DIR}/src/triangle.cpp
   
 )
 

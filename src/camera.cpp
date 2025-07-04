@@ -25,7 +25,7 @@ void CRTCamera::pan(float degs) {
     rotationMatrix = rotationMatrix * CRTMatrix::getRotationMatrixAroundY(degs);
 }
 void CRTCamera::tilt(float degs) {
-    rotationMatrix = rotationMatrix * CRTMatrix::getRotationMatrixAroundX(degs);
+    rotationMatrix =  rotationMatrix * CRTMatrix::getRotationMatrixAroundX(degs);
 }
 void CRTCamera::roll(float degs) {
     rotationMatrix = rotationMatrix * CRTMatrix::getRotationMatrixAroundZ(degs);
@@ -55,6 +55,6 @@ CRTRay CRTCamera::generateCameraRay(int row, int column) {
     float screenY = 1.0f - (2.0f*ndcY);
     screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
 
-    CRTVector normalizedVector =(rotationMatrix * CRTVector(screenX,screenY,-1.0f)).normalize();
+    CRTVector normalizedVector =( CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
     return CRTRay(cameraPosition,normalizedVector);
 }

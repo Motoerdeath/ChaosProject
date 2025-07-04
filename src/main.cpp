@@ -23,6 +23,8 @@
 //#include "../src/jsonUtilities.cpp"
 #include "../headers/mesh.hpp"
 #include "../headers/scene.hpp"
+#include "glm/ext/matrix_transform.hpp"
+
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
@@ -153,13 +155,48 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework8_Lights/scene2.crtscene";
+    const std::string filename = "../inputs/Homework8_Lights/scene3.crtscene";
+
+/**/
 
 
+/*
+glm::mat4 m(glm::vec4(1.f,0.f,0.f,0.f),glm::vec4(0.f,1.f,0.f,0.f),glm::vec4(0.f,0.f,1.f,0.f),glm::vec4(0.f,0.f,0.f,1.f));
+std::cout << m[0][0] << ","  << m[0][1] << "," << m[0][2] <<  "," <<m[0][3] <<std::endl;
+std::cout << m[1][0] << ","  << m[1][1] << "," << m[1][2] <<  "," <<m[1][3] <<std::endl;
+std::cout << m[2][0] << ","  << m[2][1] << "," << m[2][2] <<  "," <<m[2][3] <<std::endl;
+std::cout << m[3][0] << ","  << m[3][1] << "," << m[3][2] <<  "," <<m[3][3] <<std::endl;
+glm::mat4 val = glm::rotate(m, -0.44f, glm::vec3(1.f,0.f,0.f));
+std::cout << val[0][0] << ","  << val[0][1] << "," << val[0][2] <<  "," <<val[0][3] <<std::endl;
+std::cout << val[1][0] << ","  << val[1][1] << "," << val[1][2] <<  "," <<val[1][3] <<std::endl;
+std::cout << val[2][0] << ","  << val[2][1] << "," << val[2][2] <<  "," <<val[2][3] <<std::endl;
+std::cout << val[3][0] << ","  << val[3][1] << "," << val[3][2] <<  "," <<val[3][3] <<std::endl;
+val.length();
+*/
 CRTScene scene(filename);
 scene.parseSceneFile(filename);
-
 scene.render();
+/*
+CRTVector v0(1.f,0.f,0.f);
+CRTVector v1(0.f,1.f,0.f);
+CRTVector v2(0.f,0.f,1.f);
+CRTMatrix m = CRTMatrix::getRotationMatrixAroundX(-25.f);
+CRTMatrix c = scene.sceneCamera.rotationMatrix;
+
+CRTVector v01 = m*v0;
+std::cout << v01.x << ","  << v01.y << "," << v01.z << std::endl;
+CRTVector v11 = m*v1;
+std::cout << v11.x << ","  << v11.y << "," << v11.z << std::endl;
+CRTVector v21 = m*v2;
+std::cout << v21.x << ","  << v21.y << "," << v21.z << std::endl;
+CRTVector v02 = c*v0;
+std::cout << v02.x << ","  << v02.y << "," << v02.z << std::endl;
+CRTVector v12 = c*v1;
+std::cout << v12.x << ","  << v12.y << "," << v12.z << std::endl;
+CRTVector v22 = c*v2;
+std::cout << v22.x << ","  << v22.y << "," << v22.z << std::endl;
+*/
+//
 
 
 

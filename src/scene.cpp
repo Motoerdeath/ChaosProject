@@ -10,7 +10,7 @@
 
 void CRTScene::parse() {
     for(CRTMesh m : sceneObjects) {
-        for(CRTVector t : m.triangleSoup) {
+        for(CRTVector t : m.triangleVertices) {
             std::cout << t.x << ","  << t.y << "," << t.z << std::endl;
         }
     }
@@ -117,15 +117,23 @@ std::ifstream ifs(sceneFileName);
 }
 
 
+
+void CRTScene::traceRay() {
+
+}
+void CRTScene::traceShadowRay() {
+    
+}
+
 bool CRTScene::isShadowed(CRTVector pos, CRTVector lightDir) {
     CRTRay shadowRay(pos,lightDir);
 
             for(CRTMesh object : sceneObjects) {
                 for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
                     int triangleFirstIndex = object.triangleVertIndices[k];
-                    CRTTriangle triangle(object.triangleSoup[object.triangleVertIndices[k]],
-                                        object.triangleSoup[object.triangleVertIndices[k+1]],
-                                        object.triangleSoup[object.triangleVertIndices[k+2]]);
+                    CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[k]],
+                                        object.triangleVertices[object.triangleVertIndices[k+1]],
+                                        object.triangleVertices[object.triangleVertIndices[k+2]]);
                     float t = 1.f;
                     if(shadowRay.intersectTriangle(triangle, t,true)) {
                         
@@ -158,7 +166,6 @@ CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
 }
 void CRTScene::render() {
 
-    sceneCamera.tilt(-50.f);
     //iterate over all pixels
     for(int i = 0; i < sceneSettings.imageHeight;i++) {
         for(int j = 0; j < sceneSettings.imageWidth;j++) {
@@ -175,9 +182,9 @@ void CRTScene::render() {
             for(CRTMesh object : sceneObjects) {
                 for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
                     int triangleFirstIndex = object.triangleVertIndices[k];
-                    CRTTriangle triangle(object.triangleSoup[object.triangleVertIndices[k]],
-                                        object.triangleSoup[object.triangleVertIndices[k+1]],
-                                        object.triangleSoup[object.triangleVertIndices[k+2]]);
+                    CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[k]],
+                                        object.triangleVertices[object.triangleVertIndices[k+1]],
+                                        object.triangleVertices[object.triangleVertIndices[k+2]]);
                     float t = 1.f;
                     if(ray.intersectTriangle(triangle, t,false)) {
                         

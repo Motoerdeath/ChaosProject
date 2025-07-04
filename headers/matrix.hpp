@@ -24,23 +24,23 @@ class CRTMatrix{
         const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
             CRTVector(1.0f,0.0f,0.0f),
-            CRTVector(0.0f,std::cos(rads),-std::sin(rads)),
-            CRTVector(0.0f,std::sin(rads),std::cos(rads))
+            CRTVector(0.0f,std::cos(rads),std::sin(rads)),
+            CRTVector(0.0f,-std::sin(rads),std::cos(rads))
         );
     }
     CRTMatrix static getRotationMatrixAroundY(float degs) {
         const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
-            CRTVector(std::cos(rads),0.0f,std::sin(rads)),
+            CRTVector(std::cos(rads),0.0f,-std::sin(rads)),
             CRTVector(0.0f,1.0f,0.0f),
-            CRTVector(-std::sin(rads),0.0f,std::cos(rads))
+            CRTVector(std::sin(rads),0.0f,std::cos(rads))
         );
     }
     CRTMatrix static getRotationMatrixAroundZ(float degs) {
         const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
-            CRTVector(std::cos(rads),-std::sin(rads),0.0f),
-            CRTVector(std::sin(rads),std::cos(rads),0.0f),
+            CRTVector(std::cos(rads),std::sin(rads),0.0f),
+            CRTVector(-std::sin(rads),std::cos(rads),0.0f),
             CRTVector(0.0f,0.0f,1.0f)
         );
     }
@@ -58,22 +58,24 @@ class CRTMatrix{
                 lhs.getElement(2, 0)*rhs.x+lhs.getElement(2, 1)*rhs.y+lhs.getElement(2, 2)*rhs.z
             );
     }
+    /*
     friend CRTVector operator*(const CRTVector& lhs, const CRTMatrix& rhs) {
             return CRTVector(rhs.getElement(0, 0)*lhs.x+rhs.getElement(0, 1)*lhs.y+rhs.getElement(0, 2)*lhs.z,
                 rhs.getElement(1, 0)*lhs.x+rhs.getElement(1, 1)*lhs.y+rhs.getElement(1, 2)*lhs.z,
                 rhs.getElement(2, 0)*lhs.x+rhs.getElement(2, 1)*lhs.y+rhs.getElement(2, 2)*lhs.z
             );
     };
-    /*
-    CRTVector operator*(const CRTVector lhs, const CRTMatrix rhs) const {
+    */
+    
+    friend CRTVector operator*(const CRTVector lhs, const CRTMatrix rhs) {
     return 
-        CRTVector(lhs*rhs.getElement(0, 0) + y *rhs.getElement(1, 0) + z *rhs.getElement(2, 0),
-                x*rhs.getElement(0, 1) + y *rhs.getElement(1, 1) + z *rhs.getElement(2, 1),
-                x*rhs.getElement(0, 2) + y *rhs.getElement(1, 2) + z *rhs.getElement(2, 2)
+        CRTVector(lhs.x*rhs.getElement(0, 0) + lhs.y *rhs.getElement(1, 0) + lhs.z *rhs.getElement(2, 0),
+                lhs.x*rhs.getElement(0, 1) + lhs.y *rhs.getElement(1, 1) + lhs.z *rhs.getElement(2, 1),
+                lhs.x*rhs.getElement(0, 2) + lhs.y *rhs.getElement(1, 2) + lhs.z *rhs.getElement(2, 2)
     
     );
     }
-    */
+    
 
     friend CRTMatrix operator*(const CRTMatrix& lhs, const CRTMatrix& rhs) {
         CRTVector v0(
