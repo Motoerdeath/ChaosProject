@@ -1,6 +1,7 @@
 #include "../headers/scene.hpp"
 #include "../headers/triangle.hpp"
 #include"rapidjson/rapidjson.h"
+#include <algorithm>
 #include <fstream>
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
@@ -115,6 +116,25 @@ std::ifstream ifs(sceneFileName);
     sceneLights = lights;
 }
 
+
+bool CRTScene::isShadowed(CRTVector pos, CRTVector lightDir) {
+    CRTRay shadowRay(pos,lightDir);
+
+            for(CRTMesh object : sceneObjects) {
+                for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
+                    int triangleFirstIndex = object.triangleVertIndices[k];
+                    CRTTriangle triangle(object.triangleSoup[object.triangleVertIndices[k]],
+                                        object.triangleSoup[object.triangleVertIndices[k+1]],
+                                        object.triangleSoup[object.triangleVertIndices[k+2]]);
+                    float t = 1.f;
+                    if(shadowRay.intersectTriangle(triangle, t,true)) {
+                        
+                        return true;
+                    }     
+                }
+            }  
+    return false;
+}
 CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
     CRTVector color(0.f);
     CRTVector albedo = CRTVector(0.4f);
@@ -123,11 +143,14 @@ CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
     for(Light source : sceneLights) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - adjPos);
+        if(isShadowed(adjPos, lD.normalize())) continue;
         float lDLength = lD.length();
         //determine if surface is oriented towards light
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), triangleNormal));
+        if(cosLaw ==0.f) continue;
         float distanceFallOff = 4*M_PI*lDLength*lDLength;
-        color = color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
+        CRTVector temp = color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
+        color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.y,0.f,1.f));
         //color = CRTVector(cosLaw);
         //color = CRTVector(lDLength);
     }
@@ -135,6 +158,7 @@ CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
 }
 void CRTScene::render() {
 
+    sceneCamera.tilt(-50.f);
     //iterate over all pixels
     for(int i = 0; i < sceneSettings.imageHeight;i++) {
         for(int j = 0; j < sceneSettings.imageWidth;j++) {
@@ -155,7 +179,7 @@ void CRTScene::render() {
                                         object.triangleSoup[object.triangleVertIndices[k+1]],
                                         object.triangleSoup[object.triangleVertIndices[k+2]]);
                     float t = 1.f;
-                    if(ray.intersectTriangle(triangle, t)) {
+                    if(ray.intersectTriangle(triangle, t,false)) {
                         
                         if(t < closestIntersectionDistance) {
                             foundIntersection = true;

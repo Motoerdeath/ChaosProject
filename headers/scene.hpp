@@ -21,6 +21,7 @@ class CRTScene {
         void parseSceneFile(const std::string& sceneFileName);
         void render();
         void parse();
+        bool isShadowed(CRTVector pos,CRTVector lightDir);
         CRTVector shade(CRTVector pos,CRTVector triangleNormal);
     private:
     std::string sceneFilePath;

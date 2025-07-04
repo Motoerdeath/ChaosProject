@@ -27,7 +27,7 @@ class Homework5 : public Homework {
                 for(CRTTriangle triangle : triangles) {
                     float t = 1.f;
                     
-                    if(ray.intersectTriangle(triangle, t)) {
+                    if(ray.intersectTriangle(triangle, t,false)) {
                         if(t < lowestDistance) {
                             lowestDistance = t;
                             image.setPixel(triangle.color[0], triangle.color[1], triangle.color[2], j, i);
