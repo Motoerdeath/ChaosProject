@@ -153,7 +153,7 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework7_Scene/scene1.crtscene";
+    const std::string filename = "../inputs/Homework8_Lights/scene0.crtscene";
 
 
 CRTScene scene(filename);

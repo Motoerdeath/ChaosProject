@@ -16,12 +16,12 @@ class CRTScene {
         CRTScene(std::string sceneFileName){
             sceneFilePath = sceneFileName;
             sceneCamera = CRTCamera();
-            //parse();
         }
 
         void parseSceneFile(const std::string& sceneFileName);
         void render();
         void parse();
+        CRTVector shade(CRTVector pos,CRTVector triangleNormal);
     private:
     std::string sceneFilePath;
     CRTCamera sceneCamera;
