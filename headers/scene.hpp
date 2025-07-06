@@ -8,6 +8,7 @@
 #include "settings.hpp"
 #include <string>
 #include "light.hpp"
+#include "rapidjson/document.h"
 
 
 
@@ -26,11 +27,19 @@ class CRTScene {
         bool isShadowed(CRTVector pos,CRTVector lightDir);
         void traceRay();
         void traceShadowRay();
+        void outputResult();
+        void outputResult(std::string outputFilePath) { sceneImage.storeImageToFile(outputFilePath);};
+
+        void importSettings(rapidjson::Document& doc);
+        void importCamera(rapidjson::Document& doc, int width, int height);
+        void importObjects(rapidjson::Document& doc);
+        void importLights(rapidjson::Document& doc);
+        void importMaterials(rapidjson::Document& doc);
+
         CRTVector shade(CRTVector pos,CRTVector triangleNormal);
         CRTCamera sceneCamera;
     private:
     std::string sceneFilePath;
-    
     std::vector<CRTMesh> sceneObjects;
     std::vector<Light> sceneLights;
     PPMImage sceneImage;

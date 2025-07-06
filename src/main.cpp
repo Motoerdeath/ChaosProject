@@ -155,7 +155,7 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework8_Lights/scene3.crtscene";
+    const std::string filename = "../inputs/Homework8_Lights/scene2.crtscene";
 
 /**/
 
@@ -174,8 +174,14 @@ std::cout << val[3][0] << ","  << val[3][1] << "," << val[3][2] <<  "," <<val[3]
 val.length();
 */
 CRTScene scene(filename);
+std::printf("Begin importing scene.\n");
 scene.parseSceneFile(filename);
+std::printf("finished importing scene.\n");
+std::printf("Begin rendering scene.\n");
 scene.render();
+std::printf("finished rendering scene.\n");
+scene.outputResult("../output.ppm");
+std::printf("finished storing output.\n");
 /*
 CRTVector v0(1.f,0.f,0.f);
 CRTVector v1(0.f,1.f,0.f);

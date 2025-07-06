@@ -15,12 +15,8 @@ void CRTScene::parse() {
         }
     }
 }
-void CRTScene::parseSceneFile(const std::string& sceneFileName){
-std::ifstream ifs(sceneFileName);
-    assert(ifs.is_open());
-    rapidjson::IStreamWrapper isw(ifs);
-    rapidjson::Document doc;
-    doc.ParseStream(isw);
+
+void CRTScene::importSettings(rapidjson::Document& doc){
 
     CRTVector bgColor(0.f);
     int imageWidth = 0;
@@ -48,6 +44,10 @@ std::ifstream ifs(sceneFileName);
     PPMImage image(imageWidth,imageHeight);
     image.backgroundColor = bgColor;
     sceneImage = image;
+
+}
+void CRTScene::importCamera(rapidjson::Document& doc, int width, int height){
+
     CRTMatrix cameraRotationMatrix(CRTVector(1.f),CRTVector(1.f),CRTVector(1.f));
     CRTVector cameraPosition(0.f);
     //load camera information
@@ -65,7 +65,10 @@ std::ifstream ifs(sceneFileName);
             cameraPosition = loadVector(cameraPosVal.GetArray());
         }
     }
-    sceneCamera = CRTCamera(cameraPosition,cameraRotationMatrix,imageWidth,imageHeight);
+    sceneCamera = CRTCamera(cameraPosition,cameraRotationMatrix,width,height);
+}
+
+void CRTScene::importObjects(rapidjson::Document& doc){
 
     std::vector<CRTMesh> objects;
     assert(doc.HasMember("objects"));
@@ -89,6 +92,10 @@ std::ifstream ifs(sceneFileName);
         }
     }
     sceneObjects = objects;
+
+}
+
+void CRTScene::importLights(rapidjson::Document& doc){
 
     std::vector<Light> lights;
     //import light objects
@@ -114,6 +121,28 @@ std::ifstream ifs(sceneFileName);
         }
     }
     sceneLights = lights;
+}
+void CRTScene::importMaterials(rapidjson::Document& doc){
+
+    
+}
+
+void CRTScene::parseSceneFile(const std::string& sceneFileName){
+std::ifstream ifs(sceneFileName);
+    assert(ifs.is_open());
+    rapidjson::IStreamWrapper isw(ifs);
+    rapidjson::Document doc;
+    doc.ParseStream(isw);
+
+    importSettings(doc);
+    importCamera(doc, sceneSettings.imageWidth, sceneSettings.imageHeight);
+
+    importObjects(doc);
+
+    importLights(doc);
+
+
+    //import materials
 }
 
 
@@ -212,5 +241,7 @@ void CRTScene::render() {
             sceneImage.setPixel(color, j, i);
         }
     }
-    sceneImage.storeImageToFile("../output.ppm");
+    //sceneImage.storeImageToFile("../output.ppm");
 }
+
+

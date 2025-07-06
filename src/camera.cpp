@@ -55,6 +55,6 @@ CRTRay CRTCamera::generateCameraRay(int row, int column) {
     float screenY = 1.0f - (2.0f*ndcY);
     screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
 
-    CRTVector normalizedVector =( CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
+    CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
     return CRTRay(cameraPosition,normalizedVector);
 }
