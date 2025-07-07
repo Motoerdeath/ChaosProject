@@ -9,6 +9,7 @@
 #include <string>
 #include "light.hpp"
 #include "rapidjson/document.h"
+#include "../headers/material.hpp"
 
 
 
@@ -43,6 +44,7 @@ class CRTScene {
     std::string sceneFilePath;
     std::vector<CRTMesh> sceneObjects;
     std::vector<Light> sceneLights;
+    std::vector<Material> sceneMaterials;
     PPMImage sceneImage;
     CRTSettings sceneSettings;
 

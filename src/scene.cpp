@@ -91,7 +91,13 @@ void CRTScene::importObjects(rapidjson::Document& doc){
             if(!indicesVal.IsNull() && indicesVal.IsArray()) {
                 triangleVertIndices = loadIndices(indicesVal.GetArray());
             }
-            objects.push_back(CRTMesh(triangleVertices,triangleVertIndices));
+            int mID = 0;
+            if(objectVal.HasMember("material_index")) {
+                const rapidjson::Value& mIDVal = objectVal.FindMember("material_index")->value;
+                assert(mIDVal.IsInt());
+                mID = mIDVal.GetInt();
+            }
+            objects.push_back(CRTMesh(triangleVertices,triangleVertIndices,mID));
         }
     }
     sceneObjects = objects;
@@ -126,8 +132,41 @@ void CRTScene::importLights(rapidjson::Document& doc){
     sceneLights = lights;
 }
 void CRTScene::importMaterials(rapidjson::Document& doc){
-
-    
+    Material mat;
+    if(doc.HasMember("materials")) {
+        const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
+        assert(materialsVal.HasMember("type") && materialsVal.HasMember("albedo") && materialsVal.HasMember("smooth_shading"));
+        std::string temp = materialsVal.FindMember("type")->value.GetString();
+        MaterialType matType;
+        if(temp.std::string::compare("reflective")) {
+            matType = reflective;
+        } else {
+            matType = diffuse;
+        }
+        RenderingStyle style;
+        if(materialsVal.FindMember("smooth_shading")->value.GetBool()) {
+            style = smooth;
+        } else {
+            if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                style = flat;
+            } else {
+                style = constant;
+            }
+        }
+        CRTVector albedo = loadVector(materialsVal.FindMember("albedo")->value.GetArray());
+        mat = Material(matType,albedo,style);
+    } else {
+        CRTVector albedo(0.4f);
+        MaterialType matType = diffuse;
+        RenderingStyle style;
+        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                style = flat;
+        } else {
+                style = constant;
+        }
+        mat = Material(matType,albedo,style);
+    }
+    sceneMaterials.push_back(mat);
 }
 
 void CRTScene::parseSceneFile(const std::string& sceneFileName){
@@ -179,7 +218,7 @@ CRTVector CRTScene::flatShade(CRTVector pos,CRTVector triangleNormal) {
     CRTVector color(0.f);
     CRTVector albedo = CRTVector(0.4f);
     //remove shadowacne by offsetting position a small amount in the direction of the normal
-    CRTVector adjPos = pos + triangleNormal*0.00001f;
+    CRTVector adjPos = pos + triangleNormal*0.01f;
     for(Light source : sceneLights) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - adjPos);
@@ -201,7 +240,7 @@ CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
     CRTVector color(0.f);
     CRTVector albedo = CRTVector(0.4f);
     //remove shadowacne by offsetting position a small amount in the direction of the normal
-    CRTVector adjPos = pos + triangleNormal*0.1f;
+    //CRTVector adjPos = pos + triangleNormal*0.1f;
     for(Light source : sceneLights) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - pos);
@@ -256,7 +295,7 @@ void CRTScene::render() {
                             objectIndex = p;
                             std::vector<float> bary = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
                             smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.vertexNormals[object.triangleVertIndices[k+1]]*bary[0] + object.vertexNormals[object.triangleVertIndices[k+2]]*bary[1];
-                            //intersectionPoint = intersectionPoint + triangle.normal*0.001f;
+                            intersectionPoint = intersectionPoint + triangle.normal*0.1f;
                         }
                     }     
                 }
@@ -269,14 +308,7 @@ void CRTScene::render() {
             if(foundIntersection) {
                 std::vector<float> uvCoordinates = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
                 
-                CRTVector smoothedNormal = isecObject->vertexNormals[isecObject->triangleVertIndices[intersectedTriangleIndex]];
-                if(p == 0) {
-                    std::cout << "HIT"  << std::endl;
-                    std::cout << isecObject->vertexNormals.size()  << std::endl;
-                    std::cout << isecObject->triangleVertices.size()   << std::endl;
-                    std::cout << intersectedTriangle.normal.x << ","  << intersectedTriangle.normal.y << "," << intersectedTriangle.normal.z << std::endl;
-                    std::cout << smoothedNormal.x << ","  << smoothedNormal.y << "," << smoothedNormal.z << std::endl;
-                }
+
                 color= shade(intersectionPoint, smoothedNormal1);
                 //color = smoothedNormal1;
                 //color = intersectedTriangle.normal;
