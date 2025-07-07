@@ -37,7 +37,18 @@ class CRTRay {
             CRTVector v0p = intersection-triangle.v0;
             CRTVector v1p = intersection-triangle.v1;
             CRTVector v2p = intersection-triangle.v2;
-            //check if intersection point is in triangle
+
+            //use barycentric coordinates to determine whether point lies within triangle
+            /*
+            
+            std::vector<float> uvCoords = CRTTriangle::calculateBarycentricCoordinates(triangle, intersection);
+            if(uvCoords[0] >=0.f && uvCoords[1]>=0.f && uvCoords[0] <= 1.f && uvCoords[1] <= 1.f && uvCoords[0]+uvCoords[1]<= 1.f) {
+                t = t1;
+                return true;
+            }
+            */
+
+            //check if intersection point is in triangle, by checking whether it is "on the left" of each triangle side
             if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >=0 && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >=0 && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >=0 ) {
                 t = t1;
                 return true;

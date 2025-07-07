@@ -7,11 +7,14 @@
 #include "rapidjson/istreamwrapper.h"
 #include "../headers/jsonUtilities.hpp"
 #include <iostream>
+#include <vector>
 
 void CRTScene::parse() {
     for(CRTMesh m : sceneObjects) {
+        std::cout << m.vertexNormals.size() << std::endl;
+        std::cout << m.triangleVertices.size() << std::endl;
         for(CRTVector t : m.triangleVertices) {
-            std::cout << t.x << ","  << t.y << "," << t.z << std::endl;
+            //std::cout << t.x << ","  << t.y << "," << t.z << std::endl;
         }
     }
 }
@@ -172,7 +175,7 @@ bool CRTScene::isShadowed(CRTVector pos, CRTVector lightDir) {
             }  
     return false;
 }
-CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
+CRTVector CRTScene::flatShade(CRTVector pos,CRTVector triangleNormal) {
     CRTVector color(0.f);
     CRTVector albedo = CRTVector(0.4f);
     //remove shadowacne by offsetting position a small amount in the direction of the normal
@@ -181,6 +184,28 @@ CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - adjPos);
         if(isShadowed(adjPos, lD.normalize())) continue;
+        float lDLength = lD.length();
+        //determine if surface is oriented towards light
+        float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), triangleNormal));
+        if(cosLaw ==0.f) continue;
+        float distanceFallOff = 4*M_PI*lDLength*lDLength;
+        CRTVector temp = color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
+        color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.y,0.f,1.f));
+        //color = CRTVector(cosLaw);
+        //color = CRTVector(lDLength);
+    }
+    return color;
+}
+
+CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
+    CRTVector color(0.f);
+    CRTVector albedo = CRTVector(0.4f);
+    //remove shadowacne by offsetting position a small amount in the direction of the normal
+    CRTVector adjPos = pos + triangleNormal*0.1f;
+    for(Light source : sceneLights) {
+        //determine vector to light source from intersectionPoint
+        CRTVector lD = (source.lightPosition - pos);
+        if(isShadowed(pos, lD.normalize())) continue;
         float lDLength = lD.length();
         //determine if surface is oriented towards light
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), triangleNormal));
@@ -206,6 +231,10 @@ void CRTScene::render() {
             int intersectedTriangleIndex;
             CRTTriangle intersectedTriangle;
             CRTVector intersectionPoint;
+            CRTVector smoothedNormal1;
+            CRTMesh* isecObject;
+            int objectIndex;
+            int p = 0;
 
             //trace the ray through the scene to determine closest intersected Triangle
             for(CRTMesh object : sceneObjects) {
@@ -223,17 +252,35 @@ void CRTScene::render() {
                             intersectedTriangleIndex = k;
                             intersectionPoint = ray.rayOrigin + ray.rayDirection*t;
                             intersectedTriangle = triangle;
+                            isecObject = &object;
+                            objectIndex = p;
+                            std::vector<float> bary = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
+                            smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.vertexNormals[object.triangleVertIndices[k+1]]*bary[0] + object.vertexNormals[object.triangleVertIndices[k+2]]*bary[1];
+                            //intersectionPoint = intersectionPoint + triangle.normal*0.001f;
                         }
                     }     
                 }
+                p++;
             }  
             
             //perform shading
             //CRTVector color = colors[intersectedTriangleIndex % colors.size()];
             CRTVector color;
             if(foundIntersection) {
-                color= shade(intersectionPoint, intersectedTriangle.normal);
-                //color = CRTVector(1.f);
+                std::vector<float> uvCoordinates = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
+                
+                CRTVector smoothedNormal = isecObject->vertexNormals[isecObject->triangleVertIndices[intersectedTriangleIndex]];
+                if(p == 0) {
+                    std::cout << "HIT"  << std::endl;
+                    std::cout << isecObject->vertexNormals.size()  << std::endl;
+                    std::cout << isecObject->triangleVertices.size()   << std::endl;
+                    std::cout << intersectedTriangle.normal.x << ","  << intersectedTriangle.normal.y << "," << intersectedTriangle.normal.z << std::endl;
+                    std::cout << smoothedNormal.x << ","  << smoothedNormal.y << "," << smoothedNormal.z << std::endl;
+                }
+                color= shade(intersectionPoint, smoothedNormal1);
+                //color = smoothedNormal1;
+                //color = intersectedTriangle.normal;
+                //color = CRTVector(uvCoordinates[0],uvCoordinates[1],0.f);
             } else {
                 color = sceneImage.backgroundColor;
                 //sceneImage.setPixel((int)(sceneImage.backgroundColor.x *255.f), (int)(sceneImage.backgroundColor.y *255.f), (int)(sceneImage.backgroundColor.z *255.f), j, i);
