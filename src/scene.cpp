@@ -1,6 +1,5 @@
 #include "../headers/scene.hpp"
 #include "../headers/triangle.hpp"
-#include"rapidjson/rapidjson.h"
 #include <algorithm>
 #include <fstream>
 #include "rapidjson/document.h"
@@ -257,7 +256,21 @@ CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal) {
     }
     return color;
 }
+
+//implementing the ray offset method from A Fast and Robust Method for Avoiding Self-Intersection by Wächter & Binder
+//
+
+
+//CRTVector determineHitLocation(CRTVector rayOrigin, CRTVector rayDirection, float rayDistance);
 void CRTScene::render() {
+
+    /*
+    CRTVector pos(2.f,0.f,-1.f);
+    CRTVector normal(1.f,0.f,0.f);
+
+    CRTVector test = offsetRay(pos, normal);
+    std::cout << test.x << ","  << test.y << "," << test.z << std::endl;
+    */
 
     //iterate over all pixels
     for(int i = 0; i < sceneSettings.imageHeight;i++) {
@@ -270,7 +283,9 @@ void CRTScene::render() {
             int intersectedTriangleIndex;
             CRTTriangle intersectedTriangle;
             CRTVector intersectionPoint;
+            CRTVector intersectionPoint_bary;
             CRTVector smoothedNormal1;
+            CRTVector final_point;
             CRTMesh* isecObject;
             int objectIndex;
             int p = 0;
@@ -295,7 +310,11 @@ void CRTScene::render() {
                             objectIndex = p;
                             std::vector<float> bary = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
                             smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.vertexNormals[object.triangleVertIndices[k+1]]*bary[0] + object.vertexNormals[object.triangleVertIndices[k+2]]*bary[1];
+                            intersectionPoint_bary = object.triangleVertices[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.triangleVertices[object.triangleVertIndices[k+1]]*bary[0] + object.triangleVertices[object.triangleVertIndices[k+2]]*bary[1];
                             intersectionPoint = intersectionPoint + triangle.normal*0.1f;
+                            final_point = intersectionPoint_bary + triangle.normal*0.1f;
+                            intersectionPoint_bary = CRTRay::offsetRay(intersectionPoint_bary, triangle.normal);
+                            final_point = CRTRay::offsetRay(intersectionPoint_bary, triangle.normal);
                         }
                     }     
                 }
@@ -309,7 +328,7 @@ void CRTScene::render() {
                 std::vector<float> uvCoordinates = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
                 
 
-                color= shade(intersectionPoint, smoothedNormal1);
+                color= shade(final_point, smoothedNormal1);
                 //color = smoothedNormal1;
                 //color = intersectedTriangle.normal;
                 //color = CRTVector(uvCoordinates[0],uvCoordinates[1],0.f);

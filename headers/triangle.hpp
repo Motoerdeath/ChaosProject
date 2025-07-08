@@ -13,6 +13,7 @@ class CRTTriangle {
         CRTVector calculateTriangleNormal() {
             return (v1-v0).cross(v2-v0).normalize();
         }
+        CRTVector determineHitLocation(CRTVector rayOrigin,CRTVector rayDirection,float rayDistance);
         CRTVector v0;
         CRTVector v1;
         CRTVector v2;

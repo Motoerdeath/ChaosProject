@@ -22,6 +22,7 @@ class Homework5 : public Homework {
     void renderTriangles(std::vector<CRTTriangle> triangles, PPMImage &image) {
         for(int i = 0; i < height;i++) {
             for(int j = 0; j < width;j++) {
+                bool foundIntersection = false;
                 CRTRay ray = camera.generateCameraRay(i, j);
                 float lowestDistance = FLT_MAX;
                 for(CRTTriangle triangle : triangles) {
@@ -29,14 +30,18 @@ class Homework5 : public Homework {
                     
                     if(ray.intersectTriangle(triangle, t,false)) {
                         if(t < lowestDistance) {
+                            foundIntersection = true;
                             lowestDistance = t;
                             image.setPixel(triangle.color[0], triangle.color[1], triangle.color[2], j, i);
                         }
-                    } else {
-                        image.setPixel((int)(image.backgroundColor.x *255.f), (int)(image.backgroundColor.y *255.f), (int)(image.backgroundColor.z *255.f), j, i);
                     }
                 }
+                if(!foundIntersection) {
+                    image.setPixel((int)(image.backgroundColor.x *255.f), (int)(image.backgroundColor.y *255.f), (int)(image.backgroundColor.z *255.f), j, i);
+
+                }
             }
+
         }
     }
 
@@ -48,7 +53,7 @@ class Homework5 : public Homework {
 
         //Task1: render one triangle with specific coordinates
         CRTTriangle triangle1(CRTVector(-1.75f,-1.75f,-3.f),CRTVector(1.75f,-1.75f,-3.f),CRTVector(0.f,1.75f,-3.f));
-        triangle1.color = {255,255,255};
+        triangle1.color = {0,255,0};
         triangles.push_back(triangle1);
 
         //image.generateCameraRays(cameraPosition);

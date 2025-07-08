@@ -32,7 +32,7 @@ bool RAYS = true;
 
 
 int main() {
-  /*  
+  
     Homework2 homework2;
     homework2.execute();
 
@@ -44,7 +44,7 @@ int main() {
 
     Homework5 homework5;
     homework5.execute();
- */
+ 
     //Homework6 Task1
 /*
     CRTVector a(1.f,1.f,1.f);
@@ -173,6 +173,8 @@ std::cout << val[2][0] << ","  << val[2][1] << "," << val[2][2] <<  "," <<val[2]
 std::cout << val[3][0] << ","  << val[3][1] << "," << val[3][2] <<  "," <<val[3][3] <<std::endl;
 val.length();
 */
+
+/*
 CRTScene scene(filename);
 std::printf("Begin importing scene.\n");
 scene.parseSceneFile(filename);
@@ -182,6 +184,7 @@ scene.render();
 std::printf("finished rendering scene.\n");
 scene.outputResult("../output.ppm");
 std::printf("finished storing output.\n");
+*/
 /*
 CRTVector v0(1.f,0.f,0.f);
 CRTVector v1(0.f,1.f,0.f);

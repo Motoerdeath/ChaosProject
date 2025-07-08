@@ -19,3 +19,8 @@ std::vector<float> CRTTriangle::calculateBarycentricCoordinates(const CRTTriangl
     float z = 1.f-u-v;
     return {u,v};
 }
+
+CRTVector CRTTriangle::determineHitLocation(CRTVector rayOrigin,CRTVector rayDirection,float rayDistance) {
+    
+    return CRTVector(0.f);
+}
