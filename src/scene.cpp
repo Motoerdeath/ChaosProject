@@ -182,7 +182,7 @@ std::ifstream ifs(sceneFileName);
 
     importLights(doc);
 
-
+    importMaterials(doc);
     //import materials
 }
 
@@ -287,7 +287,8 @@ CRTVector CRTScene::flatShade(CRTVector pos,CRTVector triangleNormal) {
 
 CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal, Intersection& isect) {
     CRTVector color(0.f);
-    CRTVector albedo = CRTVector(0.4f);
+    //CRTVector albedo = CRTVector(0.4f);
+    CRTVector albedo = sceneMaterials[isect.intersectedObject->materialID].albedo;
     //remove shadowacne by offsetting position a small amount in the direction of the normal
     //CRTVector adjPos = pos + triangleNormal*0.1f;
     for(Light source : sceneLights) {
