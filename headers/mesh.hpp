@@ -13,9 +13,10 @@ class CRTMesh {
         std::vector<CRTVector> triangleVertices;
         std::vector<int> triangleVertIndices;
         std::vector<CRTVector> vertexNormals;
+        int materialID = 0;
     private:
         void determineVertexNormals();
-        int materialID = 0;
+        
 
 
 };

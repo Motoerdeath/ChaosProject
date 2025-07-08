@@ -2,13 +2,16 @@
 #define CRTINTERSECTION
 
 #include "crtVector.hpp"
-class Intersection{
-    public:
-    
-    private:
+#include "mesh.hpp"
+#include "triangle.hpp"
+struct Intersection{
     CRTVector intersectionPoint;
+    CRTMesh* intersectedObject;
+    CRTTriangle intersectionTriangle;
+    CRTVector baryCoords;
+    CRTVector shadingNormal;
     float t;
-
+    Intersection() {};
 };
 
 #endif

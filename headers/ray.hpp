@@ -2,7 +2,7 @@
 #define CRTRAY
 #include "../headers/crtVector.hpp"
 #include "../headers/triangle.hpp"
-#include <bit>
+//#include <bit>
 
 class CRTRay {
     public:
@@ -62,6 +62,7 @@ class CRTRay {
     }
 
     static CRTVector offsetRay(const CRTVector& pos, const CRTVector& normal) {
+        /*
         int x_i = int(256.f*normal.x);
         int y_i = int(256.f*normal.y);
         int z_i = int(256.f*normal.z);
@@ -73,6 +74,8 @@ class CRTRay {
         return CRTVector(std::abs(pos.x)<origin ? pos.x+float_scale*normal.x : p_i.x,
                         std::abs(pos.y)<origin ? pos.y+float_scale*normal.y : p_i.y,
                         std::abs(pos.z)<origin ? pos.z+float_scale*normal.z : p_i.z);
+                        */
+                        return CRTVector(0.f);
     }
     private:
 };

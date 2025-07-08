@@ -9,7 +9,8 @@
 #include <string>
 #include "light.hpp"
 #include "rapidjson/document.h"
-#include "../headers/material.hpp"
+#include "material.hpp"
+#include "intersection.hpp"
 
 
 
@@ -26,8 +27,8 @@ class CRTScene {
         void flatRender();
         void parse();
         bool isShadowed(CRTVector pos,CRTVector lightDir);
-        void traceRay();
-        void traceShadowRay();
+        bool traceRay(CRTRay& ray, Intersection& isect);
+        void traceShadowRay(CRTRay& ray);
         void outputResult();
         void outputResult(std::string outputFilePath) { sceneImage.storeImageToFile(outputFilePath);};
 
@@ -37,7 +38,7 @@ class CRTScene {
         void importLights(rapidjson::Document& doc);
         void importMaterials(rapidjson::Document& doc);
 
-        CRTVector shade(CRTVector pos,CRTVector triangleNormal);
+        CRTVector shade(CRTVector pos,CRTVector triangleNormal, Intersection& isect);
         CRTVector flatShade(CRTVector pos,CRTVector triangleNormal);
         CRTCamera sceneCamera;
     private:

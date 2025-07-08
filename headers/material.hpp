@@ -38,10 +38,11 @@ class Material{
     public: 
         Material() {};
         Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle) : type(mtype),albedo(albedo),style(rStyle) {};
-    private:
         MaterialType type;
         CRTVector albedo;
         RenderingStyle style;
+    private:
+
 };
 
 #endif

@@ -32,7 +32,7 @@ bool RAYS = true;
 
 
 int main() {
-  
+  /*
     Homework2 homework2;
     homework2.execute();
 
@@ -44,7 +44,7 @@ int main() {
 
     Homework5 homework5;
     homework5.execute();
- 
+ */
     //Homework6 Task1
 /*
     CRTVector a(1.f,1.f,1.f);
@@ -155,7 +155,7 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework8_Lights/scene2.crtscene";
+    const std::string filename = "../inputs/Homework8_Lights/scene3.crtscene";
 
 /**/
 
@@ -174,7 +174,7 @@ std::cout << val[3][0] << ","  << val[3][1] << "," << val[3][2] <<  "," <<val[3]
 val.length();
 */
 
-/*
+
 CRTScene scene(filename);
 std::printf("Begin importing scene.\n");
 scene.parseSceneFile(filename);
@@ -184,7 +184,7 @@ scene.render();
 std::printf("finished rendering scene.\n");
 scene.outputResult("../output.ppm");
 std::printf("finished storing output.\n");
-*/
+
 /*
 CRTVector v0(1.f,0.f,0.f);
 CRTVector v1(0.f,1.f,0.f);
