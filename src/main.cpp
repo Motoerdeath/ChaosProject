@@ -24,6 +24,7 @@
 #include "../headers/mesh.hpp"
 #include "../headers/scene.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "../headers/renderer.hpp"
 
 
 bool FUNDAMENTALS = true;
@@ -169,6 +170,9 @@ std::printf("finished rendering scene.\n");
 scene.outputResult("../output.ppm");
 std::printf("finished storing output.\n");
 
+CRTRenderer renderer(&scene);
+
+//renderer.render();
 /*
 CRTVector v0(1.f,0.f,0.f);
 CRTVector v1(0.f,1.f,0.f);

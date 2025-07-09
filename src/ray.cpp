@@ -4,6 +4,6 @@
 CRTVector CRTRay::reflect(const CRTVector& ray, CRTVector normal) {
     CRTVector reflectedRay(0.f);
 
-
-    return reflectedRay;
+    float dotRN = CRTVector::dot(ray, normal);
+    return ray-normal*2.f*dotRN;
 }

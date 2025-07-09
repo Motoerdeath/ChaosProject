@@ -1,6 +1,6 @@
 #include "../headers/triangle.hpp"
 
-std::vector<float> CRTTriangle::calculateBarycentricCoordinates(const CRTTriangle &triangle, const CRTVector &position) {
+CRTVector CRTTriangle::calculateBarycentricCoordinates(const CRTTriangle &triangle, const CRTVector &position) {
     CRTVector v0p = position-triangle.v0;
     CRTVector v0v1 = triangle.v1-triangle.v0;
     CRTVector v0v2 = triangle.v2-triangle.v0;
@@ -17,7 +17,7 @@ std::vector<float> CRTTriangle::calculateBarycentricCoordinates(const CRTTriangl
     float u = areaU/areaTri;
     float v = areaV/areaTri;
     float z = 1.f-u-v;
-    return {u,v};
+    return CRTVector(u,v,1.f-u-v);
 }
 
 CRTVector CRTTriangle::determineHitLocation(CRTVector rayOrigin,CRTVector rayDirection,float rayDistance) {

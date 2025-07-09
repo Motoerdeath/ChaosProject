@@ -37,18 +37,22 @@ class CRTScene {
         void importObjects(rapidjson::Document& doc);
         void importLights(rapidjson::Document& doc);
         void importMaterials(rapidjson::Document& doc);
+        const CRTVector getBackgroundColor();
+        CRTSettings* getSettings();
+        CRTCamera* getCamera();
 
         CRTVector shade(Intersection& isect);
         CRTVector flatShade(Intersection& isect);
         CRTVector constantShade(Intersection& isect);
         CRTCamera sceneCamera;
-    private:
-    std::string sceneFilePath;
+            std::string sceneFilePath;
     std::vector<CRTMesh> sceneObjects;
     std::vector<Light> sceneLights;
     std::vector<Material> sceneMaterials;
     PPMImage sceneImage;
     CRTSettings sceneSettings;
+    private:
+
 
     std::vector<CRTVector> colors = {CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),
                                 CRTVector(0.f,0.f,1.f),CRTVector(1.f,1.f,1.f),

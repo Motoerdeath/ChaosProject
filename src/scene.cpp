@@ -211,7 +211,8 @@ bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
     int objectIndex;
     int p = 0;
     std::vector<float> bary;
-    //trace the ray through the scene to determine closest intersected Triangle
+    CRTVector baryCoords;
+        //trace the ray through the scene to determine closest intersected Triangle
     for(CRTMesh object : sceneObjects) {
         for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
             int triangleFirstIndex = object.triangleVertIndices[k];
@@ -230,9 +231,9 @@ bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
                     isecObject = &object;
                     objectIndex = p;
                     materialID = object.materialID;
-                    bary = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
-                    smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.vertexNormals[object.triangleVertIndices[k+1]]*bary[0] + object.vertexNormals[object.triangleVertIndices[k+2]]*bary[1];
-                    intersectionPoint_bary = object.triangleVertices[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.triangleVertices[object.triangleVertIndices[k+1]]*bary[0] + object.triangleVertices[object.triangleVertIndices[k+2]]*bary[1];
+                    baryCoords = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
+                    smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*baryCoords.z +object.vertexNormals[object.triangleVertIndices[k+1]]*baryCoords.x + object.vertexNormals[object.triangleVertIndices[k+2]]*baryCoords.y;
+                    intersectionPoint_bary = object.triangleVertices[object.triangleVertIndices[k]]*baryCoords.z +object.triangleVertices[object.triangleVertIndices[k+1]]*baryCoords.x + object.triangleVertices[object.triangleVertIndices[k+2]]*baryCoords.y;
                     intersectionPoint = intersectionPoint + triangle.normal*0.1f;
                     final_point = intersectionPoint_bary + triangle.normal*0.1f;
                     intersectionPoint_bary = CRTRay::offsetRay(intersectionPoint_bary, triangle.normal);
@@ -247,7 +248,7 @@ bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
     isect.intersectedObject = isecObject;
     isect.intersectionPoint = final_point;
     isect.intersectionTriangle = intersectedTriangle;
-    isect.baryCoords = CRTVector(bary[0],bary[1],1.f-bary[0]-bary[1]);
+    isect.baryCoords = baryCoords;//CRTVector(bary[0],bary[1],1.f-bary[0]-bary[1]);
     isect.shadingNormal = smoothedNormal1;
     isect.mID = materialID;
     return true;
@@ -324,16 +325,30 @@ CRTVector CRTScene::shade(Intersection& isect) {
     return color;
 }
 
+void renderingAlgorithm(int x, int y) {
+    CRTVector  finalColor(0.f);
+    int maxDepth = 5;
+    int depth = 0;
+    CRTVector contributionFactor(1.f);
+    while(true) {
+        if(depth >= maxDepth){
+
+        }
+    }
+}
+
 //CRTVector determineHitLocation(CRTVector rayOrigin, CRTVector rayDirection, float rayDistance);
 void CRTScene::render() {
 
-    int maxDepth =3;
+    int maxDepth =4;
     //iterate over all pixels
     for(int i = 0; i < sceneSettings.imageHeight;i++) {
         for(int j = 0; j < sceneSettings.imageWidth;j++) {
             CRTVector color;
+            CRTVector contrib(1.f);
             CRTRay ray = sceneCamera.generateCameraRay(i, j);
             for(int depth = 0; depth < maxDepth;depth++) {
+                if(depth == 3) {color = sceneImage.backgroundColor;break;}
                 Intersection isect;
                 if(traceRay(ray, isect)) {
                     if(sceneMaterials[isect.mID].type == diffuse) {
@@ -341,26 +356,42 @@ void CRTScene::render() {
                         RenderingStyle style = mat.style;
                         if(style == constant) {
                             color = constantShade(isect);
+                            color = CRTVector(color.x*contrib.x,color.y*contrib.y,color.z*contrib.z); 
                         } else if(style == flat) {
                             color = flatShade(isect);
+                            color = CRTVector(color.x*contrib.x,color.y*contrib.y,color.z*contrib.z);
                         } else {
                             color= shade(isect);
+                            color = CRTVector(color.x*contrib.x,color.y*contrib.y,color.z*contrib.z);
                             //color= mat.albedo;//shade(isect);
                         }
                         break;
                     } else {
-                        color = CRTVector(1.f);
-                        break;
+                        Material mat = sceneMaterials[isect.mID];
+                        ray = CRTRay(isect.intersectionPoint,CRTRay::reflect(ray.rayDirection, isect.shadingNormal));
+                        contrib= CRTVector(contrib.x*mat.albedo.x,contrib.y*mat.albedo.y, contrib.z*mat.albedo.z);
                     }
                     
                 } else {
                     color = sceneImage.backgroundColor;
+                    color = CRTVector(color.x*contrib.x,color.y*contrib.y,color.z*contrib.z);
                     break;
                 }
             }
+
             sceneImage.setPixel(color, j, i);
         }
     }
 }
 
 
+const CRTVector CRTScene::getBackgroundColor() {
+    return sceneImage.backgroundColor;
+}
+
+CRTSettings* CRTScene::getSettings() {
+    return &sceneSettings;
+}
+CRTCamera* CRTScene::getCamera() {
+    return &sceneCamera;
+}
