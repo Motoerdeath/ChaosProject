@@ -10,6 +10,7 @@ struct Intersection{
     CRTTriangle intersectionTriangle;
     CRTVector baryCoords;
     CRTVector shadingNormal;
+    int mID;
     float t;
     Intersection() {};
 };

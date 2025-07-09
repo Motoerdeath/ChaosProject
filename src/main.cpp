@@ -155,24 +155,8 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework8_Lights/scene2.crtscene";
+    const std::string filename = "../inputs/Homework9_Shading1/scene4.crtscene";
 
-/**/
-
-
-/*
-glm::mat4 m(glm::vec4(1.f,0.f,0.f,0.f),glm::vec4(0.f,1.f,0.f,0.f),glm::vec4(0.f,0.f,1.f,0.f),glm::vec4(0.f,0.f,0.f,1.f));
-std::cout << m[0][0] << ","  << m[0][1] << "," << m[0][2] <<  "," <<m[0][3] <<std::endl;
-std::cout << m[1][0] << ","  << m[1][1] << "," << m[1][2] <<  "," <<m[1][3] <<std::endl;
-std::cout << m[2][0] << ","  << m[2][1] << "," << m[2][2] <<  "," <<m[2][3] <<std::endl;
-std::cout << m[3][0] << ","  << m[3][1] << "," << m[3][2] <<  "," <<m[3][3] <<std::endl;
-glm::mat4 val = glm::rotate(m, -0.44f, glm::vec3(1.f,0.f,0.f));
-std::cout << val[0][0] << ","  << val[0][1] << "," << val[0][2] <<  "," <<val[0][3] <<std::endl;
-std::cout << val[1][0] << ","  << val[1][1] << "," << val[1][2] <<  "," <<val[1][3] <<std::endl;
-std::cout << val[2][0] << ","  << val[2][1] << "," << val[2][2] <<  "," <<val[2][3] <<std::endl;
-std::cout << val[3][0] << ","  << val[3][1] << "," << val[3][2] <<  "," <<val[3][3] <<std::endl;
-val.length();
-*/
 
 
 CRTScene scene(filename);

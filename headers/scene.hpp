@@ -38,8 +38,9 @@ class CRTScene {
         void importLights(rapidjson::Document& doc);
         void importMaterials(rapidjson::Document& doc);
 
-        CRTVector shade(CRTVector pos,CRTVector triangleNormal, Intersection& isect);
-        CRTVector flatShade(CRTVector pos,CRTVector triangleNormal);
+        CRTVector shade(Intersection& isect);
+        CRTVector flatShade(Intersection& isect);
+        CRTVector constantShade(Intersection& isect);
         CRTCamera sceneCamera;
     private:
     std::string sceneFilePath;

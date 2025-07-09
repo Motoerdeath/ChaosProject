@@ -69,7 +69,6 @@ void CRTScene::importCamera(rapidjson::Document& doc, int width, int height){
     }
     sceneCamera = CRTCamera(cameraPosition,cameraRotationMatrix,width,height);
 }
-
 void CRTScene::importObjects(rapidjson::Document& doc){
 
     std::vector<CRTMesh> objects;
@@ -102,7 +101,6 @@ void CRTScene::importObjects(rapidjson::Document& doc){
     sceneObjects = objects;
 
 }
-
 void CRTScene::importLights(rapidjson::Document& doc){
 
     std::vector<Light> lights;
@@ -131,31 +129,39 @@ void CRTScene::importLights(rapidjson::Document& doc){
     sceneLights = lights;
 }
 void CRTScene::importMaterials(rapidjson::Document& doc){
-    Material mat;
+    
     if(doc.HasMember("materials")) {
         const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
-        assert(materialsVal.HasMember("type") && materialsVal.HasMember("albedo") && materialsVal.HasMember("smooth_shading"));
-        std::string temp = materialsVal.FindMember("type")->value.GetString();
-        MaterialType matType;
-        if(temp.std::string::compare("reflective")) {
-            matType = reflective;
-        } else {
-            matType = diffuse;
-        }
-        RenderingStyle style;
-        if(materialsVal.FindMember("smooth_shading")->value.GetBool()) {
-            style = smooth;
-        } else {
-            if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                style = flat;
+        for(int i = 0; i < materialsVal.Size();i++) {
+            Material mat;
+            const rapidjson::Value& materialVal = materialsVal[i];
+            assert(materialVal.HasMember("type") && materialVal.HasMember("albedo") && materialVal.HasMember("smooth_shading"));
+            std::string temp = materialVal.FindMember("type")->value.GetString();
+            MaterialType matType = diffuse;
+            
+            if(!temp.std::string::compare("reflective")) {
+                matType = reflective;
             } else {
-                style = constant;
+                matType = diffuse;
             }
+                
+            RenderingStyle style;
+            if(materialVal.FindMember("smooth_shading")->value.GetBool()) {
+                style = smooth;
+            } else {
+                if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                    style = flat;
+                } else {
+                    style = constant;
+                }
+            }
+            CRTVector albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
+            mat = Material(matType,albedo,style);
+            sceneMaterials.push_back(mat);
         }
-        CRTVector albedo = loadVector(materialsVal.FindMember("albedo")->value.GetArray());
-        mat = Material(matType,albedo,style);
     } else {
-        CRTVector albedo(0.4f);
+        Material mat;
+        CRTVector albedo(0.1f);
         MaterialType matType = diffuse;
         RenderingStyle style;
         if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
@@ -164,8 +170,9 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
                 style = constant;
         }
         mat = Material(matType,albedo,style);
+        sceneMaterials.push_back(mat);
     }
-    sceneMaterials.push_back(mat);
+    
 }
 
 void CRTScene::parseSceneFile(const std::string& sceneFileName){
@@ -190,6 +197,7 @@ std::ifstream ifs(sceneFileName);
 
 bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
 
+
     float closestIntersectionDistance = FLT_MAX;
     bool foundIntersection = false;
     int intersectedTriangleIndex;
@@ -199,6 +207,7 @@ bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
     CRTVector smoothedNormal1;
     CRTVector final_point;
     CRTMesh* isecObject;
+    int materialID = 0;
     int objectIndex;
     int p = 0;
     std::vector<float> bary;
@@ -220,6 +229,7 @@ bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
                     intersectedTriangle = triangle;
                     isecObject = &object;
                     objectIndex = p;
+                    materialID = object.materialID;
                     bary = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
                     smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.vertexNormals[object.triangleVertIndices[k+1]]*bary[0] + object.vertexNormals[object.triangleVertIndices[k+2]]*bary[1];
                     intersectionPoint_bary = object.triangleVertices[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.triangleVertices[object.triangleVertIndices[k+1]]*bary[0] + object.triangleVertices[object.triangleVertIndices[k+2]]*bary[1];
@@ -239,6 +249,7 @@ bool CRTScene::traceRay(CRTRay& ray, Intersection& isect) {
     isect.intersectionTriangle = intersectedTriangle;
     isect.baryCoords = CRTVector(bary[0],bary[1],1.f-bary[0]-bary[1]);
     isect.shadingNormal = smoothedNormal1;
+    isect.mID = materialID;
     return true;
 }
 void CRTScene::traceShadowRay(CRTRay& ray) {
@@ -263,147 +274,93 @@ bool CRTScene::isShadowed(CRTVector pos, CRTVector lightDir) {
             }  
     return false;
 }
-CRTVector CRTScene::flatShade(CRTVector pos,CRTVector triangleNormal) {
+
+CRTVector CRTScene::constantShade(Intersection& isect) {
+    return sceneMaterials[isect.mID].albedo;
+}
+CRTVector CRTScene::flatShade(Intersection& isect) {
     CRTVector color(0.f);
-    CRTVector albedo = CRTVector(0.4f);
+    CRTVector albedo = sceneMaterials[isect.mID].albedo;
     //remove shadowacne by offsetting position a small amount in the direction of the normal
-    CRTVector adjPos = pos + triangleNormal*0.01f;
+    CRTVector adjPos = isect.intersectionPoint + isect.intersectionTriangle.normal*0.01f;
     for(Light source : sceneLights) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - adjPos);
         if(isShadowed(adjPos, lD.normalize())) continue;
         float lDLength = lD.length();
         //determine if surface is oriented towards light
-        float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), triangleNormal));
+        float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), isect.intersectionTriangle.normal));
         if(cosLaw ==0.f) continue;
         float distanceFallOff = 4*M_PI*lDLength*lDLength;
         CRTVector temp = color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
-        color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.y,0.f,1.f));
+        color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.z,0.f,1.f));
         //color = CRTVector(cosLaw);
         //color = CRTVector(lDLength);
     }
     return color;
 }
 
-CRTVector CRTScene::shade(CRTVector pos,CRTVector triangleNormal, Intersection& isect) {
+CRTVector CRTScene::shade(Intersection& isect) {
+    Material  mat = sceneMaterials[isect.mID];
     CRTVector color(0.f);
     //CRTVector albedo = CRTVector(0.4f);
-    CRTVector albedo = sceneMaterials[isect.intersectedObject->materialID].albedo;
+    CRTVector albedo = mat.albedo;
     //remove shadowacne by offsetting position a small amount in the direction of the normal
     //CRTVector adjPos = pos + triangleNormal*0.1f;
     for(Light source : sceneLights) {
         //determine vector to light source from intersectionPoint
-        CRTVector lD = (source.lightPosition - pos);
-        if(isShadowed(pos, lD.normalize())) continue;
+        CRTVector lD = (source.lightPosition - isect.intersectionPoint);
+        if(isShadowed(isect.intersectionPoint, lD.normalize())) continue;
         float lDLength = lD.length();
         //determine if surface is oriented towards light
-        float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), triangleNormal));
+        float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), isect.shadingNormal));
         if(cosLaw ==0.f) continue;
         float distanceFallOff = 4*M_PI*lDLength*lDLength;
         CRTVector temp = color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
-        color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.y,0.f,1.f));
+        color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.z,0.f,1.f));
         //color = CRTVector(cosLaw);
         //color = CRTVector(lDLength);
     }
     return color;
 }
 
-//implementing the ray offset method from A Fast and Robust Method for Avoiding Self-Intersection by Wächter & Binder
-//
-
-
 //CRTVector determineHitLocation(CRTVector rayOrigin, CRTVector rayDirection, float rayDistance);
 void CRTScene::render() {
 
-    /*
-    CRTVector pos(2.f,0.f,-1.f);
-    CRTVector normal(1.f,0.f,0.f);
-
-    CRTVector test = offsetRay(pos, normal);
-    std::cout << test.x << ","  << test.y << "," << test.z << std::endl;
-    */
-
+    int maxDepth =3;
     //iterate over all pixels
     for(int i = 0; i < sceneSettings.imageHeight;i++) {
         for(int j = 0; j < sceneSettings.imageWidth;j++) {
             CRTVector color;
-            //setup
-            float closestIntersectionDistance = FLT_MAX;
             CRTRay ray = sceneCamera.generateCameraRay(i, j);
-            Intersection isect;
-            if(traceRay(ray, isect)) {
-                color= shade(isect.intersectionPoint, isect.shadingNormal,isect);
-                //color = smoothedNormal1;
-                //color = intersectedTriangle.normal;
-                //color =isect.baryCoords;
-            } else {
-                color = sceneImage.backgroundColor;
-                //sceneImage.setPixel((int)(sceneImage.backgroundColor.x *255.f), (int)(sceneImage.backgroundColor.y *255.f), (int)(sceneImage.backgroundColor.z *255.f), j, i);
-            }
-            /*
-            bool foundIntersection = false;
-            int intersectedTriangleIndex;
-            CRTTriangle intersectedTriangle;
-            CRTVector intersectionPoint;
-            CRTVector intersectionPoint_bary;
-            CRTVector smoothedNormal1;
-            CRTVector final_point;
-            CRTMesh* isecObject;
-            int objectIndex;
-            int p = 0;
-
-            //trace the ray through the scene to determine closest intersected Triangle
-            for(CRTMesh object : sceneObjects) {
-                for(int k = 0; k < object.triangleVertIndices.size();k+=3) {
-                    int triangleFirstIndex = object.triangleVertIndices[k];
-                    CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[k]],
-                                        object.triangleVertices[object.triangleVertIndices[k+1]],
-                                        object.triangleVertices[object.triangleVertIndices[k+2]]);
-                    float t = 1.f;
-                    if(ray.intersectTriangle(triangle, t,false)) {
-                        
-                        if(t < closestIntersectionDistance) {
-                            foundIntersection = true;
-                            closestIntersectionDistance = t;
-                            intersectedTriangleIndex = k;
-                            intersectionPoint = ray.rayOrigin + ray.rayDirection*t;
-                            intersectedTriangle = triangle;
-                            isecObject = &object;
-                            objectIndex = p;
-                            std::vector<float> bary = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
-                            smoothedNormal1 = object.vertexNormals[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.vertexNormals[object.triangleVertIndices[k+1]]*bary[0] + object.vertexNormals[object.triangleVertIndices[k+2]]*bary[1];
-                            intersectionPoint_bary = object.triangleVertices[object.triangleVertIndices[k]]*(1.f-bary[0]-bary[1]) +object.triangleVertices[object.triangleVertIndices[k+1]]*bary[0] + object.triangleVertices[object.triangleVertIndices[k+2]]*bary[1];
-                            intersectionPoint = intersectionPoint + triangle.normal*0.1f;
-                            final_point = intersectionPoint_bary + triangle.normal*0.1f;
-                            intersectionPoint_bary = CRTRay::offsetRay(intersectionPoint_bary, triangle.normal);
-                            final_point = CRTRay::offsetRay(intersectionPoint_bary, triangle.normal);
+            for(int depth = 0; depth < maxDepth;depth++) {
+                Intersection isect;
+                if(traceRay(ray, isect)) {
+                    if(sceneMaterials[isect.mID].type == diffuse) {
+                        Material mat = sceneMaterials[isect.mID];
+                        RenderingStyle style = mat.style;
+                        if(style == constant) {
+                            color = constantShade(isect);
+                        } else if(style == flat) {
+                            color = flatShade(isect);
+                        } else {
+                            color= shade(isect);
+                            //color= mat.albedo;//shade(isect);
                         }
-                    }     
+                        break;
+                    } else {
+                        color = CRTVector(1.f);
+                        break;
+                    }
+                    
+                } else {
+                    color = sceneImage.backgroundColor;
+                    break;
                 }
-                p++;
-            } 
-
-            
-            //perform shading
-            //CRTVector color = colors[intersectedTriangleIndex % colors.size()];
-            
-            if(foundIntersection) {
-                std::vector<float> uvCoordinates = CRTTriangle::calculateBarycentricCoordinates(intersectedTriangle, intersectionPoint);
-                
-
-                color= shade(final_point, smoothedNormal1);
-                //color = smoothedNormal1;
-                //color = intersectedTriangle.normal;
-                //color = CRTVector(uvCoordinates[0],uvCoordinates[1],0.f);
-            } else {
-                color = sceneImage.backgroundColor;
-                //sceneImage.setPixel((int)(sceneImage.backgroundColor.x *255.f), (int)(sceneImage.backgroundColor.y *255.f), (int)(sceneImage.backgroundColor.z *255.f), j, i);
             }
-                */
             sceneImage.setPixel(color, j, i);
         }
     }
-    //sceneImage.storeImageToFile("../output.ppm");
 }
 
 
