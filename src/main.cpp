@@ -156,21 +156,23 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework9_Shading1/scene4.crtscene";
+    const std::string filename = "../inputs/Homework9_Shading1/scene1.crtscene";
 
 
 
 CRTScene scene(filename);
+CRTRenderer renderer(&scene);
 std::printf("Begin importing scene.\n");
 scene.parseSceneFile(filename);
 std::printf("finished importing scene.\n");
 std::printf("Begin rendering scene.\n");
-scene.render();
+renderer.render();
+//scene.render();
 std::printf("finished rendering scene.\n");
 scene.outputResult("../output.ppm");
 std::printf("finished storing output.\n");
 
-CRTRenderer renderer(&scene);
+
 
 //renderer.render();
 /*

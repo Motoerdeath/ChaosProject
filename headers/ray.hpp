@@ -4,6 +4,14 @@
 #include "../headers/triangle.hpp"
 //#include <bit>
 
+
+enum RayType{
+    Invalid,
+    CameraRay,
+    ShadowRay,
+    ReflectionRay,
+    RefractionRay
+};
 class CRTRay {
     public:
     CRTVector rayOrigin;

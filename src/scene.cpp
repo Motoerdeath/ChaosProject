@@ -325,18 +325,6 @@ CRTVector CRTScene::shade(Intersection& isect) {
     return color;
 }
 
-void renderingAlgorithm(int x, int y) {
-    CRTVector  finalColor(0.f);
-    int maxDepth = 5;
-    int depth = 0;
-    CRTVector contributionFactor(1.f);
-    while(true) {
-        if(depth >= maxDepth){
-
-        }
-    }
-}
-
 //CRTVector determineHitLocation(CRTVector rayOrigin, CRTVector rayDirection, float rayDistance);
 void CRTScene::render() {
 

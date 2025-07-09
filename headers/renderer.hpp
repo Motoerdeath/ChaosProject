@@ -18,6 +18,11 @@ class CRTRenderer {
     CRTVector traceReflectionRay(const CRTRay& ray);
     CRTVector traceRefractionRay(const CRTRay& ray);
     bool findIntersection(const CRTRay& ray,Intersection& isect);
+
+    CRTVector calculateShading(const CRTRay& ray,Intersection& isect);
+    CRTVector constantShading(const CRTRay& ray,Intersection& isect);
+    CRTVector flatShading(const CRTRay& ray,Intersection& isect);
+    CRTVector smoothShading(const CRTRay& ray,Intersection& isect);
     int maxDepth = 5;
 };
 
