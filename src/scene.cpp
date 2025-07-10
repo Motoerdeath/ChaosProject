@@ -138,11 +138,14 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
             assert(materialVal.HasMember("type") && materialVal.HasMember("albedo") && materialVal.HasMember("smooth_shading"));
             std::string temp = materialVal.FindMember("type")->value.GetString();
             MaterialType matType = diffuse;
+            float ior =1.f;
             if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
                 if(!temp.std::string::compare("reflective")) {
                     matType = reflective;
                 } else if(!temp.std::string::compare("refractive")) {
                     matType = refractive;
+                    assert(materialVal.HasMember("ior"));
+                    ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
                 } else {
                     matType = diffuse;
                 }
@@ -156,7 +159,7 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
                 style = flat;
             }
             CRTVector albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
-            mat = Material(matType,albedo,style);
+            mat = Material(matType,albedo,style,ior);
             sceneMaterials.push_back(mat);
         }
     } else {
@@ -342,10 +345,7 @@ void CRTScene::render() {
                     if(sceneMaterials[isect.mID].type == diffuse) {
                         Material mat = sceneMaterials[isect.mID];
                         RenderingStyle style = mat.style;
-                        if(style == constant) {
-                            color = constantShade(isect);
-                            color = CRTVector(color.x*contrib.x,color.y*contrib.y,color.z*contrib.z); 
-                        } else if(style == flat) {
+                        if(style == flat) {
                             color = flatShade(isect);
                             color = CRTVector(color.x*contrib.x,color.y*contrib.y,color.z*contrib.z);
                         } else {

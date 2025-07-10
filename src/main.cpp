@@ -156,7 +156,7 @@ int main() {
 */
     
     
-    const std::string filename = "../inputs/Homework8_Lights/scene2.crtscene";
+    const std::string filename = "../inputs/Homework9_Shading1/scene3.crtscene";
 
 
 

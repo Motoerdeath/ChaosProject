@@ -110,19 +110,23 @@ CRTVector CRTRenderer::traceCameraRay(const CRTRay& ray) {
     if(findIntersection(ray, isect)) {
 
         Material mat = scene->sceneMaterials[isect.mID];
-        /*
-        if(mat.style == constant) 
+        
+        if(mat.type == constant) 
         {
-            return constantShading(ray, isect);
-
-        } else if(mat.style == flat) {
-
-        } else if(mat.style == smooth) {
-
-        } else {
-            throw std::runtime_error("invalid Rnendering Style");
-        }*/
-        return flatShading(ray, isect);
+            return mat.albedo;
+        } 
+        if(mat.type == diffuse) {
+            return calculateShading(ray, isect);
+        }
+        if(mat.type == reflective) {
+            return CRTVector(0.f);
+        }
+        if(mat.type == refractive) {
+            return CRTVector(1.f);
+        }
+        //if we reach this part, something went wrong
+        throw std::runtime_error("invalid Material Type");
+        
     } else {
         return scene->sceneSettings.backgroundColor;
     }
@@ -177,20 +181,19 @@ CRTVector CRTRenderer::traceRefractionRay(const CRTRay& ray) {
 
 CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     Material mat = scene->sceneMaterials[isect.mID];
-        /*
-        if(mat.style == constant) 
-        {
-            return constantShading(ray, isect);
-
-        } else if(mat.style == flat) {
-
-        } else if(mat.style == smooth) {
-
-        } else {
-            throw std::runtime_error("invalid Rnendering Style");
-        }
-            */
-            return CRTVector(0.f);
+        
+    if(mat.type == constant) {
+        return mat.albedo;
+    }
+    if(mat.style == flat) {
+        return flatShading(ray, isect);
+    } else if(mat.style == smooth) {
+        return smoothShading(ray, isect);
+    } else {
+        throw std::runtime_error("invalid Rendering Style");
+    }
+    
+    return CRTVector(0.f);
 }
 CRTVector CRTRenderer::constantShading(const CRTRay& ray,Intersection& isect) {
     return scene->sceneMaterials[isect.mID].albedo;
