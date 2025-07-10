@@ -5,6 +5,16 @@
 #include "scene.hpp"
 #include "intersection.hpp"
 #include <memory>
+
+
+enum DebugMode {
+    None,
+    GeometricNormals,
+    ShadingNormals,
+    BarycentricCoordinates,
+    TextureCoordinates,
+    HeatMap,
+};
 class CRTRenderer {
     public:
     CRTRenderer() {}
@@ -23,6 +33,8 @@ class CRTRenderer {
     CRTVector constantShading(const CRTRay& ray,Intersection& isect);
     CRTVector flatShading(const CRTRay& ray,Intersection& isect);
     CRTVector smoothShading(const CRTRay& ray,Intersection& isect);
+
+    bool intersect(const CRTRay& ray,Intersection& isect);
     int maxDepth = 5;
 };
 

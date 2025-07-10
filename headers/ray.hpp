@@ -139,6 +139,7 @@ class CRTRay {
     static CRTVector reflect(const CRTVector& ray, CRTVector normal);
     static CRTVector refract(const CRTVector& ray, CRTVector normal);
     int rayDepth = 0;
+    RayType type;
     private:
     
 };

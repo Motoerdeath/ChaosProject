@@ -20,6 +20,36 @@ void CRTRenderer::render() {
     //init FinalColor
 }
 
+bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect) {
+    bool foundIntersection = false;
+    float closestIntersectionDistance = FLT_MAX;
+    int materialID;
+    int objectID;
+    CRTVector geoNormal;
+    CRTVector shadingNormal;
+    CRTVector baryCoords;
+    CRTVector position;
+    CRTTriangle isectTriangle;
+
+    for(int i = 0; i < scene->sceneObjects.size(); i++) {
+        CRTMesh* object = &(scene->sceneObjects[i]);
+        for(int k = 0; k < object->triangleVertIndices.size();k+=3) {
+            CRTTriangle triangle(object->triangleVertices[object->triangleVertIndices[k]],
+                                object->triangleVertices[object->triangleVertIndices[k+1]],
+                                object->triangleVertices[object->triangleVertIndices[k+2]]);
+            float t;
+            //shoot shadowRay
+            if(ray.type == ShadowRay){
+
+            }
+            if(ray.type == CameraRay || ray.type == ReflectionRay) {
+
+            }
+
+        }
+    }
+}
+
 bool CRTRenderer::findIntersection(const CRTRay& ray,Intersection& isect) {
 
     bool foundIntersection = false;
@@ -165,7 +195,8 @@ CRTVector CRTRenderer::flatShading(const CRTRay& ray, Intersection& isect) {
     for(Light source : scene->sceneLights) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - adjPos);
-        //if(isShadowed(adjPos, lD.normalize())) continue;
+        
+        if(traceShadowRay(CRTRay(isect.intersectionPoint,lD.normalize()))) continue;
         float lDLength = lD.length();
         //determine if surface is oriented towards light
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), isect.intersectionTriangle.normal));
@@ -188,7 +219,7 @@ CRTVector CRTRenderer::smoothShading(const CRTRay& ray, Intersection& isect) {
     for(Light source : scene->sceneLights) {
         //determine vector to light source from intersectionPoint
         CRTVector lD = (source.lightPosition - isect.intersectionPoint);
-        //if(isShadowed(isect.intersectionPoint, lD.normalize())) continue;
+        if(traceShadowRay(CRTRay(isect.intersectionPoint,lD.normalize()))) continue;
         float lDLength = lD.length();
         //determine if surface is oriented towards light
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), isect.shadingNormal));
