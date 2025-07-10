@@ -4,6 +4,11 @@
 #include <stdexcept>
 
 
+CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
+    scene2 = std::unique_ptr<CRTScene>(scene);
+    CRTSettings* settings = scene->getSettings();
+    image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
+};
 void CRTRenderer::render() {
     
     //iterate over all pixels
@@ -14,7 +19,7 @@ void CRTRenderer::render() {
             CRTVector color = traceCameraRay(cameraRay);
 
 
-            scene->sceneImage.setPixel(color,x,y);
+            image.setPixel(color,x,y);
         }
     }
     //init FinalColor
@@ -40,14 +45,19 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect) {
             float t;
             //shoot shadowRay
             if(ray.type == ShadowRay){
-
+                if(CRTRay::intersectTriangle(ray,triangle,t, true) && t < closestIntersectionDistance) {
+                    return true;
+                }
             }
-            if(ray.type == CameraRay || ray.type == ReflectionRay) {
-
+            if(ray.type == CameraRay) {
+                if(CRTRay::intersectTriangle(ray,triangle,t, false) && t < closestIntersectionDistance) {
+                    
+                }
             }
 
         }
     }
+    return false;
 }
 
 bool CRTRenderer::findIntersection(const CRTRay& ray,Intersection& isect) {

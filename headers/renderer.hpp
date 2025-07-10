@@ -2,6 +2,7 @@
 #define CRTRENDERER
 
 #include "crtVector.hpp"
+#include "ppmImage.hpp"
 #include "scene.hpp"
 #include "intersection.hpp"
 #include <memory>
@@ -18,8 +19,9 @@ enum DebugMode {
 class CRTRenderer {
     public:
     CRTRenderer() {}
-    CRTRenderer(CRTScene* scene) : scene(scene){scene2 = std::unique_ptr<CRTScene>(scene);};
+    CRTRenderer(CRTScene* scene);
     void render();
+    void storeImage(std::string filePathName){ image.storeImageToFile(filePathName);};
     private:
     CRTScene* scene;
     std::unique_ptr<CRTScene> scene2;
@@ -33,9 +35,11 @@ class CRTRenderer {
     CRTVector constantShading(const CRTRay& ray,Intersection& isect);
     CRTVector flatShading(const CRTRay& ray,Intersection& isect);
     CRTVector smoothShading(const CRTRay& ray,Intersection& isect);
-
+    void createRenderImage();
+    PPMImage image;
     bool intersect(const CRTRay& ray,Intersection& isect);
     int maxDepth = 5;
+    
 };
 
 class ConstantRenderer : public CRTRenderer {

@@ -4,8 +4,10 @@
 #include <string>
 #include "crtVector.hpp"
 enum MaterialType {
+    constant,
     diffuse,
-    reflective
+    reflective,
+    refractive
 };
 /*
 MaterialType strToType(std::string input){
@@ -18,7 +20,6 @@ MaterialType strToType(std::string input){
 }
     */
 enum RenderingStyle {
-    constant,
     flat,
     smooth
 };
@@ -38,11 +39,12 @@ class Material{
     public: 
         Material() {};
         Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle) : type(mtype),albedo(albedo),style(rStyle) {};
+        Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle, float ior) : type(mtype),albedo(albedo),style(rStyle), ior(ior) {};
         MaterialType type;
         CRTVector albedo;
         RenderingStyle style;
+        float ior = 1.0f;
     private:
-
 };
 
 #endif

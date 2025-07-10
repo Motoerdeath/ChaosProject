@@ -138,22 +138,22 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
             assert(materialVal.HasMember("type") && materialVal.HasMember("albedo") && materialVal.HasMember("smooth_shading"));
             std::string temp = materialVal.FindMember("type")->value.GetString();
             MaterialType matType = diffuse;
-            
-            if(!temp.std::string::compare("reflective")) {
-                matType = reflective;
+            if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                if(!temp.std::string::compare("reflective")) {
+                    matType = reflective;
+                } else if(!temp.std::string::compare("refractive")) {
+                    matType = refractive;
+                } else {
+                    matType = diffuse;
+                }
             } else {
-                matType = diffuse;
-            }
-                
+                matType = constant;
+            } 
             RenderingStyle style;
             if(materialVal.FindMember("smooth_shading")->value.GetBool()) {
                 style = smooth;
             } else {
-                if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                    style = flat;
-                } else {
-                    style = constant;
-                }
+                style = flat;
             }
             CRTVector albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
             mat = Material(matType,albedo,style);
@@ -161,13 +161,13 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
         }
     } else {
         Material mat;
-        CRTVector albedo(0.1f);
-        MaterialType matType = diffuse;
-        RenderingStyle style;
+        CRTVector albedo(0.4f);
+        MaterialType matType;
+        RenderingStyle style = flat;
         if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                style = flat;
+                matType = diffuse;
         } else {
-                style = constant;
+                matType = constant;
         }
         mat = Material(matType,albedo,style);
         sceneMaterials.push_back(mat);
