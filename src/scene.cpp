@@ -134,31 +134,46 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
         const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
         for(int i = 0; i < materialsVal.Size();i++) {
             Material mat;
-            const rapidjson::Value& materialVal = materialsVal[i];
-            assert(materialVal.HasMember("type") && materialVal.HasMember("albedo") && materialVal.HasMember("smooth_shading"));
-            std::string temp = materialVal.FindMember("type")->value.GetString();
+            CRTVector albedo(1.f);
             MaterialType matType = diffuse;
             float ior =1.f;
-            if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                if(!temp.std::string::compare("reflective")) {
-                    matType = reflective;
-                } else if(!temp.std::string::compare("refractive")) {
-                    matType = refractive;
-                    assert(materialVal.HasMember("ior"));
-                    ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
-                } else {
-                    matType = diffuse;
-                }
+
+            const rapidjson::Value& materialVal = materialsVal[i];
+            //&& materialVal.HasMember("albedo")
+            assert(materialVal.HasMember("type")  && materialVal.HasMember("smooth_shading"));
+            std::string temp = materialVal.FindMember("type")->value.GetString();
+
+            //handle refractive/Semitransparent Materials
+            if(!temp.std::string::compare("refractive")) {
+                assert(materialVal.HasMember("ior"));
+                ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
+                matType = refractive;
             } else {
-                matType = constant;
-            } 
+                assert(materialVal.HasMember("albedo"));
+                if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                    if(!temp.std::string::compare("reflective")) {
+                        matType = reflective;
+                    } else if(!temp.std::string::compare("diffuse")) {
+                        matType = diffuse;
+                    } else if(!temp.std::string::compare("constant")){
+                        matType = constant;
+                        
+                    } else {
+                        assert(false);
+                    }
+                } else {
+                    matType = constant;
+                }
+                albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());;
+            }
+
+ 
             RenderingStyle style;
             if(materialVal.FindMember("smooth_shading")->value.GetBool()) {
                 style = smooth;
             } else {
                 style = flat;
             }
-            CRTVector albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
             mat = Material(matType,albedo,style,ior);
             sceneMaterials.push_back(mat);
         }

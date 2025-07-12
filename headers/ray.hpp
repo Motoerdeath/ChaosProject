@@ -111,7 +111,7 @@ class CRTRay {
             */
 
             //check if intersection point is in triangle, by checking whether it is "on the left" of each triangle side
-            if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >=0 && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >=0 && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >=0 ) {
+            if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >=-EPSILON && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >=-EPSILON && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >=-EPSILON ) {
                 t = t1;
                 return true;
             }
@@ -137,7 +137,7 @@ class CRTRay {
                         return CRTVector(0.f);
     }
     static CRTVector reflect(const CRTVector& ray, CRTVector normal);
-    static CRTVector refract(const CRTVector& ray, CRTVector normal);
+    static CRTVector refract(const CRTVector& ray,const CRTVector& normal,const float relativeIOR);
     int rayDepth = 0;
     RayType type;
     private:

@@ -48,7 +48,7 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene0.crtscene";
+const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
 
 
 
@@ -63,6 +63,7 @@ renderer.render();
 std::printf("finished rendering scene.\n");
 renderer.storeImage("../output.ppm");
 std::printf("finished storing output.\n");
+
 
     return 0;
 }
