@@ -26,6 +26,9 @@ class CRTVector {
     CRTVector operator*(const float scalar) const {
         return CRTVector(x*scalar,y*scalar,z*scalar);
     }
+    friend CRTVector operator*(const float scalar,const CRTVector& rhs) {
+        return CRTVector(rhs.x*scalar,rhs.y*scalar,rhs.z*scalar);
+    }
     bool operator==(const CRTVector& rhs) const {
         return x==rhs.x && y==rhs.y && z==rhs.y;
     }
