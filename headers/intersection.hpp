@@ -6,15 +6,17 @@
 #include "triangle.hpp"
 struct Intersection{
     CRTVector intersectionPoint;
-    CRTMesh* intersectedObject;
-    CRTTriangle intersectionTriangle;
-    CRTVector baryCoords;
-    CRTVector shadingNormal;
     CRTVector geomNormal;
-    int mID;
-    float t;
+    CRTVector shadingNormal;
+    CRTVector baryCoords;
+    int materialIDx;
     int objectIDx;
     int triangleIDx;
+    float t;
+
+
+    CRTMesh* intersectedObject;
+    CRTTriangle intersectionTriangle;
     Intersection() {};
 };
 

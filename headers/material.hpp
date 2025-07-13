@@ -44,6 +44,7 @@ class Material{
         CRTVector albedo;
         RenderingStyle style;
         float ior = 1.0f;
+        std::string albedoTex = ""; //string that references the name of the texture
     private:
 };
 

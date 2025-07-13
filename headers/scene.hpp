@@ -22,41 +22,25 @@ class CRTScene {
         }
 
         void parseSceneFile(const std::string& sceneFileName);
-        void render();
-        void constantRender();
-        void flatRender();
         void parse();
-        bool isShadowed(CRTVector pos,CRTVector lightDir);
-        bool traceRay(CRTRay& ray, Intersection& isect);
-        void traceShadowRay(CRTRay& ray);
-        void outputResult();
-        void outputResult(std::string outputFilePath) { sceneImage.storeImageToFile(outputFilePath);};
-
         void importSettings(rapidjson::Document& doc);
         void importCamera(rapidjson::Document& doc, int width, int height);
         void importObjects(rapidjson::Document& doc);
         void importLights(rapidjson::Document& doc);
         void importMaterials(rapidjson::Document& doc);
+        void importTextures(rapidjson::Document& doc);
         const CRTVector getBackgroundColor();
         CRTSettings* getSettings();
         CRTCamera* getCamera();
+        Material getMaterial(int materialIDx);
 
-        CRTVector shade(Intersection& isect);
-        CRTVector flatShade(Intersection& isect);
-        CRTVector constantShade(Intersection& isect);
         CRTCamera sceneCamera;
-            std::string sceneFilePath;
-    std::vector<CRTMesh> sceneObjects;
-    std::vector<Light> sceneLights;
-    std::vector<Material> sceneMaterials;
-    PPMImage sceneImage;
-    CRTSettings sceneSettings;
-    private:
-
-
-    std::vector<CRTVector> colors = {CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),
-                                CRTVector(0.f,0.f,1.f),CRTVector(1.f,1.f,1.f),
-                                CRTVector(1.f,1.f,0.f),CRTVector(0.f,1.f,1.f),
-                                CRTVector(1.f,0.f,1.f),CRTVector(0.f,0.f,0.f)};
+        std::string sceneFilePath;
+        std::vector<CRTMesh> sceneObjects;
+        std::vector<Light> sceneLights;
+        std::vector<Material> sceneMaterials;
+        PPMImage sceneImage;
+        CRTSettings sceneSettings;
+        private:
 };
 #endif
