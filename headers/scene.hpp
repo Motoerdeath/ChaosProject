@@ -10,7 +10,6 @@
 #include "light.hpp"
 #include "rapidjson/document.h"
 #include "material.hpp"
-#include "intersection.hpp"
 
 
 

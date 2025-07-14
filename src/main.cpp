@@ -3,27 +3,13 @@
 #include "../src/Tasks/homework4.cpp"
 #include "../src/Tasks/homework5.cpp"
 
-#include "../headers/triangle.hpp"
-#include "../headers/camera.hpp"
-#include "../headers/settings.hpp"
-#include "glm/fwd.hpp"
-#include "glm/geometric.hpp"
+
 #include <cassert>
-#include <cfloat>
-#include <cstdint>
 #include <cstdio>
-#include <fstream>
+
 #include <string>
 #include <vector>
-#include "../headers/matrix.hpp"
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/istreamwrapper.h"
-#include "rapidjson/document.h"
-#include <iostream>
-//#include "../src/jsonUtilities.cpp"
-#include "../headers/mesh.hpp"
 #include "../headers/scene.hpp"
-#include "glm/ext/matrix_transform.hpp"
 #include "../headers/renderer.hpp"
 
 
@@ -48,7 +34,7 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene5.crtscene";
+const std::string filename = "../inputs/Homework11_Shading3/scene4.crtscene";
 
 
 
