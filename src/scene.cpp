@@ -1,6 +1,7 @@
 #include "../headers/scene.hpp"
 #include "../headers/triangle.hpp"
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
@@ -141,21 +142,21 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
             const rapidjson::Value& materialVal = materialsVal[i];
             //&& materialVal.HasMember("albedo")
             assert(materialVal.HasMember("type")  && materialVal.HasMember("smooth_shading"));
-            std::string temp = materialVal.FindMember("type")->value.GetString();
+            std::string typeName = materialVal.FindMember("type")->value.GetString();
 
             //handle refractive/Semitransparent Materials
-            if(!temp.std::string::compare("refractive")) {
+            if(!typeName.std::string::compare("refractive")) {
                 assert(materialVal.HasMember("ior"));
                 ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
                 matType = refractive;
             } else {
                 assert(materialVal.HasMember("albedo"));
                 if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                    if(!temp.std::string::compare("reflective")) {
+                    if(!typeName.std::string::compare("reflective")) {
                         matType = reflective;
-                    } else if(!temp.std::string::compare("diffuse")) {
+                    } else if(!typeName.std::string::compare("diffuse")) {
                         matType = diffuse;
-                    } else if(!temp.std::string::compare("constant")){
+                    } else if(!typeName.std::string::compare("constant")){
                         matType = constant;
                         
                     } else {
@@ -164,7 +165,7 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
                 } else {
                     matType = constant;
                 }
-                albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());;
+                albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
             }
 
  
@@ -192,7 +193,49 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
     }
     
 }
+void importTextures(rapidjson::Document& doc) {
+    if(doc.HasMember("textures") ) {
+        const rapidjson::Value& texturesVal = doc.FindMember("textures")->value;
+        assert(texturesVal.IsArray());
+        for(int i = 0; i < texturesVal.Size(); i++) {
+            const rapidjson::Value& textureVal = texturesVal[i];
+            assert(textureVal.HasMember("type") && textureVal.HasMember("name"));
+            std::string typeName = textureVal.FindMember("type")->value.GetString();
+            std::string textureName = textureVal.FindMember("name")->value.GetString();
+            Texture newTexture{};
+            newTexture.name = textureName;
+            if(!typeName.std::string::compare("albedo")) {
+                //load albedo texture
+                newTexture.type = albedoTexture;
+                newTexture.albedo = loadVector(textureVal.FindMember("albedo")->value.GetArray());
+            } else if(!typeName.std::string::compare("edges")) {
+                assert(textureVal.HasMember("inner_color") &&textureVal.HasMember("edge_color") && textureVal.HasMember("edge_width"));
+                newTexture.type = edgeTexture;
+                newTexture.innerColor = loadVector(textureVal.FindMember("inner_color")->value.GetArray());
+                newTexture.edgeColor = loadVector(textureVal.FindMember("edge_color")->value.GetArray());
+                newTexture.edgeWidth = static_cast<float>(textureVal.FindMember("edge_width")->value.GetDouble());
+                //load edges Texture
+            } else if(!typeName.std::string::compare("checker")) {
+                assert(textureVal.HasMember("color_A") &&textureVal.HasMember("color_B") && textureVal.HasMember("square_size"));
+                newTexture.type = checkersTexture;
+                newTexture.colorA = loadVector(textureVal.FindMember("color_A")->value.GetArray());
+                newTexture.colorB = loadVector(textureVal.FindMember("color_B")->value.GetArray());
+                newTexture.squareSize = static_cast<float>(textureVal.FindMember("square_size")->value.GetDouble());
 
+            } else if (!typeName.std::string::compare("bitmap")) {
+                assert(textureVal.HasMember("file_path"));
+                newTexture.type = bitmapTexture;
+                std::string textureFilePath = textureVal.FindMember("bitmap")->value.GetString();
+
+            } else {
+                std::cout << "unsupported texture type encountered" << std::endl;
+                assert(false);
+            }
+
+        }
+
+    }
+}
 void CRTScene::parseSceneFile(const std::string& sceneFileName){
 std::ifstream ifs(sceneFileName);
     assert(ifs.is_open());

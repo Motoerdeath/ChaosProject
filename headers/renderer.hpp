@@ -6,6 +6,7 @@
 #include "ray.hpp"
 #include "scene.hpp"
 #include "intersection.hpp"
+#include "texture.hpp"
 #include <limits>
 #include <memory>
 
@@ -49,5 +50,7 @@ class CRTRenderer {
     const float shadowbias = 0.01f;
     const float reflectionBias = 0.001f;
     const float refractionBias = 0.001f;
+    Texture aTexture;
+    
 };
 #endif

@@ -8,7 +8,6 @@
 #include <cstdio>
 
 #include <string>
-#include <vector>
 #include "../headers/scene.hpp"
 #include "../headers/renderer.hpp"
 
@@ -34,7 +33,7 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene4.crtscene";
+const std::string filename = "../inputs/Homework11_Shading3/scene0.crtscene";
 
 
 

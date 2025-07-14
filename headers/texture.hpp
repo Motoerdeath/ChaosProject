@@ -15,8 +15,7 @@ enum TextureType {
 class Texture {
     public:
         CRTVector sample(CRTVector uvCoordinates);
-    private:
-        std::string name="";
+                std::string name="";
         TextureType type=invalidTexture;
 
         //TExture type specific sampling methods
@@ -25,11 +24,26 @@ class Texture {
         CRTVector sampleEdgesTexture(CRTVector uvCoordinates);
         CRTVector sampleBitmapTexture(CRTVector uvCoordinates);
 
-        //texture type specific variables
-        CRTVector albedo{0.f}; //required for and by Albedo textures
-        float edgeWidth = 0.f; //required for and by edge textures
-        float checkerCubeSize = 0.f; // required for and by checkers textures
-        std::vector<CRTVector> buffer{}; // required for and by Bitmap textures
+        //texture type specific variables:
+
+        //required for and by Albedo textures
+        CRTVector albedo{0.f}; 
+
+        //required for and by edge textures
+        float edgeWidth = 0.f; 
+        CRTVector edgeColor{0.f};
+        CRTVector innerColor{1.f};
+        // required for and by checkers textures
+        float squareSize = 0.f;
+        CRTVector colorA{0.f};
+        CRTVector colorB{0.f};
+        
+        // required for and by Bitmap textures
+        std::vector<std::vector<CRTVector>> buffer; 
+        int bitmapWidth;
+        int bitmapHeight;
+    private:
+
 };
 
 #endif

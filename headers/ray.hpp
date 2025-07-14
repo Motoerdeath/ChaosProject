@@ -1,7 +1,8 @@
 #ifndef CRTRAY
 #define CRTRAY
-#include "../headers/crtVector.hpp"
-#include "../headers/triangle.hpp"
+#include "crtVector.hpp"
+#include "triangle.hpp"
+#include "AABB.hpp"
 //#include <bit>
 
 
@@ -69,6 +70,7 @@ class CRTRay {
         return false;
     }
 
+    static bool intersectBoundingBox();
     static bool intersectTriangle(const CRTRay& ray,CRTTriangle triangle, float& t, bool hitBackside) {
 
         constexpr float EPSILON = 0.00001f;

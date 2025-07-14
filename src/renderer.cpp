@@ -12,7 +12,13 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
 };
 void CRTRenderer::render() {
-    
+    aTexture.albedo = CRTVector(0.f,0.f,1.f);
+    aTexture.type = albedoTexture;
+    aTexture.innerColor = CRTVector(1.f,0.f,0.f);
+    aTexture.edgeColor = CRTVector(0.f,1.f,0.f);
+    aTexture.edgeWidth = 0.1f;
+    aTexture.type=edgeTexture;
+
     //iterate over all pixels
     CRTSettings* settings = scene->getSettings();
     for(int y = 0; y < settings->imageHeight;y++) {
@@ -138,7 +144,8 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
     CRTVector final_color(0.f);
 
     //get the albedo of the material 
-    CRTVector albedo = mat.albedo;
+    //CRTVector albedo = mat.albedo;
+    CRTVector albedo = aTexture.sample(isect.baryCoords);
 
     CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
 
@@ -222,78 +229,6 @@ CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) 
     float f = fresnel(ray,normal);
     return f * traceRay(createReflectionRay(ray, isect.intersectionPoint, normal)) +  (1.f-f)* traceRay(refractionRay);
 }
-
-/*
-CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) {
-    Material mat = scene->sceneMaterials[isect.materialIDx];
-    CRTVector normal;
-
-    
-    if(mat.style == smooth) {
-        normal = isect.shadingNormal;
-    } else {
-        normal = isect.geomNormal;
-    }
-
-    float fresnel = CRTRenderer::fresnel(ray,normal);
-    float entryIOR = 1.f;
-    float exitIOR = mat.ior;
-    if(CRTVector::dot(ray.rayDirection.normalize(), normal)>0.f){
-        normal = normal* -1.f;
-        entryIOR = mat.ior;
-        exitIOR = 1.f;
-    }
-    float cosAlpha = -1.f * CRTVector::dot(ray.rayDirection.normalize(), normal);
-    float sinAlpha = sqrt(1.f-(cosAlpha*cosAlpha));
-    float relativeIOR = entryIOR/exitIOR;
-
-
-    /*
-    CRTRay reflectionRay(isect.intersectionPoint,CRTRay::reflect(ray.rayDirection.normalize(), normal));
-    reflectionRay.type = ReflectionRay;
-    reflectionRay.rayDepth = ray.rayDepth+1;
-    
-    CRTRay reflectionRay = createReflectionRay(ray, isect.intersectionPoint, normal);
-    //if(1.f-(cosAlpha*cosAlpha) > 1.0f){return CRTVector(0.f);}
-
-    float sinT2 = relativeIOR*relativeIOR * (1.f-cosAlpha*cosAlpha);
-    if(sinAlpha >= relativeIOR) return traceRay(reflectionRay);
-    //if(sinAlpha >= relativeIOR) return CRTVector(0.f);
-    float cosT = sqrt(1.f-sinT2);
-    CRTVector t = relativeIOR*ray.rayDirection + (relativeIOR*cosAlpha - cosT) * normal;
-    glm::vec3 vectorI =glm::vec3(ray.rayDirection.x,ray.rayDirection.y,ray.rayDirection.z);
-    glm::vec3 vectorN =glm::vec3(normal.x,normal.y,normal.z);
-    glm::vec3 vectorR = glm::refract(vectorI,vectorN,relativeIOR);
-    glm::vec3 vectorf = glm::reflect(vectorI,vectorN);
-    CRTVector vR(vectorR.x,vectorR.y,vectorR.z);
-    CRTVector vf(vectorf.x,vectorf.y,vectorf.z);
-    float sinBeta = sinAlpha*relativeIOR;
-    float cosBeta = sqrt(1.f-(sinBeta*sinBeta));
-    CRTVector A = cosBeta*(normal*-1.f);
-    CRTVector C = (ray.rayDirection.normalize() + cosAlpha*normal).normalize();
-    CRTVector B = C *sinBeta;
-    CRTVector R = A+B;
-    CRTVector refractionOrigin = isect.intersectionPoint + (normal*(-1.f)*0.01f);
-    //std::cout << "Begin" << std::endl;
-    //std::cout << fresnel << std::endl;
-    //std::cout << reflectionRay.rayDirection.x<< ";"<<reflectionRay.rayDirection.y <<";" <<reflectionRay.rayDirection.z  <<std::endl;
-    //std::cout << vf.x<< ";"<<vf.y <<";" <<vf.z  <<std::endl;
-    //std::cout << t.x<< ";"<<t.y <<";" <<t.z  <<std::endl;
-
-
-    //schlick approximation for Fresnel term/specular reflectance
-    float r0 = (entryIOR-exitIOR)/(entryIOR+exitIOR);
-    r0 = r0*r0;
-    float F = r0+((1.f-r0)*pow((1.f - cosAlpha),5));
-    //std::cout << F << std::endl;
-    //CRTVector t = -1.f*(sinBeta/sinAlpha)*(ray.rayDirection.normalize() - normal*cosAlpha) - normal*cosBeta;
-    CRTRay refractionRay(refractionOrigin,vR);
-    refractionRay.type = RefractionRay;
-    refractionRay.rayDepth = ray.rayDepth+1;
-    //return traceRay(reflectionRay)*F + (1.f-F) *traceRay(refractionRay);
-    return traceRay(refractionRay);
-}
-*/
 CRTRay CRTRenderer::createReflectionRay(const CRTRay& ray, const CRTVector& position, const CRTVector& normal) {
     const CRTVector reflectionOrigin = position + normal * reflectionBias;
     CRTRay reflectionRay(reflectionOrigin,CRTRay::reflect(ray.rayDirection, normal));
@@ -303,7 +238,7 @@ CRTRay CRTRenderer::createReflectionRay(const CRTRay& ray, const CRTVector& posi
 }
 
 CRTVector refract(const CRTRay& ray,const CRTVector normal, const float relativeIOR) {
-
+    return CRTVector{0.f};
 }
 
 //this represents a simplified version of the Fresnel Equation

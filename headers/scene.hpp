@@ -10,6 +10,7 @@
 #include "light.hpp"
 #include "rapidjson/document.h"
 #include "material.hpp"
+#include "texture.hpp"
 
 
 
@@ -38,6 +39,7 @@ class CRTScene {
         std::vector<CRTMesh> sceneObjects;
         std::vector<Light> sceneLights;
         std::vector<Material> sceneMaterials;
+        std::vector<Texture> sceneTextures;
         PPMImage sceneImage;
         CRTSettings sceneSettings;
         private:
