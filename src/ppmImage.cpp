@@ -47,7 +47,8 @@ void PPMImage::setPixel(int r, int g, int b, int x, int y) {
     image[y][x] = {r,g,b};
 }
 void PPMImage::setPixel(CRTVector color, int x, int y) {
-    image[y][x] = {(int) (color.x*255.f),(int) (color.y*255.f),(int) (color.z*255.f)};
+    CRTVector final_color = CRTVector(glm::clamp(color.x,0.f,1.f),glm::clamp(color.y,0.f,1.f),glm::clamp(color.z,0.f,1.f));
+    image[y][x] = {(int) (final_color.x*255.f),(int) (final_color.y*255.f),(int) (final_color.z*255.f)};
 }
 void PPMImage::renderRandomizedBackground() {
 

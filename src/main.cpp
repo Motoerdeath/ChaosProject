@@ -48,7 +48,7 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
+const std::string filename = "../inputs/Homework11_Shading3/scene5.crtscene";
 
 
 

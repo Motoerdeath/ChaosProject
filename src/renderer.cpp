@@ -18,11 +18,14 @@ void CRTRenderer::render() {
     for(int y = 0; y < settings->imageHeight;y++) {
         for(int x = 0; x < settings->imageWidth;x++) { 
             CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
+            cameraRay.rayDepth = 0;
+            cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
 
 
             image.setPixel(color,x,y);
         }
+        std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
     }
 }
 CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
@@ -30,7 +33,7 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
 
     Intersection isect;
     if(intersect(ray, isect)) {
-
+        //std::cout << "test" << std::endl;
         Material mat = scene->sceneMaterials[isect.materialIDx];
         return calculateShading(ray, isect);
 
@@ -61,10 +64,12 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
             //shoot shadowRay
             if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
                 hitCondition = CRTRay::intersectTriangle(ray,triangle,t, true) && t < closestIntersectionDistance && t < maxT;
-            }
-            if(ray.type == CameraRay) {
+            } else {
                 hitCondition = CRTRay::intersectTriangle(ray,triangle,t, false) && t < closestIntersectionDistance && t < maxT;
             }
+            //if(ray.type == CameraRay) {
+                
+            //}
 
             if(hitCondition) {
 
@@ -152,9 +157,10 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), normal));
         if(cosLaw ==0.f) continue;
         float distanceFallOff = 4*M_PI*lDLength*lDLength;
-        CRTVector temp = final_color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
-        final_color = CRTVector(glm::clamp(temp.x,0.f,1.f),glm::clamp(temp.y,0.f,1.f),glm::clamp(temp.z,0.f,1.f));
-    }
+        final_color = final_color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
+        }
+    //final_color = CRTVector(glm::clamp(final_color.x,0.f,1.f),glm::clamp(final_color.y,0.f,1.f),glm::clamp(final_color.z,0.f,1.f));
+
     return final_color;
 }
 
@@ -174,7 +180,12 @@ CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) 
 CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) {
     
     Material mat = scene->getMaterial(isect.materialIDx);
-    CRTVector normal = isect.geomNormal;
+    CRTVector normal;
+    if(mat.style == smooth) {
+        normal = isect.shadingNormal;
+    } else {
+        normal = isect.geomNormal;
+    } 
     CRTVector I = ray.rayDirection.normalize();
     float entryIOR = 1.f;
     float exitIOR = mat.ior;
@@ -184,7 +195,6 @@ CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) 
         entryIOR = mat.ior;
         exitIOR = 1.f;
     }
-
     float relativeIOR = entryIOR/exitIOR;
 
     float cosAlpha = -1.f*CRTVector::dot(I, normal);
