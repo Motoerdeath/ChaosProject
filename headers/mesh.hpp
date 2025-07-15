@@ -9,11 +9,11 @@ class CRTMesh {
         CRTMesh();
         CRTMesh(std::vector<CRTVector> vertices,std::vector<int> indices) : triangleVertices(vertices), triangleVertIndices(indices) { vertexNormals.reserve(triangleVertices.size());determineVertexNormals();}
         CRTMesh(std::vector<CRTVector> vertices,std::vector<int> indices, int mID) : triangleVertices(vertices), triangleVertIndices(indices),materialID(mID) { vertexNormals.reserve(triangleVertices.size());determineVertexNormals();}
-
+        CRTMesh(std::vector<CRTVector> vertices,std::vector<int> indices, int mID, std::vector<CRTVector> texCoords) : triangleVertices(vertices), triangleVertIndices(indices),materialID(mID),textureCoords(texCoords) { vertexNormals.reserve(triangleVertices.size());determineVertexNormals();}
         std::vector<CRTVector> triangleVertices;
         std::vector<int> triangleVertIndices;
         std::vector<CRTVector> vertexNormals;
-        std::vector<CRTVector> TextureCoords;
+        std::vector<CRTVector> textureCoords;
         int materialID = 0;
     private:
         void determineVertexNormals();

@@ -12,12 +12,14 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
 };
 void CRTRenderer::render() {
+    /*
     aTexture.albedo = CRTVector(0.f,0.f,1.f);
     aTexture.type = albedoTexture;
     aTexture.innerColor = CRTVector(1.f,0.f,0.f);
     aTexture.edgeColor = CRTVector(0.f,1.f,0.f);
     aTexture.edgeWidth = 0.1f;
     aTexture.type=edgeTexture;
+    */
 
     //iterate over all pixels
     CRTSettings* settings = scene->getSettings();
@@ -144,8 +146,8 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
     CRTVector final_color(0.f);
 
     //get the albedo of the material 
-    //CRTVector albedo = mat.albedo;
-    CRTVector albedo = aTexture.sample(isect.baryCoords);
+    CRTVector albedo = mat.albedo;
+    //CRTVector albedo = aTexture.sample(isect.baryCoords);
 
     CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
 

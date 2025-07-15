@@ -3,6 +3,12 @@
 
 #include <cmath>
 
+
+struct UVCoordinates{
+    float u;
+    float v;
+    UVCoordinates(float u, float v ) : u(u),v(v) {}
+};
 //3 dimensional vectorsused for position and direction data
 class CRTVector {
 

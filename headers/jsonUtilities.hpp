@@ -12,4 +12,5 @@ CRTVector loadVector(const rapidjson::Value::ConstArray& bgColorArr);
 CRTMatrix loadMatrix(const rapidjson::Value::ConstArray& rotMatrix);
 std::vector<CRTVector> loadVertices(const rapidjson::Value::ConstArray& verticesArr);
 std::vector<int> loadIndices(const rapidjson::Value::ConstArray& indicesArr);
+std::vector<CRTVector> loadTextureCoordinates(const rapidjson::Value::ConstArray& uvCoordArr);
 #endif

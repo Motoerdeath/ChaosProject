@@ -51,3 +51,14 @@ std::vector<int> loadIndices(const rapidjson::Value::ConstArray& indicesArr) {
     return indices;
 }
 
+std::vector<CRTVector> loadTextureCoordinates(const rapidjson::Value::ConstArray& uvCoordsArr) {
+    std::vector<CRTVector> textureCoords;
+    assert(uvCoordsArr.Size() % 3 == 0);
+    for(int i =0; i < uvCoordsArr.Size();i+=3) {
+        CRTVector v(static_cast<float>(uvCoordsArr[i].GetDouble()),
+                    static_cast<float>(uvCoordsArr[i+1].GetDouble()),
+                    static_cast<float>(uvCoordsArr[i+2].GetDouble()));
+        textureCoords.push_back(v);
+    }
+    return textureCoords;
+}

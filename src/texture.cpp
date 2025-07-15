@@ -22,12 +22,12 @@ CRTVector Texture::sample(CRTVector uvCoordinates) {
     }
 }
 
-CRTVector Texture::sampleAlbedoTexture(CRTVector uvCoordinates) {
+CRTVector Texture::sampleAlbedoTexture(CRTVector baryCoords) {
     return albedo;
 }
 
-CRTVector Texture::sampleEdgesTexture(CRTVector uvCoordinates) {
-    if(uvCoordinates.x >= edgeWidth && uvCoordinates.y >= edgeWidth && uvCoordinates.z >= edgeWidth) {
+CRTVector Texture::sampleEdgesTexture(CRTVector baryCoords) {
+    if(baryCoords.x >= edgeWidth && baryCoords.y >= edgeWidth && baryCoords.z >= edgeWidth) {
         return innerColor;
     } else {
         return edgeColor;
@@ -41,6 +41,8 @@ CRTVector Texture::sampleCheckersTexture(CRTVector uvCoordinatesInterpolated) {
     return CRTVector{0.f};
 }
 
-CRTVector Texture::sampleBitmapTexture(CRTVector uvCoordinates) {
-    return CRTVector{0.f};
+CRTVector Texture::sampleBitmapTexture(CRTVector uvCoordinatesInterpolated) {
+    int u = static_cast<int>(uvCoordinatesInterpolated.x*bitmapWidth);
+    int v = static_cast<int>(uvCoordinatesInterpolated.y*bitmapHeight);
+    return buffer[u][v];
 }

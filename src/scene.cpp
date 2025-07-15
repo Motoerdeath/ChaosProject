@@ -80,6 +80,7 @@ void CRTScene::importObjects(rapidjson::Document& doc){
             const rapidjson::Value& objectVal = objectsVal[i];
             std::vector<int> triangleVertIndices;
             std::vector<CRTVector> triangleVertices;
+            std::vector<CRTVector> textureCoords;
             assert(objectVal.HasMember("vertices"));
             assert(objectVal.HasMember("triangles"));
             const rapidjson::Value& verticesVal = objectVal.FindMember("vertices")->value;
@@ -96,7 +97,15 @@ void CRTScene::importObjects(rapidjson::Document& doc){
                 assert(mIDVal.IsInt());
                 mID = mIDVal.GetInt();
             }
-            objects.push_back(CRTMesh(triangleVertices,triangleVertIndices,mID));
+            if(objectVal.HasMember("uvs")) {
+                const rapidjson::Value& uvVal = objectVal.FindMember("uvs")->value;
+                assert(uvVal.IsArray());
+                textureCoords = loadTextureCoordinates(uvVal.GetArray());
+                objects.push_back(CRTMesh(triangleVertices,triangleVertIndices,mID,textureCoords));
+            } else {
+                objects.push_back(CRTMesh(triangleVertices,triangleVertIndices,mID));
+            }
+            
         }
     }
     sceneObjects = objects;
@@ -134,6 +143,8 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
     if(doc.HasMember("materials")) {
         const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
         for(int i = 0; i < materialsVal.Size();i++) {
+
+            //check if the material is actually used in the scene, skip if no
             Material mat;
             CRTVector albedo(1.f);
             MaterialType matType = diffuse;
