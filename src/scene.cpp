@@ -7,6 +7,7 @@
 #include "rapidjson/istreamwrapper.h"
 #include "../headers/jsonUtilities.hpp"
 #include <iostream>
+#include <string>
 #include <vector>
 
 void CRTScene::parse() {
@@ -204,7 +205,7 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
     }
     
 }
-void importTextures(rapidjson::Document& doc) {
+void CRTScene::importTextures(rapidjson::Document& doc) {
     if(doc.HasMember("textures") ) {
         const rapidjson::Value& texturesVal = doc.FindMember("textures")->value;
         assert(texturesVal.IsArray());
@@ -242,9 +243,30 @@ void importTextures(rapidjson::Document& doc) {
                 std::cout << "unsupported texture type encountered" << std::endl;
                 assert(false);
             }
-
+            sceneTextures.push_back(newTexture);
         }
-
+    } else {
+        if(doc.HasMember("materials")) {
+            const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
+            for(int i = 0; i < materialsVal.Size();i++) {
+                const rapidjson::Value& materialVal = materialsVal[i];
+                Texture newTexture;
+                newTexture.name = "Texture"+ std::to_string(i);
+                if(!materialVal.HasMember("albedo")) {
+                    newTexture.type = invalidTexture;
+                } else {
+                    newTexture.type = albedoTexture;
+                    newTexture.albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
+                }
+                sceneTextures.push_back(newTexture);
+            }
+        } else {
+            Texture newTexture;
+            newTexture.name = "Texture0";
+            newTexture.albedo = CRTVector(0.4f);
+            newTexture.type = albedoTexture;
+            sceneTextures.push_back(newTexture);
+        }
     }
 }
 void CRTScene::parseSceneFile(const std::string& sceneFileName){
@@ -263,6 +285,8 @@ std::ifstream ifs(sceneFileName);
 
     importMaterials(doc);
     //import materials
+    importTextures(doc);
+    std::cout << "j" << std::endl;
 }
 
 Material CRTScene::getMaterial(int materialIDx) {

@@ -24,6 +24,7 @@ class CRTRenderer {
     CRTRenderer() {}
     CRTRenderer(CRTScene* scene);
     void render();
+    void renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight);
     void storeImage(std::string filePathName){ image.storeImageToFile(filePathName);};
     private:
     CRTScene* scene;

@@ -36,6 +36,32 @@ void CRTRenderer::render() {
         std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
     }
 }
+void CRTRenderer::renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight) {
+    /*
+    aTexture.albedo = CRTVector(0.f,0.f,1.f);
+    aTexture.type = albedoTexture;
+    aTexture.innerColor = CRTVector(1.f,0.f,0.f);
+    aTexture.edgeColor = CRTVector(0.f,1.f,0.f);
+    aTexture.edgeWidth = 0.1f;
+    aTexture.type=edgeTexture;
+    */
+
+    //iterate over all pixels
+    CRTSettings* settings = scene->getSettings();
+    for(int y = startY; y < regionHeight;y++) {
+        for(int x = startX; x < regionWidth;x++) { 
+            CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
+            cameraRay.rayDepth = 0;
+            cameraRay.type = CameraRay;
+            CRTVector color = traceRay(cameraRay);
+
+
+            image.setPixel(color,x,y);
+        }
+    }
+    std::cout << "Bucket finished" << std::endl;
+}
+
 CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
     if(ray.rayDepth >= maxDepth) return scene->getBackgroundColor();
 
