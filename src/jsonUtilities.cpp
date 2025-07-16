@@ -6,6 +6,8 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stbi/stb_image.h"
 CRTVector loadVector(const rapidjson::Value::ConstArray& bgColorArr) {
     assert(bgColorArr.Size() == 3);
     return CRTVector(static_cast<float>(bgColorArr[0].GetDouble()),
@@ -61,4 +63,27 @@ std::vector<CRTVector> loadTextureCoordinates(const rapidjson::Value::ConstArray
         textureCoords.push_back(v);
     }
     return textureCoords;
+}
+std::vector<std::vector<CRTVector>> loadImageFromFile(const std::string filePath) {
+    std::vector<std::vector<CRTVector>> resultImage;
+    unsigned char* image;
+    int width, height, n;
+    int forceChannels = 3;
+    //resultImage.reserve(height,std::vector<CRTVector>(width,CRTVector))
+
+    
+    image = stbi_load(filePath.c_str(), &width, &height, &n, forceChannels);
+    
+    if(image) {
+        resultImage.resize(height,std::vector<CRTVector>(width,CRTVector(0.f)));
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                resultImage[y][x] = CRTVector(static_cast<float>(image[y*width*n+x*n])/255.f,static_cast<float>(image[y*width*n+x*n+1])/255.f,static_cast<float>(image[y*width*n+x*n+2])/255.f);
+            }
+        }
+    } else {
+        assert(false);
+    }
+    stbi_image_free(image);
+    return resultImage;
 }

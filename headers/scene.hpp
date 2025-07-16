@@ -44,6 +44,7 @@ class CRTScene {
         std::vector<Texture> sceneTextures;
         PPMImage sceneImage;
         CRTSettings sceneSettings;
+        std::vector<std::vector<CRTVector>> textureImage;
         private:
 };
 #endif

@@ -315,6 +315,7 @@ std::ifstream ifs(sceneFileName);
     //import materials
     importTextures(doc);
     std::cout << "j" << std::endl;
+    textureImage = loadImageFromFile("../inputs/Homework12_Textures/textures/dragon.jpg");
 }
 
 Material CRTScene::getMaterial(int materialIDx) {

@@ -25,13 +25,13 @@ void CRTRenderer::render() {
     CRTSettings* settings = scene->getSettings();
     for(int y = 0; y < settings->imageHeight;y++) {
         for(int x = 0; x < settings->imageWidth;x++) { 
+
             CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
-
-
             image.setPixel(color,x,y);
+
         }
         std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
     }
@@ -82,10 +82,12 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
     int materialID;
     int objectID;
     int triangleID;
+    int textureID{0};
     CRTVector geoNormal;
     CRTVector shadingNormal;
     CRTVector baryCoords;
     CRTVector position;
+    CRTVector textureCoords{0.f};
 
     for(int i = 0; i < scene->sceneObjects.size(); i++) {
         CRTMesh* object = &(scene->sceneObjects[i]);
@@ -116,7 +118,21 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
                 position = ray.rayOrigin + ray.rayDirection*t;
                 baryCoords = CRTTriangle::calculateBarycentricCoordinates(triangle,position);
                 shadingNormal = object->vertexNormals[object->triangleVertIndices[k]]*baryCoords.z +object->vertexNormals[object->triangleVertIndices[k+1]]*baryCoords.x + object->vertexNormals[object->triangleVertIndices[k+2]]*baryCoords.y;
+
                 
+                Material mat = scene->getMaterial(materialID);
+
+                /*
+                for(int j =0; j < scene->sceneTextures.size();j++) {
+                    if(!mat.albedoTex.std::string::compare(scene->sceneTextures[j].name)) {
+                        textureID = j;
+                        break;
+                    }
+                }
+                if(scene->sceneTextures[textureID].type == checkersTexture || scene->sceneTextures[textureID].type == bitmapTexture) {
+                    textureCoords = object->textureCoords[object->triangleVertIndices[k]]*baryCoords.z +object->textureCoords[object->triangleVertIndices[k+1]]*baryCoords.x + object->textureCoords[object->triangleVertIndices[k+2]]*baryCoords.y;
+                }
+                    */
                 if(ray.type == ShadowRay) {
                     Material mat = scene->getMaterial(materialID);
                     if (mat.type != refractive) {
