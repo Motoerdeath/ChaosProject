@@ -8,7 +8,7 @@
 #include "settings.hpp"
 #include <string>
 #include "light.hpp"
-#include "rapidjson/document.h"
+#include "../include/rapidjson/document.h"
 #include "material.hpp"
 #include "texture.hpp"
 

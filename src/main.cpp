@@ -8,14 +8,18 @@
 #include <cstdio>
 
 #include <string>
+#include <thread>
 #include "../headers/scene.hpp"
 #include "../headers/renderer.hpp"
+#include <iostream>
 
 
 bool FUNDAMENTALS = true;
 bool RAYS = true;
 
-
+void func() {
+  std::cout << "Hello from Thread" << std::this_thread::get_id()<<std::endl;
+}
 
 int main() {
   /*
@@ -33,7 +37,7 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene0.crtscene";
+const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
 
 
 
@@ -48,6 +52,10 @@ std::printf("finished rendering scene.\n");
 renderer.storeImage("../output.ppm");
 std::printf("finished storing output.\n");
 
+  //std::thread t;
+  //std::thread t(&func);
 
-    return 0;
+  //t.join();
+
+  return 0;
 }

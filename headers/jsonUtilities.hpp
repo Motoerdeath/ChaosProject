@@ -2,7 +2,7 @@
 #define JSONUTILITIES
 #include "../headers/crtVector.hpp"
 #include "../headers/matrix.hpp"
-#include "rapidjson/Document.h"
+#include "../include/rapidjson/Document.h"
 #include <cassert>
 #include <vector>
 

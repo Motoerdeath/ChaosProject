@@ -316,7 +316,8 @@ struct GenericStringRef {
 
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
 
-    GenericStringRef& operator=(const GenericStringRef& rhs) { s = rhs.s; length = rhs.length; }
+    //thisa causes a build error had to remove it for my project.
+    //GenericStringRef& operator=(const GenericStringRef& rhs) { s = rhs.s; length = rhs.length; }
 
     //! implicit conversion to plain CharType pointer
     operator const Ch *() const { return s; }

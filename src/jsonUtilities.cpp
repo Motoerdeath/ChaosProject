@@ -1,13 +1,13 @@
 #include "../headers/jsonUtilities.hpp"
 #include "../headers/crtVector.hpp"
 #include "../headers/matrix.hpp"
-#include "rapidjson/rapidjson.h"
-#include "rapidjson/Document.h"
+#include "../include/rapidjson/rapidjson.h"
+#include "../include/rapidjson/Document.h"
 #include <cassert>
 #include <string>
 #include <vector>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stbi/stb_image.h"
+#include "../include/stbi/stb_image.h"
 CRTVector loadVector(const rapidjson::Value::ConstArray& bgColorArr) {
     assert(bgColorArr.Size() == 3);
     return CRTVector(static_cast<float>(bgColorArr[0].GetDouble()),

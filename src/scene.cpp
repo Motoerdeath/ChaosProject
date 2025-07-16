@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
-#include "rapidjson/document.h"
-#include "rapidjson/istreamwrapper.h"
+#include "../include/rapidjson/document.h"
+#include "../include/rapidjson/istreamwrapper.h"
 #include "../headers/jsonUtilities.hpp"
 #include <iostream>
 #include <string>
@@ -158,8 +158,8 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
 
             //handle refractive/Semitransparent Materials
             if(!typeName.std::string::compare("refractive")) {
-                //assert(materialVal.HasMember("ior"));
-                //ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
+                assert(materialVal.HasMember("ior"));
+                ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
                 matType = refractive;
             } else {
                 assert(materialVal.HasMember("albedo"));
@@ -315,7 +315,7 @@ std::ifstream ifs(sceneFileName);
     //import materials
     importTextures(doc);
     std::cout << "j" << std::endl;
-    textureImage = loadImageFromFile("../inputs/Homework12_Textures/textures/dragon.jpg");
+    //textureImage = loadImageFromFile("../inputs/Homework12_Textures/textures/dragon.jpg");
 }
 
 Material CRTScene::getMaterial(int materialIDx) {

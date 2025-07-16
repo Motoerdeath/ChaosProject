@@ -1,7 +1,7 @@
 #ifndef GLOBALS
 #define GLOBALS
 
-#include "glm/glm.hpp"
+#include "../include/glm/glm.hpp"
 #include "../headers/crtVector.hpp"
 
 struct GridCell {

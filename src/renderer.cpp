@@ -1,5 +1,5 @@
 #include "../headers/renderer.hpp"
-#include "glm/geometric.hpp"
+#include "../include/glm/geometric.hpp"
 #include <cfloat>
 #include <cmath>
 #include <iostream>
@@ -26,27 +26,22 @@ void CRTRenderer::render() {
     for(int y = 0; y < settings->imageHeight;y++) {
         for(int x = 0; x < settings->imageWidth;x++) { 
 
+
             CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
-            image.setPixel(color,x,y);
 
+
+            image.setPixel(color,x,y);
+            
         }
         std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
     }
 }
 void CRTRenderer::renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight) {
-    /*
-    aTexture.albedo = CRTVector(0.f,0.f,1.f);
-    aTexture.type = albedoTexture;
-    aTexture.innerColor = CRTVector(1.f,0.f,0.f);
-    aTexture.edgeColor = CRTVector(0.f,1.f,0.f);
-    aTexture.edgeWidth = 0.1f;
-    aTexture.type=edgeTexture;
-    */
 
-    //iterate over all pixels
+    //iterate over all pixels in the region
     CRTSettings* settings = scene->getSettings();
     for(int y = startY; y < regionHeight;y++) {
         for(int x = startX; x < regionWidth;x++) { 
@@ -260,13 +255,6 @@ CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) 
     CRTVector A = cosBeta * -1.f * normal;
     CRTVector R = A +B;
     CRTRay refractionRay(isect.intersectionPoint + -1.f*0.001f*normal,R);
-
-    glm::vec3 vectorI =glm::vec3(ray.rayDirection.x,ray.rayDirection.y,ray.rayDirection.z);
-    glm::vec3 vectorN =glm::vec3(normal.x,normal.y,normal.z);
-    glm::vec3 vectorR = glm::refract(vectorI,vectorN,relativeIOR);
-    glm::vec3 vectorf = glm::reflect(vectorI,vectorN);
-    CRTVector vR(vectorR.x,vectorR.y,vectorR.z);
-    CRTVector vf(vectorf.x,vectorf.y,vectorf.z);
     //glm::refract(ray.rayDirection)
     refractionRay.rayDepth = ray.rayDepth+1;
     refractionRay.type = RefractionRay;
