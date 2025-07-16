@@ -9,9 +9,12 @@ struct Intersection{
     CRTVector geomNormal;
     CRTVector shadingNormal;
     CRTVector baryCoords;
+    CRTVector textureCoords;
     int materialIDx;
     int objectIDx;
     int triangleIDx;
+    int textureIDx{0};
+
     float t;
 
 

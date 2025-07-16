@@ -28,11 +28,13 @@ class CRTScene {
         void importObjects(rapidjson::Document& doc);
         void importLights(rapidjson::Document& doc);
         void importMaterials(rapidjson::Document& doc);
+        void importMaterialsWithTextures(rapidjson::Document& doc);
         void importTextures(rapidjson::Document& doc);
         const CRTVector getBackgroundColor();
         CRTSettings* getSettings();
         CRTCamera* getCamera();
         Material getMaterial(int materialIDx);
+        Texture* getTexture(int textureIDx);
 
         CRTCamera sceneCamera;
         std::string sceneFilePath;

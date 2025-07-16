@@ -33,7 +33,7 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene3.crtscene";
+const std::string filename = "../inputs/Homework11_Shading3/scene0.crtscene";
 
 
 
@@ -44,7 +44,6 @@ scene.parseSceneFile(filename);
 std::printf("finished importing scene.\n");
 std::printf("Begin rendering scene.\n");
 renderer.render();
-//scene.render();
 std::printf("finished rendering scene.\n");
 renderer.storeImage("../output.ppm");
 std::printf("finished storing output.\n");

@@ -158,8 +158,8 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
 
             //handle refractive/Semitransparent Materials
             if(!typeName.std::string::compare("refractive")) {
-                assert(materialVal.HasMember("ior"));
-                ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
+                //assert(materialVal.HasMember("ior"));
+                //ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
                 matType = refractive;
             } else {
                 assert(materialVal.HasMember("albedo"));
@@ -205,6 +205,34 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
     }
     
 }
+void CRTScene::importMaterialsWithTextures(rapidjson::Document& doc) {
+    if(doc.HasMember("materials")) {
+        Material mat;
+        std::string albedoTex = "Texture0";
+        MaterialType matType;
+        RenderingStyle style = flat;
+        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                matType = diffuse;
+        } else {
+                matType = constant;
+        }
+        mat = Material(matType,albedoTex,style,1.f);
+        sceneMaterials.push_back(mat);
+    } else {
+        Material mat;
+        std::string albedoTex = "Texture0";
+        MaterialType matType;
+        RenderingStyle style = flat;
+        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                matType = diffuse;
+        } else {
+                matType = constant;
+        }
+        mat = Material(matType,albedoTex,style,1.f);
+        sceneMaterials.push_back(mat);
+    }
+}
+
 void CRTScene::importTextures(rapidjson::Document& doc) {
     if(doc.HasMember("textures") ) {
         const rapidjson::Value& texturesVal = doc.FindMember("textures")->value;
@@ -237,7 +265,7 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
             } else if (!typeName.std::string::compare("bitmap")) {
                 assert(textureVal.HasMember("file_path"));
                 newTexture.type = bitmapTexture;
-                std::string textureFilePath = textureVal.FindMember("bitmap")->value.GetString();
+                std::string textureFilePath = textureVal.FindMember("file_path")->value.GetString();
 
             } else {
                 std::cout << "unsupported texture type encountered" << std::endl;

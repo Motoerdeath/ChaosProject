@@ -40,6 +40,7 @@ class Material{
         Material() {};
         Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle) : type(mtype),albedo(albedo),style(rStyle) {};
         Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle, float ior) : type(mtype),albedo(albedo),style(rStyle), ior(ior) {};
+        Material(MaterialType mtype,std::string albedoTex, RenderingStyle rStyle, float ior) : type(mtype),albedoTex(albedoTex),style(rStyle), ior(ior) {};
         MaterialType type;
         CRTVector albedo;
         RenderingStyle style;

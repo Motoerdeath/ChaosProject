@@ -36,8 +36,12 @@ CRTVector Texture::sampleEdgesTexture(CRTVector baryCoords) {
 
 CRTVector Texture::sampleCheckersTexture(CRTVector uvCoordinatesInterpolated) {
 
-    float sizeFactor = 2.f/squareSize;
-    if(uvCoordinatesInterpolated.x < sizeFactor)
+    int uFactor = static_cast<int>(uvCoordinatesInterpolated.x/squareSize);
+    int vFactor = static_cast<int>(uvCoordinatesInterpolated.y/squareSize);
+    if(uFactor % 2 == 0 && vFactor % 2 == 0) return colorA;
+    if(uFactor % 2 == 1 && vFactor % 2 == 0) return colorB;
+    if(uFactor % 2 == 0 && vFactor % 2 == 1) return colorB;
+    if(uFactor % 2 == 1 && vFactor % 2 == 1) return colorA;
     return CRTVector{0.f};
 }
 
