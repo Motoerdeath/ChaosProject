@@ -20,7 +20,21 @@ class CRTTriangle {
         CRTVector normal;
         std::vector<int> color;
         CRTVector color2 = CRTVector(0.f);
+
+        CRTVector getTexCoords(const CRTVector uvCoordinates);
+        
     private:
+        CRTVector geoNormal;
+        CRTVector vertexNormal0;
+        CRTVector vertexNormal1;
+        CRTVector vertexNormal2;
+        CRTVector texCoords0;
+        CRTVector texCoords1;
+        CRTVector texCoords2;
+        int textureID;
+        int objectID;
+        int materialID;
+
 
 
 };

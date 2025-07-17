@@ -20,7 +20,10 @@ set(CCP_SOURCE_FILES
   ${CMAKE_SOURCE_DIR}/src/ray.cpp
   ${CMAKE_SOURCE_DIR}/src/renderer.cpp
   ${CMAKE_SOURCE_DIR}/src/texture.cpp
-  
+  ${CMAKE_SOURCE_DIR}/src/bucketqueue.cpp
+  ${CMAKE_SOURCE_DIR}/src/AABB.cpp
+  ${CMAKE_SOURCE_DIR}/src/accelerationStructure.cpp
+
 )
 
 

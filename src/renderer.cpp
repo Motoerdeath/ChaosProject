@@ -43,18 +43,21 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
 
     //iterate over all pixels in the region
     CRTSettings* settings = scene->getSettings();
-    for(int y = startY; y < regionHeight;y++) {
-        for(int x = startX; x < regionWidth;x++) { 
-            CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
+    for(int y = 0; y < regionHeight;y++) {
+        for(int x = 0; x < regionWidth;x++) { 
+            int actualY = startY+y;
+            int actualX = startX+x;
+            CRTRay cameraRay = scene->sceneCamera.generateCameraRay(actualY, actualX);
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
 
 
-            image.setPixel(color,x,y);
+            image.setPixel(color,actualX,actualY);
+            //CRTVector final_color = CRTVector(glm::clamp(color.x,0.f,1.f),glm::clamp(color.y,0.f,1.f),glm::clamp(color.z,0.f,1.f));
+            //image.image[y][x] = {(int) (final_color.x*255.f),(int) (final_color.y*255.f),(int) (final_color.z*255.f)};
         }
     }
-    std::cout << "Bucket finished" << std::endl;
 }
 
 CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
@@ -283,4 +286,16 @@ float fresnel_schlick(const CRTRay& ray,const CRTVector& normal,const float etai
     float r0 = (etai-eta2)/(etai+eta2);
     r0 = r0*r0;
     return r0+((1.f-r0)*pow((1.f - CRTVector::dot(ray.rayDirection.normalize(), normal)),5));
+}
+
+void CRTRenderer::generateBoundingBox() {
+for(CRTMesh object : scene->sceneObjects) {
+  for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
+      CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
+                    object.triangleVertices[object.triangleVertIndices[i+1]],
+                    object.triangleVertices[object.triangleVertIndices[i+2]]);
+
+      entireSceneBB.include(triangle);
+  }
+}
 }

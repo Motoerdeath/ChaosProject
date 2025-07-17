@@ -52,6 +52,9 @@ class CRTRenderer {
     const float reflectionBias = 0.001f;
     const float refractionBias = 0.001f;
     Texture aTexture;
+
+    AABB entireSceneBB;
+    void generateBoundingBox();
     
 };
 #endif

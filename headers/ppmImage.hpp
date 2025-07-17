@@ -69,12 +69,13 @@ class PPMImage{
         void generateCameraRays(CRTVector cameraPosition);
         std::vector<std::vector<CRTRay>> cameraRays;
         CRTVector backgroundColor = CRTVector(0.f);
+        std::vector<std::vector<std::vector<int>>> image;
 
     private:
         int imageWidth;
         int imageHeight;
         int maxColorValue;
-        std::vector<std::vector<std::vector<int>>> image;
+        
         
         std::vector<std::vector<GridCell>> grid;
         std::vector<Shape> shapes;
