@@ -55,6 +55,8 @@ class CRTRenderer {
 
     AABB entireSceneBB;
     void generateBoundingBox();
+    float fade(float low, float high, float value);
+    CRTVector temperature(float intensity);
     
 };
 #endif

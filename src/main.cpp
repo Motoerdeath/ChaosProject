@@ -89,7 +89,7 @@ for(CRTMesh object : scene.sceneObjects) {
 
 std::printf("finished importing scene.\n");
 std::printf("Begin rendering scene.\n");
-//renderer.render();
+renderer.render();
 std::printf("finished rendering scene.\n");
 //renderer.storeImage("../output.ppm");
 std::printf("finished storing output.\n");
@@ -104,12 +104,12 @@ std::cout << nThreads << std::endl;;
   std::vector<std::thread> threads;
 
   for(int i = 0; i < nThreads;i++) {
-    threads.push_back(std::thread(&func2,i,&(queue.buckets),&renderer));
+    //threads.push_back(std::thread(&func2,i,&(queue.buckets),&renderer));
   }
     
 
   for(std::thread& t : threads) {
-    t.join();
+    //t.join();
   }
 renderer.storeImage("../output.ppm");
 

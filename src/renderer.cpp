@@ -1,9 +1,11 @@
 #include "../headers/renderer.hpp"
 #include "../include/glm/geometric.hpp"
+#include <algorithm>
 #include <cfloat>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#include <chrono>
 
 
 CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
@@ -26,14 +28,16 @@ void CRTRenderer::render() {
     for(int y = 0; y < settings->imageHeight;y++) {
         for(int x = 0; x < settings->imageWidth;x++) { 
 
-
+            auto start = std::chrono::steady_clock::now();
             CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
-
-
-            image.setPixel(color,x,y);
+            auto finish = std::chrono::steady_clock::now();
+            const std::chrono::duration<double> elapsed_seconds{finish - start};
+            float time = elapsed_seconds.count()*100000.f;
+            CRTVector timeColor = temperature(time);
+            image.setPixel(timeColor,x,y);
             
         }
         std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
@@ -298,4 +302,25 @@ for(CRTMesh object : scene->sceneObjects) {
       entireSceneBB.include(triangle);
   }
 }
+}
+
+
+float CRTRenderer::fade(float low, float high, float value) {
+    float mid = (low+high)*0.5f;
+    float range = (high-low)*0.5f;
+    float x = 1.f-std::clamp(0.f,1.f,std::abs(mid-value)/range);
+    return std::lerp(0.f,1.f,x);
+}
+
+CRTVector CRTRenderer::temperature(float intensity) {
+    const CRTVector blue(0.f,0.f,1.f);
+    const CRTVector cyan(0.f,1.f,1.f);
+    const CRTVector green(0.f,1.f,0.f);
+    const CRTVector yellow(1.f,1.f,0.f);
+    const CRTVector red(1.f,0.f,0.f);
+    return CRTVector(fade(-0.25f, 0.25f, intensity)*blue
+                        +fade(0.f, 0.5f, intensity)*cyan
+                        +fade(0.25f, 0.75f, intensity)*green
+                        +fade(0.5f, 1.f, intensity)*yellow
+                        +std::lerp(0.75f, 1.f, intensity)*red);
 }

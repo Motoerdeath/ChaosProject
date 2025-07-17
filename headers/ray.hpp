@@ -70,7 +70,7 @@ class CRTRay {
         return false;
     }
 
-    static bool intersectBoundingBox();
+    static bool intersectBoundingBox(const CRTRay& ray, const AABB& aabb);
     static bool intersectTriangle(const CRTRay& ray,CRTTriangle triangle, float& t, bool hitBackside) {
 
         constexpr float EPSILON = 0.00001f;
