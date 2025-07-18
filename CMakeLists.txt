@@ -28,11 +28,11 @@ set(CCP_SOURCE_FILES
 
 
 set(Project_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-#file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 
 
 #add_executable(${PROJECT_NAME} ${CCP_SOURCE_FILES})
-add_executable(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/src/main.cpp" ${CCP_SOURCE_FILES})
+add_executable(${PROJECT_NAME} "${PROJECT_SOURCE_DIR}/src/main.cpp" ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
 

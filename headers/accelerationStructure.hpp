@@ -3,6 +3,8 @@
 
 #include "AABB.hpp"
 #include "intersection.hpp"
+#include "mesh.hpp"
+#include "ray.hpp"
 #include "triangle.hpp"
 #include <vector>
 
@@ -17,12 +19,14 @@ struct ASNode{
 class AccelerationStructure{
     public:
         AccelerationStructure() {}
-        AccelerationStructure createAccelerationStructure();
-        Intersection findIntersection();
+        void buildAS();
+        bool findIntersection(const CRTRay& ray, Intersection& isect, const float maxT=std::numeric_limits<float>::max());
+        void createTriangleSoup(std::vector<CRTMesh> objects);
     private:
         std::vector<CRTTriangle> triangleSoup;
-        std::vector<ASNode> structure;
+        std::vector<ASNode> accelerationStructure;
         int MAXTRIANGLESPERLEAF;
+        int MAXSEARCHDEPTH;
 
 };
 

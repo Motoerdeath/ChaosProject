@@ -297,15 +297,15 @@ float fresnel_schlick(const CRTRay& ray,const CRTVector& normal,const float etai
 }
 
 void CRTRenderer::generateBoundingBox() {
-for(CRTMesh object : scene->sceneObjects) {
-  for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
-      CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
-                    object.triangleVertices[object.triangleVertIndices[i+1]],
-                    object.triangleVertices[object.triangleVertIndices[i+2]]);
+    for(CRTMesh object : scene->sceneObjects) {
+        for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
+            CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
+                            object.triangleVertices[object.triangleVertIndices[i+1]],
+                            object.triangleVertices[object.triangleVertIndices[i+2]]);
 
-      entireSceneBB.include(triangle);
-  }
-}
+            entireSceneBB.include(triangle);
+        }
+    }
 }
 
 
