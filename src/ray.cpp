@@ -1,6 +1,7 @@
 #include "../headers/ray.hpp"
 #include <algorithm>
 #include <iostream>
+#include <limits>
 
 
 CRTVector CRTRay::reflect(const CRTVector& rayDirection, CRTVector normal) {
@@ -29,14 +30,24 @@ CRTVector CRTRay::refract(const CRTVector& rayDirection,const CRTVector& normal,
 
 
 bool CRTRay::intersectBoundingBox(const CRTRay &ray, const AABB &aabb) {
-    float smallestDistance = 0.f;
+    float smallestDistance = std::numeric_limits<float>::max();
     CRTVector pos{0.f};
+    CRTVector tMin = (aabb.min-ray.rayOrigin)/ray.rayDirection;
+    CRTVector tMax = (aabb.max-ray.rayOrigin)/ray.rayDirection;
+
+    CRTVector t1 = CRTVector(std::min(tMin.x,tMax.x),std::min(tMin.y,tMax.y),std::min(tMin.z,tMax.z));
+    CRTVector t2 = CRTVector(std::max(tMin.x,tMax.x),std::max(tMin.y,tMax.y),std::max(tMin.z,tMax.z));
+
+    float tNear = std::max(std::max(t1.x,t1.y),t1.z);
+    float tFar = std::min(std::min(t2.x,t2.y),t2.z);
+    return tNear <= tFar && tFar >=0.f;
+
     float tx1 = (aabb.min.x - ray.rayOrigin.x) / ray.rayDirection.x;
     float tx2 = (aabb.max.x - ray.rayOrigin.x) / ray.rayDirection.x;
-    float ty1 = (aabb.min.x - ray.rayOrigin.y) / ray.rayDirection.y;
-    float ty2 = (aabb.max.x - ray.rayOrigin.y) / ray.rayDirection.y;
-    float tz1 = (aabb.min.x - ray.rayOrigin.z) / ray.rayDirection.z;
-    float tz2 = (aabb.max.x - ray.rayOrigin.z) / ray.rayDirection.z;
+    float ty1 = (aabb.min.y - ray.rayOrigin.y) / ray.rayDirection.y;
+    float ty2 = (aabb.max.y - ray.rayOrigin.y) / ray.rayDirection.y;
+    float tz1 = (aabb.min.z - ray.rayOrigin.z) / ray.rayDirection.z;
+    float tz2 = (aabb.max.z - ray.rayOrigin.z) / ray.rayDirection.z;
     if(tx1 > 0.f) {
         CRTVector p = ray.rayOrigin + tx1*ray.rayDirection;
         if(p.x <= aabb.max.x && p.x >= aabb.min.x) {
@@ -73,5 +84,9 @@ bool CRTRay::intersectBoundingBox(const CRTRay &ray, const AABB &aabb) {
             smallestDistance = std::min(tz2,smallestDistance);
         }
     }
-
+    if(smallestDistance >0.f) {
+        return true;
+    } else {
+        return false;
+    }
 }

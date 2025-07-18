@@ -22,17 +22,20 @@ void CRTRenderer::render() {
     aTexture.edgeWidth = 0.1f;
     aTexture.type=edgeTexture;
     */
+    generateBoundingBox();
 
     //iterate over all pixels
     CRTSettings* settings = scene->getSettings();
     for(int y = 0; y < settings->imageHeight;y++) {
         for(int x = 0; x < settings->imageWidth;x++) { 
 
-            auto start = std::chrono::steady_clock::now();
+            auto start = std::chrono::steady_clock::now();//timing
             CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
+
+            //Heatmap and timing stuff
             auto finish = std::chrono::steady_clock::now();
             const std::chrono::duration<double> elapsed_seconds{finish - start};
             float time = elapsed_seconds.count()*100000.f;
@@ -55,8 +58,6 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);
-
-
             image.setPixel(color,actualX,actualY);
             //CRTVector final_color = CRTVector(glm::clamp(color.x,0.f,1.f),glm::clamp(color.y,0.f,1.f),glm::clamp(color.z,0.f,1.f));
             //image.image[y][x] = {(int) (final_color.x*255.f),(int) (final_color.y*255.f),(int) (final_color.z*255.f)};
@@ -90,7 +91,9 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
     CRTVector baryCoords;
     CRTVector position;
     CRTVector textureCoords{0.f};
-
+    if(!CRTRay::intersectBoundingBox(ray, entireSceneBB)) {
+        return false;
+    }
     for(int i = 0; i < scene->sceneObjects.size(); i++) {
         CRTMesh* object = &(scene->sceneObjects[i]);
         for(int k = 0; k < object->triangleVertIndices.size();k+=3) {
@@ -99,6 +102,7 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
                                 object->triangleVertices[object->triangleVertIndices[k+2]]);
             float t;
             bool hitCondition = false;
+
             //shoot shadowRay
             if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
                 hitCondition = CRTRay::intersectTriangle(ray,triangle,t, true) && t < closestIntersectionDistance && t < maxT;

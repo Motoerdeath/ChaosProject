@@ -38,6 +38,9 @@ class CRTVector {
     bool operator==(const CRTVector& rhs) const {
         return x==rhs.x && y==rhs.y && z==rhs.y;
     }
+    CRTVector operator/(const CRTVector& rhs) const {
+        return CRTVector(x/rhs.x,y/rhs.y,z/rhs.z);
+    }
 
     CRTVector cross(const CRTVector& rhs) const {
         return CRTVector(y*rhs.z-z*rhs.y,
