@@ -2,6 +2,7 @@
 #define CRTVECTOR
 
 #include <cmath>
+#include <stdexcept>
 
 
 struct UVCoordinates{
@@ -40,6 +41,28 @@ class CRTVector {
     }
     CRTVector operator/(const CRTVector& rhs) const {
         return CRTVector(x/rhs.x,y/rhs.y,z/rhs.z);
+    }
+    float* operator[](int index) {
+        if(index == 0) {
+            return &x;
+        } else if(index == 1) {
+            return &y;
+        } else if(index == 2) {
+            return &z;
+        } else {
+            throw std::length_error("trying to access element outside this 3-Element vector");
+        }
+    }
+    const float operator[](int index) const  {
+        if(index == 0) {
+            return x;
+        } else if(index == 1) {
+            return y;
+        } else if(index == 2) {
+            return z;
+        } else {
+            throw std::length_error("trying to access element outside this 3-Element vector");
+        }
     }
 
     CRTVector cross(const CRTVector& rhs) const {

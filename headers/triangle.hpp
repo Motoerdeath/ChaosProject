@@ -22,8 +22,7 @@ class CRTTriangle {
         CRTVector color2 = CRTVector(0.f);
 
         CRTVector getTexCoords(const CRTVector uvCoordinates);
-        
-    private:
+
         CRTVector geoNormal;
         CRTVector vertexNormal0;
         CRTVector vertexNormal1;
@@ -31,9 +30,11 @@ class CRTTriangle {
         CRTVector texCoords0;
         CRTVector texCoords1;
         CRTVector texCoords2;
-        int textureID;
         int objectID;
         int materialID;
+        
+    private:
+
 
 
 

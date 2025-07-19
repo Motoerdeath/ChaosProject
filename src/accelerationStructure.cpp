@@ -3,24 +3,176 @@
 
 #include "../headers/accelerationStructure.hpp"
 #include <limits>
+#include <numeric>
 #include <stack>
 
 
 
 void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
-    for(CRTMesh object : objects) {
+    for(int i = 0; i < objects.size();i++) {
+        CRTMesh object = objects[i];
         for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
             CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
                             object.triangleVertices[object.triangleVertIndices[i+1]],
                             object.triangleVertices[object.triangleVertIndices[i+2]]);
 
+            triangle.objectID = i;
+            triangle.geoNormal = triangle.normal;
+            triangle.materialID = object.materialID;
+            triangle.vertexNormal0 = object.vertexNormals[object.triangleVertIndices[i]];
+            triangle.vertexNormal1 = object.vertexNormals[object.triangleVertIndices[i+1]];
+            triangle.vertexNormal2 = object.vertexNormals[object.triangleVertIndices[i+2]];
+            triangle.texCoords0 = object.textureCoords[object.triangleVertIndices[i]];
+            triangle.texCoords1 = object.textureCoords[object.triangleVertIndices[i+1]];
+            triangle.texCoords2 = object.textureCoords[object.triangleVertIndices[i+2]];
+            
             triangleSoup.push_back(triangle);
         }
     }
 }
+//for he moemnt we only build a kd tree
+bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri) {
+    AABB triaabb{tri};
+    CRTVector v1 = triaabb.min-aabb.max;
+    CRTVector v2 = aabb.min - triaabb.max;
+    if(v1.x > 0.f|| v1.y >0.f || v1.z >0.f || v2.x >0.f || v2.y >0.f || v2.z >0.f) return false;
+    return true;
+}
 
+bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri,int i) {
+    AABB triaabb{tri};
+    CRTVector v1 = triaabb.min-aabb.max;
+    CRTVector v2 = aabb.min - triaabb.max;
+    if(v1.x > 0.f|| v1.y >0.f || v1.z >0.f || v2.x >0.f || v2.y >0.f || v2.z >0.f) return false;
+    return true;
+}
+
+void AccelerationStructure::AABBSplitting(const AABB& toSplit, AABB& a, AABB& b, int axis) {
+    float mid = (toSplit.max[axis] - toSplit.min[axis]) /2.f;
+    float splitCoordinatePoint = toSplit.min[axis] + mid;
+    a = toSplit;
+    b = toSplit;
+    if(axis == 0) {
+        a.max.x = splitCoordinatePoint;
+        b.min.x = splitCoordinatePoint;
+    }
+    if(axis == 1) {
+        a.max.y = splitCoordinatePoint;
+        b.min.y = splitCoordinatePoint;
+    }
+    if(axis == 2) {
+        a.max.z = splitCoordinatePoint;
+        b.min.z = splitCoordinatePoint;
+    }
+}
 void AccelerationStructure::buildAS() {
+    ASNode root;
+    root.child1 =-1;
+    root.child2 =-1;
+    root.parentIDx =-1;
+    AABB rootBB;
+    for(CRTTriangle tri : triangleSoup) {
+        rootBB.include(tri);
+    }
+    root.boundingBox = rootBB;
+    accTree.push_back(root);
+    std::vector<int> triangleIndexes(triangleSoup.size());
+    std::iota(triangleIndexes.begin(), triangleIndexes.end(), 0);
 
+    buildAccTree(0, 0, triangleIndexes);
+
+}
+
+void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<CRTTriangle> triangles) {
+    if(triangles.size() <= MAXTRIANGLESPERLEAF || depth >= MAXTREEDEPTH) {
+        //build leaf node
+        accTree[parentIdx].triangles = triangles;
+        return;
+    } else {
+        int splittingAxis = depth% 3;
+        AABB child1AABB;
+        AABB child2AABB;
+        AABBSplitting(accTree[parentIdx].boundingBox, child1AABB, child2AABB, splittingAxis);
+        std::vector<CRTTriangle> child1triangles;
+        std::vector<CRTTriangle> child2triangles;
+        for(CRTTriangle tri : triangles) {
+            if(AABBTriIntersection(child1AABB, tri)) {
+                child1triangles.push_back(tri);
+            }
+            if(AABBTriIntersection(child2AABB, tri)) {
+                child2triangles.push_back(tri);
+            }
+        }
+        //if there are triangles in child 1 then build that subnode
+        if(child1triangles.size()>0) {  
+            ASNode child1;
+            child1.child1  = -1;
+            child1.child2  = -1;
+            child1.boundingBox = child1AABB;
+            child1.parentIDx = parentIdx;
+            int child1Idx = accTree.size();
+            accTree.push_back(child1);
+            accTree[parentIdx].child1 =child1Idx;
+            buildAccTree(child1Idx, depth+1, child1triangles);
+        }
+        if(child2triangles.size() > 0) {
+            ASNode child2;
+            child2.child1  = -1;
+            child2.child2  = -1;
+            child2.boundingBox = child2AABB;
+            child2.parentIDx = parentIdx;
+            int child2Idx = accTree.size();
+            accTree.push_back(child2);
+            accTree[parentIdx].child2 =child2Idx;
+            buildAccTree(child2Idx, depth+1, child2triangles);
+        }
+    }
+}
+void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<int> triangleSoupIndexes) {
+    if(triangleSoupIndexes.size() <= MAXTRIANGLESPERLEAF || depth >= MAXTREEDEPTH) {
+        //build leaf node
+        accTree[parentIdx].triangleSoupIdx = triangleSoupIndexes;
+        return;
+    } else {
+        int splittingAxis = depth% 3;
+        AABB child1AABB;
+        AABB child2AABB;
+        AABBSplitting(accTree[parentIdx].boundingBox, child1AABB, child2AABB, splittingAxis);
+        std::vector<int> child1triangles;
+        std::vector<int> child2triangles;
+        for(int triIdx : triangleSoupIndexes) {
+            
+            if(AABBTriIntersection(child1AABB, triangleSoup[triIdx])) {
+                child1triangles.push_back(triIdx);
+            }
+            if(AABBTriIntersection(child2AABB, triangleSoup[triIdx])) {
+                child2triangles.push_back(triIdx);
+            }
+        }
+        //if there are triangles in child 1 then build that subnode
+        if(child1triangles.size()>0) {  
+            ASNode child1;
+            child1.child1  = -1;
+            child1.child2  = -1;
+            child1.boundingBox = child1AABB;
+            child1.parentIDx = parentIdx;
+            int child1Idx = accTree.size();
+            accTree.push_back(child1);
+            accTree[parentIdx].child1 =child1Idx;
+            buildAccTree(child1Idx, depth+1, child1triangles);
+        }
+        if(child2triangles.size() > 0) {
+            ASNode child2;
+            child2.child1  = -1;
+            child2.child2  = -1;
+            child2.boundingBox = child2AABB;
+            child2.parentIDx = parentIdx;
+            int child2Idx = accTree.size();
+            accTree.push_back(child2);
+            accTree[parentIdx].child2 =child2Idx;
+            buildAccTree(child2Idx, depth+1, child2triangles);
+        }
+    }
 }
 
 bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& isect, const float maxT) {
@@ -31,13 +183,14 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     CRTTriangle closestTriangle;
     bool foundIntersection = false;
     while(!nodeStack.empty()) {
-        ASNode* currentNode = &accelerationStructure[nodeStack.top()];
+        ASNode* currentNode = &accTree[nodeStack.top()];
         nodeStack.pop();
         if(CRTRay::intersectBoundingBox(ray, currentNode->boundingBox)) {
             if(currentNode->triangles.size() > 0) {
                 float minT = std::numeric_limits<float>::max();
 
-                for(CRTTriangle tri : currentNode->triangles) {
+                for(int i = 0; i < currentNode->triangleSoupIdx.size();i++) {
+                    CRTTriangle tri = triangleSoup[currentNode->triangleSoupIdx[i]];
                     float t;
                     if(CRTRay::intersectTriangle(ray,tri,t, false)) {
                         if(t <maxT && t < minT) {
@@ -59,8 +212,9 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
 
     if(!foundIntersection) return false;
 
+    
     //init the intersectionData
-
+    //TODO fill intersection
 
     return true;
 }

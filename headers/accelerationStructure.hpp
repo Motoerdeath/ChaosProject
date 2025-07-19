@@ -14,6 +14,7 @@ struct ASNode{
     int child2=-1;
     AABB boundingBox;
     std::vector<CRTTriangle> triangles;
+    std::vector<int> triangleSoupIdx;
 
 };
 class AccelerationStructure{
@@ -22,11 +23,17 @@ class AccelerationStructure{
         void buildAS();
         bool findIntersection(const CRTRay& ray, Intersection& isect, const float maxT=std::numeric_limits<float>::max());
         void createTriangleSoup(std::vector<CRTMesh> objects);
+        static bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri, int i);
     private:
         std::vector<CRTTriangle> triangleSoup;
-        std::vector<ASNode> accelerationStructure;
-        int MAXTRIANGLESPERLEAF;
-        int MAXSEARCHDEPTH;
+        std::vector<ASNode> accTree;
+        int MAXTRIANGLESPERLEAF = 4;
+        int MAXTREEDEPTH = 5;
+        bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri);
+        
+        void AABBSplitting(const AABB& toSplit, AABB& a, AABB& b, int axis); //axis: 0 = x; 1=y; 2= z;
+        void buildAccTree(int parentIdx, int depth, std::vector<CRTTriangle> triangles);
+        void buildAccTree(int parentIdx, int depth, std::vector<int> triangleSoupIndexes);
 
 };
 

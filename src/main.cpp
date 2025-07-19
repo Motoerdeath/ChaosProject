@@ -18,6 +18,7 @@
 #include <vector>
 #include <chrono>
 #include "../headers/bucket.hpp"
+#include "../headers/accelerationStructure.hpp"
 
 
 #define MULTITHREADING 0;
@@ -69,27 +70,18 @@ int main() {
     
 const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
 
-
-
 CRTScene scene(filename);
 CRTRenderer renderer(&scene);
 std::printf("Begin importing scene.\n");
 scene.parseSceneFile(filename);
 
-AABB entireSceneBB;
-for(CRTMesh object : scene.sceneObjects) {
-  for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
-      CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
-                    object.triangleVertices[object.triangleVertIndices[i+1]],
-                    object.triangleVertices[object.triangleVertIndices[i+2]]);
-
-      entireSceneBB.include(triangle);
-  }
-}
+AccelerationStructure as;
+as.createTriangleSoup(scene.sceneObjects);
+as.buildAS();
 
 std::printf("finished importing scene.\n");
 std::printf("Begin rendering scene.\n");
-renderer.render();
+//renderer.render();
 std::printf("finished rendering scene.\n");
 //renderer.storeImage("../output.ppm");
 std::printf("finished storing output.\n");
