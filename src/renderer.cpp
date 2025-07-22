@@ -13,6 +13,12 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
     CRTSettings* settings = scene->getSettings();
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
 };
+void CRTRenderer::setupTriangleAccessStructure() {
+
+    as.createTriangleSoup(scene->sceneObjects);
+    as.buildAS();
+    std::printf("hey");
+}
 void CRTRenderer::render() {
     /*
     aTexture.albedo = CRTVector(0.f,0.f,1.f);
@@ -24,6 +30,9 @@ void CRTRenderer::render() {
     */
     generateBoundingBox();
 
+
+    //as.createTriangleSoup(scene->sceneObjects);
+    //as.buildAS();
     //iterate over all pixels
     CRTSettings* settings = scene->getSettings();
     for(int y = 0; y < settings->imageHeight;y++) {
@@ -36,11 +45,11 @@ void CRTRenderer::render() {
             CRTVector color = traceRay(cameraRay);
 
             //Heatmap and timing stuff
-            auto finish = std::chrono::steady_clock::now();
-            const std::chrono::duration<double> elapsed_seconds{finish - start};
-            float time = elapsed_seconds.count()*100000.f;
-            CRTVector timeColor = temperature(time);
-            image.setPixel(timeColor,x,y);
+            //auto finish = std::chrono::steady_clock::now();
+            //const std::chrono::duration<double> elapsed_seconds{finish - start};
+            //float time = elapsed_seconds.count()*100000.f;
+            //CRTVector timeColor = temperature(time);
+            image.setPixel(color,x,y);
             
         }
         std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
@@ -69,7 +78,9 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
     if(ray.rayDepth >= maxDepth) return scene->getBackgroundColor();
 
     Intersection isect;
-    if(intersect(ray, isect)) {
+    if(as.findIntersection(ray, isect)) {
+        //Intersection isect2;
+        //as.findIntersection(ray, isect2);
         //std::cout << "test" << std::endl;
         Material mat = scene->sceneMaterials[isect.materialIDx];
         return calculateShading(ray, isect);
@@ -312,7 +323,7 @@ void CRTRenderer::generateBoundingBox() {
 float CRTRenderer::fade(float low, float high, float value) {
     float mid = (low+high)*0.5f;
     float range = (high-low)*0.5f;
-    float x = 1.f-std::clamp(0.f,1.f,std::abs(mid-value)/range);
+    float x = 1.f-std::clamp(std::abs(mid-value)/range,0.f,1.f);
     return std::lerp(0.f,1.f,x);
 }
 

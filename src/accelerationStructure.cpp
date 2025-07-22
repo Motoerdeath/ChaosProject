@@ -5,26 +5,27 @@
 #include <limits>
 #include <numeric>
 #include <stack>
+#include <cassert>
 
 
 
 void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
     for(int i = 0; i < objects.size();i++) {
         CRTMesh object = objects[i];
-        for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
-            CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
-                            object.triangleVertices[object.triangleVertIndices[i+1]],
-                            object.triangleVertices[object.triangleVertIndices[i+2]]);
+        for(int j = 0; j < object.triangleVertIndices.size();j+=3) {
+            CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[j]],
+                            object.triangleVertices[object.triangleVertIndices[j+1]],
+                            object.triangleVertices[object.triangleVertIndices[j+2]]);
 
             triangle.objectID = i;
             triangle.geoNormal = triangle.normal;
             triangle.materialID = object.materialID;
-            triangle.vertexNormal0 = object.vertexNormals[object.triangleVertIndices[i]];
-            triangle.vertexNormal1 = object.vertexNormals[object.triangleVertIndices[i+1]];
-            triangle.vertexNormal2 = object.vertexNormals[object.triangleVertIndices[i+2]];
-            triangle.texCoords0 = object.textureCoords[object.triangleVertIndices[i]];
-            triangle.texCoords1 = object.textureCoords[object.triangleVertIndices[i+1]];
-            triangle.texCoords2 = object.textureCoords[object.triangleVertIndices[i+2]];
+            triangle.vertexNormal0 = object.vertexNormals[object.triangleVertIndices[j]];
+            triangle.vertexNormal1 = object.vertexNormals[object.triangleVertIndices[j+1]];
+            triangle.vertexNormal2 = object.vertexNormals[object.triangleVertIndices[j+2]];
+            triangle.texCoords0 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j]];
+            triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
+            triangle.texCoords2 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+2]];
             
             triangleSoup.push_back(triangle);
         }
@@ -181,40 +182,66 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     std::stack<int> nodeStack;
     nodeStack.push(roodIDx); //the root of the AS is always checked first
     CRTTriangle closestTriangle;
+    int triangleIDx;
     bool foundIntersection = false;
+    float minT = std::numeric_limits<float>::max();
     while(!nodeStack.empty()) {
         ASNode* currentNode = &accTree[nodeStack.top()];
         nodeStack.pop();
         if(CRTRay::intersectBoundingBox(ray, currentNode->boundingBox)) {
-            if(currentNode->triangles.size() > 0) {
-                float minT = std::numeric_limits<float>::max();
+            if(currentNode->triangleSoupIdx.size() > 0) {
+                
 
                 for(int i = 0; i < currentNode->triangleSoupIdx.size();i++) {
+
                     CRTTriangle tri = triangleSoup[currentNode->triangleSoupIdx[i]];
                     float t;
-                    if(CRTRay::intersectTriangle(ray,tri,t, false)) {
-                        if(t <maxT && t < minT) {
+                    bool hitCondition = false;
+                    
+                    if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
+                        hitCondition = CRTRay::intersectTriangle(ray,tri,t, true) && t < minT && t < maxT;
+                    } else {
+                        hitCondition = CRTRay::intersectTriangle(ray,tri,t, false) && t < minT && t < maxT;
+                    }
+                    if(hitCondition) {
+                            triangleIDx = currentNode->triangleSoupIdx[i];
                             minT = t;
                             closestTriangle = tri;
                             foundIntersection = true;
-                        }
                     }
-                }
 
+                }
             } else {
                 if(currentNode->child1 != -1) nodeStack.push(currentNode->child1); 
                 if(currentNode->child2 != -1) nodeStack.push(currentNode->child2); 
             }
-        } else {
-            
         }
     }
 
     if(!foundIntersection) return false;
+    isect.intersectionPoint = ray.rayOrigin + ray.rayDirection * minT;
+    //offset intersectionPoint
 
-    
-    //init the intersectionData
-    //TODO fill intersection
+    isect.geomNormal = closestTriangle.geoNormal;
+    isect.triangleIDx = triangleIDx;
+    isect.materialIDx = closestTriangle.materialID;
+    isect.objectIDx = closestTriangle.objectID;
+    isect.t = minT;
+    isect.baryCoords = CRTTriangle::calculateBarycentricCoordinates(closestTriangle, isect.intersectionPoint);
+    isect.shadingNormal = closestTriangle.vertexNormal0 * isect.baryCoords.z + closestTriangle.vertexNormal2 * isect.baryCoords.x + closestTriangle.vertexNormal2 * isect.baryCoords.y;
+    isect.textureCoords = closestTriangle.texCoords0 * isect.baryCoords.z + closestTriangle.texCoords1 * isect.baryCoords.x + closestTriangle.texCoords2 * isect.baryCoords.y;
+
 
     return true;
 }
+
+/*
+        isect.intersectionPoint = position;
+        isect.baryCoords = baryCoords;
+        isect.geomNormal = geoNormal;
+        isect.shadingNormal = shadingNormal;
+        isect.materialIDx = materialID;
+        isect.objectIDx = objectID;
+        isect.triangleIDx = triangleID;
+        isect.t = closestIntersectionDistance;
+        */

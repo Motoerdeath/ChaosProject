@@ -25,8 +25,9 @@
 #define DEBUGLEVEL 0;
 
 std::mutex bucketMutex;
+std::mutex updateMutex;
 std::vector<int> a{0,1,2,3,4,5,6,7,8,9};
-
+int finishedBuckets =0;
 
 void func2(int threadIndex,std::queue<Bucket>* buckets, CRTRenderer* renderer) {
   //
@@ -40,6 +41,11 @@ void func2(int threadIndex,std::queue<Bucket>* buckets, CRTRenderer* renderer) {
       //std::this_thread::sleep_for(std::chrono::milliseconds(100));
       renderer->renderRegion(temp.startX, temp.startY, temp.width, temp.height);
       //std::cout << "Bucket " << temp.bucketIDx<<" finished!"<<std::endl;
+
+      updateMutex.lock();
+      finishedBuckets++;
+      std::cout << finishedBuckets<<" Buckets finished!"<<std::endl;
+      updateMutex.unlock();
     } else {
       bucketMutex.unlock();
       return;
@@ -68,16 +74,18 @@ int main() {
  */
 
     
-const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
+const std::string filename = "../inputs/Homework9_Shading1/scene5.crtscene";
 
 CRTScene scene(filename);
-CRTRenderer renderer(&scene);
+
 std::printf("Begin importing scene.\n");
 scene.parseSceneFile(filename);
+CRTRenderer renderer(&scene);
+renderer.setupTriangleAccessStructure();
 
-AccelerationStructure as;
-as.createTriangleSoup(scene.sceneObjects);
-as.buildAS();
+//AccelerationStructure as;
+//as.createTriangleSoup(scene.sceneObjects);
+//as.buildAS();
 
 std::printf("finished importing scene.\n");
 std::printf("Begin rendering scene.\n");
@@ -87,8 +95,8 @@ std::printf("finished rendering scene.\n");
 std::printf("finished storing output.\n");
 
 
-  BucketQueue queue;
-  queue.generateBucketQueue(1920, 1080, 24);
+BucketQueue queue;
+queue.generateBucketQueue(1920, 1080, 24);
 
 const auto nThreads = std::thread::hardware_concurrency();
 
@@ -96,12 +104,12 @@ std::cout << nThreads << std::endl;;
   std::vector<std::thread> threads;
 
   for(int i = 0; i < nThreads;i++) {
-    //threads.push_back(std::thread(&func2,i,&(queue.buckets),&renderer));
+    threads.push_back(std::thread(&func2,i,&(queue.buckets),&renderer));
   }
     
 
   for(std::thread& t : threads) {
-    //t.join();
+    t.join();
   }
 renderer.storeImage("../output.ppm");
 

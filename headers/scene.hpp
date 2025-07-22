@@ -22,6 +22,7 @@ class CRTScene {
         }
 
         void parseSceneFile(const std::string& sceneFileName);
+        void parseSceneFile2(const std::string& sceneFileName);
         void parse();
         void importSettings(rapidjson::Document& doc);
         void importCamera(rapidjson::Document& doc, int width, int height);

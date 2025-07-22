@@ -331,3 +331,29 @@ CRTSettings* CRTScene::getSettings() {
 CRTCamera* CRTScene::getCamera() {
     return &sceneCamera;
 }
+
+
+void CRTScene::parseSceneFile2(const std::string& sceneFileName) {
+
+
+    //import settings
+        //import backgroundColor: CRTVector
+        //import ImageSettings:
+            //import width : int
+            //import height : int
+            //import bucketsize : int
+    //import Camera
+        //import RotationMatrix : 3x3 Matrix
+        //import Position : CRTVector
+    //import lights : Array
+        //for each light:
+            //import intensity : int
+            //import position : CRTVector
+    //import Materials: Array
+        //for each material
+            //import Type : string valid forms: "diffuse"/"reflective"/"refractive"/"constant"
+            //if "back_face_culling" is present, set that value otherwise set it to false
+            //import Albedo if pre
+    
+
+}

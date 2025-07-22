@@ -28,7 +28,7 @@ class AccelerationStructure{
         std::vector<CRTTriangle> triangleSoup;
         std::vector<ASNode> accTree;
         int MAXTRIANGLESPERLEAF = 4;
-        int MAXTREEDEPTH = 5;
+        int MAXTREEDEPTH = 15;
         bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri);
         
         void AABBSplitting(const AABB& toSplit, AABB& a, AABB& b, int axis); //axis: 0 = x; 1=y; 2= z;

@@ -1,6 +1,7 @@
 #ifndef CRTRENDERER
 #define CRTRENDERER
 
+#include "accelerationStructure.hpp"
 #include "crtVector.hpp"
 #include "ppmImage.hpp"
 #include "ray.hpp"
@@ -26,6 +27,7 @@ class CRTRenderer {
     void render();
     void renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight);
     void storeImage(std::string filePathName){ image.storeImageToFile(filePathName);};
+    void setupTriangleAccessStructure();
     private:
     CRTScene* scene;
     std::unique_ptr<CRTScene> scene2;
@@ -57,6 +59,9 @@ class CRTRenderer {
     void generateBoundingBox();
     float fade(float low, float high, float value);
     CRTVector temperature(float intensity);
+    AccelerationStructure as;
+    AccelerationStructure access;
+    
     
 };
 #endif
