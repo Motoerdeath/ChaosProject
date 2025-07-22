@@ -29,6 +29,8 @@ class CRTScene {
         void importObjects(rapidjson::Document& doc);
         void importLights(rapidjson::Document& doc);
         void importMaterials(rapidjson::Document& doc);
+        Material importBasicMaterial(rapidjson::Document& doc, int mIdx);
+        Material importTextureMaterial(rapidjson::Document& doc, int mIdx);
         void importMaterialsWithTextures(rapidjson::Document& doc);
         void importTextures(rapidjson::Document& doc);
         const CRTVector getBackgroundColor();

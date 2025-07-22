@@ -23,9 +23,16 @@ void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
             triangle.vertexNormal0 = object.vertexNormals[object.triangleVertIndices[j]];
             triangle.vertexNormal1 = object.vertexNormals[object.triangleVertIndices[j+1]];
             triangle.vertexNormal2 = object.vertexNormals[object.triangleVertIndices[j+2]];
-            triangle.texCoords0 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j]];
-            triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
-            triangle.texCoords2 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+2]];
+            if(object.textureCoords.size() == object.triangleVertices.size()) {
+                triangle.texCoords0 = object.textureCoords[object.triangleVertIndices[j]];
+                triangle.texCoords1 = object.textureCoords[object.triangleVertIndices[j+1]];
+                triangle.texCoords2 = object.textureCoords[object.triangleVertIndices[j+2]];
+            } else {
+                triangle.texCoords0 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j]];
+                triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
+                triangle.texCoords2 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+2]];
+            }
+
             
             triangleSoup.push_back(triangle);
         }
@@ -228,7 +235,7 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     isect.objectIDx = closestTriangle.objectID;
     isect.t = minT;
     isect.baryCoords = CRTTriangle::calculateBarycentricCoordinates(closestTriangle, isect.intersectionPoint);
-    isect.shadingNormal = closestTriangle.vertexNormal0 * isect.baryCoords.z + closestTriangle.vertexNormal2 * isect.baryCoords.x + closestTriangle.vertexNormal2 * isect.baryCoords.y;
+    isect.shadingNormal = closestTriangle.vertexNormal0 * isect.baryCoords.z + closestTriangle.vertexNormal1 * isect.baryCoords.x + closestTriangle.vertexNormal2 * isect.baryCoords.y;
     isect.textureCoords = closestTriangle.texCoords0 * isect.baryCoords.z + closestTriangle.texCoords1 * isect.baryCoords.x + closestTriangle.texCoords2 * isect.baryCoords.y;
 
 

@@ -62,6 +62,7 @@ class CRTRenderer {
     AccelerationStructure as;
     AccelerationStructure access;
     
+    CRTVector getAlbedo(Material mat, Intersection& isect);
     
 };
 #endif

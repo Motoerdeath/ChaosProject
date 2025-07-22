@@ -48,5 +48,5 @@ CRTVector Texture::sampleCheckersTexture(CRTVector uvCoordinatesInterpolated) {
 CRTVector Texture::sampleBitmapTexture(CRTVector uvCoordinatesInterpolated) {
     int u = static_cast<int>(uvCoordinatesInterpolated.x*bitmapWidth);
     int v = static_cast<int>(uvCoordinatesInterpolated.y*bitmapHeight);
-    return buffer[u][v];
+    return buffer[v][u];
 }

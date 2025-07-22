@@ -64,7 +64,7 @@ std::vector<CRTVector> loadTextureCoordinates(const rapidjson::Value::ConstArray
     }
     return textureCoords;
 }
-std::vector<std::vector<CRTVector>> loadImageFromFile(const std::string filePath) {
+std::vector<std::vector<CRTVector>> loadImageFromFile(const std::string filePath, int& imageWidth, int& imageHeight) {
     std::vector<std::vector<CRTVector>> resultImage;
     unsigned char* image;
     int width, height, n;
@@ -78,12 +78,14 @@ std::vector<std::vector<CRTVector>> loadImageFromFile(const std::string filePath
         resultImage.resize(height,std::vector<CRTVector>(width,CRTVector(0.f)));
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                resultImage[y][x] = CRTVector(static_cast<float>(image[y*width*n+x*n])/255.f,static_cast<float>(image[y*width*n+x*n+1])/255.f,static_cast<float>(image[y*width*n+x*n+2])/255.f);
+                resultImage[height-1-y][x] = CRTVector(static_cast<float>(image[y*width*n+x*n])/255.f,static_cast<float>(image[y*width*n+x*n+1])/255.f,static_cast<float>(image[y*width*n+x*n+2])/255.f);
             }
         }
     } else {
         assert(false);
     }
     stbi_image_free(image);
+    imageHeight = height;
+    imageWidth = width;
     return resultImage;
 }

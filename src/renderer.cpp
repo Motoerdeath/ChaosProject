@@ -79,9 +79,6 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
 
     Intersection isect;
     if(as.findIntersection(ray, isect)) {
-        //Intersection isect2;
-        //as.findIntersection(ray, isect2);
-        //std::cout << "test" << std::endl;
         Material mat = scene->sceneMaterials[isect.materialIDx];
         return calculateShading(ray, isect);
 
@@ -195,7 +192,25 @@ CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     return CRTVector(0.f);
 }
 
+CRTVector CRTRenderer::getAlbedo(Material mat,Intersection& isect)  {
+    if(!mat.albedoTex.std::string::compare("invalid")) {
+        return mat.albedo;
+    } else {
+        for(Texture tex : scene->sceneTextures) {
+            if(!tex.name.std::string::compare(mat.albedoTex)) {
+                if(tex.type == checkersTexture || tex.type == bitmapTexture) {
+                    return tex.sample(isect.textureCoords);
+                } else {
+                    return tex.sample(isect.baryCoords);
+                }
+            }
+        }
+    }
+    return CRTVector(0.f);
+}
 CRTVector CRTRenderer::constantShading(const CRTRay& ray,Intersection& isect) {
+    Material mat = scene->sceneMaterials[isect.materialIDx];
+    return getAlbedo(mat, isect);
     return scene->sceneMaterials[isect.materialIDx].albedo;
 }
 
@@ -205,7 +220,7 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
     CRTVector final_color(0.f);
 
     //get the albedo of the material 
-    CRTVector albedo = mat.albedo;
+    CRTVector albedo = getAlbedo(mat, isect);
     //CRTVector albedo = aTexture.sample(isect.baryCoords);
 
     CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
@@ -234,6 +249,7 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
 
 CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) {
     Material mat = scene->sceneMaterials[isect.materialIDx];
+    CRTVector albedo = getAlbedo(mat, isect);
     CRTVector normal;
     if(mat.style == smooth) {
         normal = isect.shadingNormal;
@@ -241,7 +257,7 @@ CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) 
         normal = isect.geomNormal;
     }           
     CRTVector shadingResult = traceRay(createReflectionRay(ray, isect.intersectionPoint, normal));
-    return CRTVector(mat.albedo.x*shadingResult.x,mat.albedo.y*shadingResult.y,mat.albedo.z*shadingResult.z);
+    return CRTVector(albedo.x*shadingResult.x,albedo.y*shadingResult.y,albedo.z*shadingResult.z);
 }
 
 

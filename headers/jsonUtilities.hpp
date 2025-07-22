@@ -13,5 +13,5 @@ CRTMatrix loadMatrix(const rapidjson::Value::ConstArray& rotMatrix);
 std::vector<CRTVector> loadVertices(const rapidjson::Value::ConstArray& verticesArr);
 std::vector<int> loadIndices(const rapidjson::Value::ConstArray& indicesArr);
 std::vector<CRTVector> loadTextureCoordinates(const rapidjson::Value::ConstArray& uvCoordArr);
-std::vector<std::vector<CRTVector>> loadImageFromFile(const std::string filePath);
+std::vector<std::vector<CRTVector>> loadImageFromFile(const std::string filePath,int& width, int&  height);
 #endif
