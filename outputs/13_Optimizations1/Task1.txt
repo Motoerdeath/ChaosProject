@@ -10,4 +10,4 @@ Release: 1561.53 seconds
 AABB-testing: 781.303 seconds
 Region-Rendering(8 Threads->4 regions): 637.342
 Bucket Rendering(8 threads): 410.814 seconds
-AABB&Bucket rendering(8 threads): 211.751
+AABB&Bucket rendering(8 threads): 204.751

@@ -18,7 +18,6 @@ void CRTRenderer::setupTriangleAccessStructure() {
 
     as.createTriangleSoup(scene->sceneObjects);
     as.buildAS();
-    std::printf("hey");
 }
 void CRTRenderer::render() {
     bool Multithreading = true;
@@ -63,15 +62,36 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
     if(ray.rayDepth >= maxDepth) return scene->getBackgroundColor();
 
     Intersection isect;
-    if(as.findIntersection(ray, isect)) {
-        Material mat = scene->sceneMaterials[isect.materialIDx];
-        return calculateShading(ray, isect);
 
+    if(useAccelerationStructure) {
+        if(as.findIntersection(ray, isect)) {
+            Material mat = scene->sceneMaterials[isect.materialIDx];
+            return calculateShading(ray, isect);
+
+        } else {
+            return scene->sceneSettings.backgroundColor;
+        }
     } else {
-        return scene->sceneSettings.backgroundColor;
-    }
+        if(intersect(ray, isect)) {
+            Material mat = scene->sceneMaterials[isect.materialIDx];
+            return calculateShading(ray, isect);
 
+        } else {
+            return scene->sceneSettings.backgroundColor;
+        }
+    }
 }
+
+bool CRTRenderer::traceShadowRay(const CRTRay& ray, const float maxT) {
+
+    Intersection isect;
+    if(useAccelerationStructure) {
+        return as.findIntersection(ray, isect);
+    } else {
+        return intersect(ray, isect);
+    }
+}
+
 bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float maxT) {
     bool foundIntersection = false;
     float closestIntersectionDistance = FLT_MAX;
@@ -209,8 +229,7 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
         const CRTVector shadowRayOrigin = isect.intersectionPoint + normal * shadowbias;
         CRTRay shadowRay(shadowRayOrigin,lD.normalize());
         shadowRay.type= ShadowRay;
-        Intersection shadowIsect;
-        if(intersect(shadowRay, shadowIsect,lD.length())) {
+        if(traceShadowRay(shadowRay,lD.length())) {
             continue;
         }
         float lDLength = lD.length();
@@ -372,10 +391,12 @@ void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {
       renderer->renderRegion(temp.startX, temp.startY, temp.width, temp.height);
       //std::cout << "Bucket " << temp.bucketIDx<<" finished!"<<std::endl;
 
+      /* //get updates for when a bucket has been finished and how many
       renderer->updateMutex.lock();
       renderer->finishedBuckets++;
       std::cout << renderer->finishedBuckets<<" Buckets finished!"<<std::endl;
       renderer->updateMutex.unlock();
+      */
     } else {
       renderer->bucketMutex.unlock();
       return;
@@ -390,11 +411,11 @@ void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {
 
 void CRTRenderer::renderMultiThreaded() {
     CRTSettings* settings = scene->getSettings();
-    //renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, 24);
+    renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, 24);
     const auto nThreads = std::thread::hardware_concurrency();
 
     std::vector<std::thread> threads;
-    renderQueue.generateRegionQueue(settings->imageWidth, settings->imageHeight, nThreads);
+    //renderQueue.generateRegionQueue(settings->imageWidth, settings->imageHeight, nThreads);
     for(int i = 0; i < nThreads;i++) {
         threads.push_back(std::thread(threadFunc,&renderQueue.buckets,this));
         //threads.push_back(std::thread(&threadFunc));

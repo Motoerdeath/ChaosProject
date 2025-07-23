@@ -1,0 +1,13 @@
+Hardware:
+
+scene0 Results:
+
+Bucket Rendering(8 threads) & AABB :1.1524 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 5, max Triangles per leaf 4) : 0.734524
+Bucket Rendering(8 threads) & acceleration tree(max depth 10, max Triangles per leaf 4) : 0.705754
+
+scene 1 Results:
+
+Bucket Rendering(8 threads) & AABB : 202.565
+Bucket Rendering(8 threads) & acceleration tree(max depth 5, max Triangles per leaf 4) : 43.4109
+Bucket Rendering(8 threads) & acceleration tree(max depth 10, max Triangles per leaf 4) : 8.70617

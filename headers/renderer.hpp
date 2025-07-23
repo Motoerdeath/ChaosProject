@@ -76,6 +76,7 @@ class CRTRenderer {
     int raysPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
+    bool useAccelerationStructure = true;
 
 };
 #endif
