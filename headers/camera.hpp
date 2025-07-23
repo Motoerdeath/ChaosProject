@@ -4,6 +4,9 @@
 #include "crtVector.hpp"
 #include "matrix.hpp"
 #include "../headers/ray.hpp"
+#include <cstdint>
+#include <random>
+#include <chrono>
 enum Axis{
     X,
     Y,
@@ -30,8 +33,10 @@ class CRTCamera {
         void move(CRTVector& movVector);
         void rotate(float degs,CRTVector rotationAxis);
         CRTRay generateCameraRay(int row, int column);
+        CRTRay generateCameraRay(int row, int column, bool jitter);
         void lookAt(CRTVector target);
         CRTMatrix rotationMatrix;
+    
     private:
     CRTVector cameraPosition;
     

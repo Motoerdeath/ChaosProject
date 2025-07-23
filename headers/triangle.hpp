@@ -32,6 +32,7 @@ class CRTTriangle {
         CRTVector texCoords2;
         int objectID;
         int materialID;
+        bool backFaceCulling = false;
         
     private:
 

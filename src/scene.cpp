@@ -145,6 +145,7 @@ Material CRTScene::importBasicMaterial(rapidjson::Document& doc, int mIdx) {
     CRTVector albedo(1.f);
     MaterialType matType;
     float ior =1.f;
+    bool backFaceCulling=false;
     const rapidjson::Value& materialVal = doc.FindMember("materials")->value[mIdx];
 
     assert(materialVal.HasMember("type")  && materialVal.HasMember("smooth_shading"));
@@ -154,6 +155,10 @@ Material CRTScene::importBasicMaterial(rapidjson::Document& doc, int mIdx) {
     } else {
         style = flat;
     }
+    if(materialVal.HasMember("back_face_culling")) {
+        assert(materialVal.FindMember("back_face_culling")->value.IsBool());
+        backFaceCulling = materialVal.FindMember("back_face_culling")->value.GetBool();
+    } 
     std::string typeName = materialVal.FindMember("type")->value.GetString();
 
     if(materialVal.HasMember("albedo")) {
@@ -186,7 +191,7 @@ Material CRTScene::importBasicMaterial(rapidjson::Document& doc, int mIdx) {
             matType = constant;
         }
     }
-    mat = Material(matType,albedo,style,ior);
+    mat = Material(matType,albedo,style,ior,backFaceCulling);
     return mat;
 }
 
@@ -196,6 +201,7 @@ Material CRTScene::importTextureMaterial(rapidjson::Document& doc, int mIdx) {
     std::string albedoTex;
     MaterialType matType;
     float ior =1.f;
+    bool backFaceCulling=false;
     const rapidjson::Value& materialVal = doc.FindMember("materials")->value[mIdx];
 
     assert(materialVal.HasMember("type")  && materialVal.HasMember("smooth_shading") && materialVal.HasMember("albedo"));
@@ -205,6 +211,11 @@ Material CRTScene::importTextureMaterial(rapidjson::Document& doc, int mIdx) {
     } else {
         style = flat;
     }
+
+    if(materialVal.HasMember("back_face_culling")) {
+        assert(materialVal.FindMember("back_face_culling")->value.IsBool());
+        backFaceCulling = materialVal.FindMember("back_face_culling")->value.GetBool();
+    } 
     std::string typeName = materialVal.FindMember("type")->value.GetString();
 
     albedoTex = materialVal.FindMember("albedo")->value.GetString();
@@ -228,7 +239,7 @@ Material CRTScene::importTextureMaterial(rapidjson::Document& doc, int mIdx) {
             matType = constant;
         }
     }
-    mat = Material(matType,albedoTex,style,ior);
+    mat = Material(matType,albedoTex,style,ior,backFaceCulling);
     return mat;
 }
 void CRTScene::importMaterials(rapidjson::Document& doc){
@@ -249,96 +260,18 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
             }
             sceneMaterials.push_back(mat);
         }
-    }
-            /*
-            //&& materialVal.HasMember("albedo")
-            assert(materialVal.HasMember("type")  && materialVal.HasMember("smooth_shading"));
-            std::string typeName = materialVal.FindMember("type")->value.GetString();
-
-            //handle refractive/Semitransparent Materials
-            if(!typeName.std::string::compare("refractive")) {
-                assert(materialVal.HasMember("ior"));
-                ior = static_cast<float>(materialVal.FindMember("ior")->value.GetDouble());
-                matType = refractive;
-            } else {
-                assert(materialVal.HasMember("albedo"));
-                if(materialVal.FindMember("albedo")->value.IsString()) {
-                    textureAlbedo = materialVal.FindMember("albedo")->value.GetString();
-                } else {
-                    if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                        if(!typeName.std::string::compare("reflective")) {
-                            matType = reflective;
-                        } else if(!typeName.std::string::compare("diffuse")) {
-                            matType = diffuse;
-                        } else if(!typeName.std::string::compare("constant")){
-                            matType = constant;
-                            
-                        } else {
-                            assert(false);
-                        }
-                    } else {
-                        matType = constant;
-                    }
-                    albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
-                }
-
-            }
-
- 
-            RenderingStyle style;
-            if(materialVal.FindMember("smooth_shading")->value.GetBool()) {
-                style = smooth;
-            } else {
-                style = flat;
-            }
-            if(materialVal.FindMember("albedo")->value.IsString()) {
-                mat = Material(matType,textureAlbedo,style,ior);
-            } else {
-                mat = Material(matType,albedo,style,ior);
-            }
-            
-            sceneMaterials.push_back(mat);
-        }
     } else {
         Material mat;
-        CRTVector albedo(0.4f);
+        CRTVector albedo(0.5f);
         MaterialType matType;
         RenderingStyle style = flat;
+        bool backFaceCulling = false;
         if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
                 matType = diffuse;
         } else {
                 matType = constant;
         }
-        mat = Material(matType,albedo,style);
-        sceneMaterials.push_back(mat);
-    }
-    */
-    
-}
-void CRTScene::importMaterialsWithTextures(rapidjson::Document& doc) {
-    if(doc.HasMember("materials")) {
-        Material mat;
-        std::string albedoTex = "Texture0";
-        MaterialType matType;
-        RenderingStyle style = flat;
-        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                matType = diffuse;
-        } else {
-                matType = constant;
-        }
-        mat = Material(matType,albedoTex,style,1.f);
-        sceneMaterials.push_back(mat);
-    } else {
-        Material mat;
-        std::string albedoTex = "Texture0";
-        MaterialType matType;
-        RenderingStyle style = flat;
-        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                matType = diffuse;
-        } else {
-                matType = constant;
-        }
-        mat = Material(matType,albedoTex,style,1.f);
+        mat = Material(matType,albedo,style,backFaceCulling);
         sceneMaterials.push_back(mat);
     }
 }
@@ -377,6 +310,7 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
                 newTexture.type = bitmapTexture;
                 std::string textureFilePath = textureVal.FindMember("file_path")->value.GetString();
                 int width, height;
+                //TODO change where and how texture files will be accessed to be more generalizable
                 newTexture.buffer = loadImageFromFile("../inputs/Homework12_Textures"+ textureFilePath,width,height);
                 newTexture.bitmapHeight = height;
                 newTexture.bitmapWidth = width;
@@ -444,30 +378,4 @@ CRTSettings* CRTScene::getSettings() {
 }
 CRTCamera* CRTScene::getCamera() {
     return &sceneCamera;
-}
-
-
-void CRTScene::parseSceneFile2(const std::string& sceneFileName) {
-
-
-    //import settings
-        //import backgroundColor: CRTVector
-        //import ImageSettings:
-            //import width : int
-            //import height : int
-            //import bucketsize : int
-    //import Camera
-        //import RotationMatrix : 3x3 Matrix
-        //import Position : CRTVector
-    //import lights : Array
-        //for each light:
-            //import intensity : int
-            //import position : CRTVector
-    //import Materials: Array
-        //for each material
-            //import Type : string valid forms: "diffuse"/"reflective"/"refractive"/"constant"
-            //if "back_face_culling" is present, set that value otherwise set it to false
-            //import Albedo if pre
-    
-
 }

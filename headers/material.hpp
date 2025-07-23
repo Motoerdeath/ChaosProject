@@ -38,14 +38,15 @@ RenderingStyle strToStyle(std::string input){
 class Material{
     public: 
         Material() {};
-        Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle) : type(mtype),albedo(albedo),style(rStyle) {};
-        Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle, float ior) : type(mtype),albedo(albedo),style(rStyle), ior(ior) {};
-        Material(MaterialType mtype,std::string albedoTex, RenderingStyle rStyle, float ior) : type(mtype),albedoTex(albedoTex),style(rStyle), ior(ior) {};
+        Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle, bool backFaceCulling) : type(mtype),albedo(albedo),style(rStyle),backFaceCulling(backFaceCulling) {};
+        Material(MaterialType mtype,CRTVector albedo, RenderingStyle rStyle, float ior, bool backFaceCulling) : type(mtype),albedo(albedo),style(rStyle), ior(ior),backFaceCulling(backFaceCulling) {};
+        Material(MaterialType mtype,std::string albedoTex, RenderingStyle rStyle, float ior, bool backFaceCulling) : type(mtype),albedoTex(albedoTex),style(rStyle), ior(ior) ,backFaceCulling(backFaceCulling){};
         MaterialType type;
         CRTVector albedo;
         RenderingStyle style;
         float ior = 1.0f;
         std::string albedoTex = "invalid"; //string that references the name of the texture
+        bool backFaceCulling = false;
     private:
 };
 

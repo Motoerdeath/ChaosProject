@@ -58,3 +58,23 @@ CRTRay CRTCamera::generateCameraRay(int row, int column) {
     CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
     return CRTRay(cameraPosition,normalizedVector);
 }
+
+CRTRay CRTCamera::generateCameraRay(int row, int column, bool jitter) {
+    float offsetX = 0.f;
+    float offsetY = 0.f;
+    if(jitter) {
+
+    }
+    float x = static_cast<float>(column) +0.5f + offsetX;
+    float y = static_cast<float>(row) +0.5f + offsetY;
+                
+    float ndcX = x/imageWidth;
+    float ndcY = y/imageHeight;
+
+    float screenX = ndcX *2.0f -1.0f;
+    float screenY = 1.0f - (2.0f*ndcY);
+    screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
+
+    CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
+    return CRTRay(cameraPosition,normalizedVector);
+}

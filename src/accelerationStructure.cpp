@@ -204,7 +204,6 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
                     CRTTriangle tri = triangleSoup[currentNode->triangleSoupIdx[i]];
                     float t;
                     bool hitCondition = false;
-                    
                     if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
                         hitCondition = CRTRay::intersectTriangle(ray,tri,t, true) && t < minT && t < maxT;
                     } else {

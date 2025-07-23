@@ -10,6 +10,9 @@
 #include "texture.hpp"
 #include <limits>
 #include <memory>
+#include "../headers/bucket.hpp"
+
+#include <mutex>
 
 
 enum DebugMode {
@@ -19,6 +22,7 @@ enum DebugMode {
     BarycentricCoordinates,
     TextureCoordinates,
     HeatMap,
+    TriangleView
 };
 class CRTRenderer {
     public:
@@ -28,6 +32,11 @@ class CRTRenderer {
     void renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight);
     void storeImage(std::string filePathName){ image.storeImageToFile(filePathName);};
     void setupTriangleAccessStructure();
+
+        BucketQueue renderQueue;
+    std::mutex bucketMutex;
+    std::mutex updateMutex;
+    int finishedBuckets =0;
     private:
     CRTScene* scene;
     std::unique_ptr<CRTScene> scene2;
@@ -53,16 +62,20 @@ class CRTRenderer {
     const float shadowbias = 0.01f;
     const float reflectionBias = 0.001f;
     const float refractionBias = 0.001f;
-    Texture aTexture;
 
     AABB entireSceneBB;
     void generateBoundingBox();
     float fade(float low, float high, float value);
     CRTVector temperature(float intensity);
+    float heatMapHigh = 100.f;
     AccelerationStructure as;
     AccelerationStructure access;
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
-    
+    DebugMode debug = None;
+    int raysPerPixel = 1;
+    void renderSingleThreaded(); 
+    void renderMultiThreaded();
+
 };
 #endif

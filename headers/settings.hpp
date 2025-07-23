@@ -8,6 +8,8 @@ class CRTSettings {
     CRTVector backgroundColor;
     int imageWidth;
     int imageHeight;
+    int bucketSize;
+    bool multithreading;
 
     private:
 };
