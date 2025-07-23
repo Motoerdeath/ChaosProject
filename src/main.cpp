@@ -2,6 +2,7 @@
 #include "../src/Tasks/homework3.cpp"
 #include "../src/Tasks/homework4.cpp"
 #include "../src/Tasks/homework5.cpp"
+#include "../src/Tasks/homework12.cpp"
 
 
 #include <cassert>
@@ -23,13 +24,15 @@
 
 #define MULTITHREADING 0;
 #define DEBUGLEVEL 0;
-std::vector<int> a{0,1,2,3,4,5,6,7,8,9};
 
 
 int main() {
 
+
+//Homework12  homework12;
+//homework12.execute();
     
-const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
+const std::string filename = "../inputs/Homework9_Shading1/scene5.crtscene";
 
 CRTScene scene(filename);
 

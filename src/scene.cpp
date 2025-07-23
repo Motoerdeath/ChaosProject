@@ -25,6 +25,11 @@ void CRTScene::importSettings(rapidjson::Document& doc){
     CRTVector bgColor(0.f);
     int imageWidth = 0;
     int imageHeight = 0;
+    int bucketSize = 0;
+    bool globalIllumination = false;
+    bool reflections = true;
+    bool refractions = true;
+
     assert(doc.HasMember("settings"));
     const rapidjson::Value& settingsVal = doc.FindMember("settings")->value;
     //load image settings
@@ -41,6 +46,18 @@ void CRTScene::importSettings(rapidjson::Document& doc){
         if(!widthValue.IsNull() && widthValue.IsInt() && !heightValue.IsNull() && heightValue.IsInt()) {
             imageWidth = widthValue.GetInt();
             imageHeight = heightValue.GetInt();
+        }
+        if(settingsVal.FindMember("image_settings")->value.HasMember("bucketSize")) {
+            bucketSize =  settingsVal.FindMember("image_settings")->value.FindMember("bucketSize")->value.GetInt();
+        }
+        if(settingsVal.HasMember("gi_on")) {
+            globalIllumination = settingsVal.FindMember("gi_on")->value.GetBool();
+        }
+        if(settingsVal.HasMember("reflections_on")) {
+            reflections = settingsVal.FindMember("reflections_on")->value.GetBool();
+        }
+        if(settingsVal.HasMember("refractions_on")) {
+            refractions = settingsVal.FindMember("refractions_on")->value.GetBool();
         }
     }
     CRTSettings settings(bgColor,imageWidth,imageHeight);

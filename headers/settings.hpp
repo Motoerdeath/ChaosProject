@@ -10,6 +10,9 @@ class CRTSettings {
     int imageHeight;
     int bucketSize;
     bool multithreading;
+    bool globalIllumination;
+    bool reflections;
+    bool refractions;
 
     private:
 };

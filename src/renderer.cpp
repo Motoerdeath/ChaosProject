@@ -170,7 +170,7 @@ CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     } else if(debug == ShadingNormals) {
         return isect.shadingNormal;
     } else if(debug == BarycentricCoordinates) {
-        return isect.baryCoords;
+        return CRTVector(isect.baryCoords.x,isect.baryCoords.y,0.f);
     } else if(debug == TextureCoordinates) {
         return isect.textureCoords;
     } else if (debug == TriangleView) {

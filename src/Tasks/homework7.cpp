@@ -3,15 +3,15 @@
 #include <time.h>
 #include <random>
 #include <string>
-class Homework6 : public Homework {
+class Homework7 : public Homework {
     public:
-        Homework6() {setup();};
+        Homework7() {setup();};
         void execute() override {
             run();
             cleanup();
         }
     private:
-    std::string resultsFolderPath = "../outputs/06_Camera/";
+    std::string resultFilePath = "../outputs/07_Scene/output.ppm";
 
     void setup() override {
 
