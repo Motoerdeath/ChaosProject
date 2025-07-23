@@ -13,6 +13,7 @@ class BucketQueue {
     public:
     BucketQueue() {}
     void generateBucketQueue(int imageWidth, int imageHeight, int bucketSize);
+    void generateRegionQueue(int imageWidth, int imageHeight, int numThreads);
     std::queue<Bucket> buckets;
     private:
     

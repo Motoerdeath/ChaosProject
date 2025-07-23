@@ -100,17 +100,6 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
             //shoot shadowRay
             hitCondition = CRTRay::intersectTriangle(ray,triangle,t, hitBackSide) && t < closestIntersectionDistance && t < maxT;
 
-            /*
-            if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
-                hitCondition = CRTRay::intersectTriangle(ray,triangle,t, true) && t < closestIntersectionDistance && t < maxT;
-            } else {
-                hitCondition = CRTRay::intersectTriangle(ray,triangle,t, false) && t < closestIntersectionDistance && t < maxT;
-            }
-                */
-            //if(ray.type == CameraRay) {
-                
-            //}
-
             if(hitCondition) {
 
                 foundIntersection = true;
@@ -123,20 +112,6 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
                 baryCoords = CRTTriangle::calculateBarycentricCoordinates(triangle,position);
                 shadingNormal = object->vertexNormals[object->triangleVertIndices[k]]*baryCoords.z +object->vertexNormals[object->triangleVertIndices[k+1]]*baryCoords.x + object->vertexNormals[object->triangleVertIndices[k+2]]*baryCoords.y;
 
-                
-                
-
-                /*
-                for(int j =0; j < scene->sceneTextures.size();j++) {
-                    if(!mat.albedoTex.std::string::compare(scene->sceneTextures[j].name)) {
-                        textureID = j;
-                        break;
-                    }
-                }
-                if(scene->sceneTextures[textureID].type == checkersTexture || scene->sceneTextures[textureID].type == bitmapTexture) {
-                    textureCoords = object->textureCoords[object->triangleVertIndices[k]]*baryCoords.z +object->textureCoords[object->triangleVertIndices[k+1]]*baryCoords.x + object->textureCoords[object->triangleVertIndices[k+2]]*baryCoords.y;
-                }
-                    */
                 if(ray.type == ShadowRay) {
                     Material mat = scene->getMaterial(materialID);
                     if (mat.type != refractive) {
@@ -224,7 +199,6 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
 
     //get the albedo of the material 
     CRTVector albedo = getAlbedo(mat, isect);
-    //CRTVector albedo = aTexture.sample(isect.baryCoords);
 
     CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
 
@@ -416,11 +390,11 @@ void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {
 
 void CRTRenderer::renderMultiThreaded() {
     CRTSettings* settings = scene->getSettings();
-    renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, 24);
+    //renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, 24);
     const auto nThreads = std::thread::hardware_concurrency();
 
     std::vector<std::thread> threads;
-
+    renderQueue.generateRegionQueue(settings->imageWidth, settings->imageHeight, nThreads);
     for(int i = 0; i < nThreads;i++) {
         threads.push_back(std::thread(threadFunc,&renderQueue.buckets,this));
         //threads.push_back(std::thread(&threadFunc));
