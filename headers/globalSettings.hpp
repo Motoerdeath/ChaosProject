@@ -7,6 +7,7 @@
 #define SAMPLESPERPIXEL 1
 #define CAMERAJITTER 0
 #define MAXPATHDEPTH 5
+#define MOVABLEOBJECTS 0
 
 //Settings for Acceleration structures
 #define ACCELERATION 1 //

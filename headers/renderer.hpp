@@ -57,6 +57,7 @@ class CRTRenderer {
     void createRenderImage();
     PPMImage image;
     bool intersect(const CRTRay& ray,Intersection& isect,const float maxT=std::numeric_limits<float>::max());
+    bool intersect2(const CRTRay& ray,Intersection& isect,const float maxT=std::numeric_limits<float>::max());
     int maxDepth = 5;
     CRTVector diffuseShading(const CRTRay& ray,Intersection& isect);
     CRTVector diffuseShadingGI(const CRTRay& ray,Intersection& isect);

@@ -29,10 +29,12 @@ int main() {
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
   CRTRenderer renderer(&scene);
+  scene.fullObjects[0].offset = CRTVector(0.f,1.f,0.f);
   renderer.setupTriangleAccessStructure();
   std::printf("finished importing scene.\n");
   std::printf("Begin rendering scene.\n");
   auto start = std::chrono::high_resolution_clock::now();
+  
   renderer.render();
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);

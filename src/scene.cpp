@@ -91,6 +91,7 @@ void CRTScene::importCamera(rapidjson::Document& doc, int width, int height){
 void CRTScene::importObjects(rapidjson::Document& doc){
 
     std::vector<CRTMesh> objects;
+    
     assert(doc.HasMember("objects"));
     const rapidjson::Value& objectsVal = doc.FindMember("objects")->value;
     if(!objectsVal.IsNull() && objectsVal.IsArray()) {
@@ -119,9 +120,15 @@ void CRTScene::importObjects(rapidjson::Document& doc){
                 const rapidjson::Value& uvVal = objectVal.FindMember("uvs")->value;
                 assert(uvVal.IsArray());
                 textureCoords = loadTextureCoordinates(uvVal.GetArray());
-                objects.push_back(CRTMesh(triangleVertices,triangleVertIndices,mID,textureCoords));
+                CRTMesh newMesh(triangleVertices,triangleVertIndices,mID,textureCoords);
+                CRTObject newObject(newMesh);
+                fullObjects.push_back(newObject);
+                objects.push_back(newMesh);
             } else {
-                objects.push_back(CRTMesh(triangleVertices,triangleVertIndices,mID));
+                CRTMesh newMesh(triangleVertices,triangleVertIndices,mID);
+                CRTObject newObject(newMesh);
+                fullObjects.push_back(newObject);
+                objects.push_back(newMesh);
             }
             
         }

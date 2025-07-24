@@ -32,12 +32,40 @@ void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
                 triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
                 triangle.texCoords2 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+2]];
             }
-
-            
             triangleSoup.push_back(triangle);
         }
     }
 }
+
+void AccelerationStructure::createTriangleSoup(std::vector<CRTObject> objects) {
+    for(int i = 0; i < objects.size();i++) {
+        CRTObject object = objects[i];
+        CRTMesh mesh = object.mesh;
+        for(int j = 0; j < mesh.triangleVertIndices.size();j+=3) {
+            CRTTriangle triangle(mesh.triangleVertices[mesh.triangleVertIndices[j]]+ object.offset,
+                            mesh.triangleVertices[mesh.triangleVertIndices[j+1]]+ object.offset,
+                            mesh.triangleVertices[mesh.triangleVertIndices[j+2]]+ object.offset);
+
+            triangle.objectID = i;
+            triangle.geoNormal = triangle.normal;
+            triangle.materialID = mesh.materialID;
+            triangle.vertexNormal0 = mesh.vertexNormals[mesh.triangleVertIndices[j]];
+            triangle.vertexNormal1 = mesh.vertexNormals[mesh.triangleVertIndices[j+1]];
+            triangle.vertexNormal2 = mesh.vertexNormals[mesh.triangleVertIndices[j+2]];
+            if(mesh.textureCoords.size() == mesh.triangleVertices.size()) {
+                triangle.texCoords0 = mesh.textureCoords[mesh.triangleVertIndices[j]];
+                triangle.texCoords1 = mesh.textureCoords[mesh.triangleVertIndices[j+1]];
+                triangle.texCoords2 = mesh.textureCoords[mesh.triangleVertIndices[j+2]];
+            } else {
+                triangle.texCoords0 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j]];
+                triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
+                triangle.texCoords2 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+2]];
+            }
+            triangleSoup.push_back(triangle);
+        }
+    }
+}
+
 //for he moemnt we only build a kd tree
 bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri) {
     AABB triaabb{tri};

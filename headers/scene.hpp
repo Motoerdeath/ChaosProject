@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "crtVector.hpp"
 #include "mesh.hpp"
+#include "object.hpp"
 #include "ppmImage.hpp"
 #include "settings.hpp"
 #include <string>
@@ -42,6 +43,7 @@ class CRTScene {
         CRTCamera sceneCamera;
         std::string sceneFilePath;
         std::vector<CRTMesh> sceneObjects;
+        std::vector<CRTObject> fullObjects;
         std::vector<Light> sceneLights;
         std::vector<Material> sceneMaterials;
         std::vector<Texture> sceneTextures;

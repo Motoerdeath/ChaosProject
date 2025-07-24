@@ -4,6 +4,7 @@
 #include "AABB.hpp"
 #include "intersection.hpp"
 #include "mesh.hpp"
+#include "object.hpp"
 #include "ray.hpp"
 #include "triangle.hpp"
 #include <vector>
@@ -24,6 +25,7 @@ class AccelerationStructure{
         void buildAS();
         bool findIntersection(const CRTRay& ray, Intersection& isect, const float maxT=std::numeric_limits<float>::max());
         void createTriangleSoup(std::vector<CRTMesh> objects);
+        void createTriangleSoup(std::vector<CRTObject> objects);
         static bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri, int i);
     private:
         std::vector<CRTTriangle> triangleSoup;
