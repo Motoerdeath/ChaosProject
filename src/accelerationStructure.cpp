@@ -185,7 +185,7 @@ void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<i
 
 bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& isect, const float maxT) {
     int depth = 0;
-    int roodIDx = 0; //for now the root of the AS si always at index 0
+    int roodIDx = 0; //for now the root of the AS is always at index 0
     std::stack<int> nodeStack;
     nodeStack.push(roodIDx); //the root of the AS is always checked first
     CRTTriangle closestTriangle;
