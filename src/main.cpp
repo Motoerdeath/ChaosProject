@@ -32,10 +32,11 @@ int main() {
   //Homework12  homework12;
   //homework12.execute();
       
-  const std::string filename = "../inputs/Homework13_Optimizations1/scene0.crtscene";
+  const std::string filename = "../inputs/Homework9_Shading1/scene3.crtscene";
 
   CRTScene scene(filename);
 
+  std::cout << glm::tan(45*M_PI/180) << std::endl;
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
   CRTRenderer renderer(&scene);

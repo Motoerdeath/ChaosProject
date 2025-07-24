@@ -38,6 +38,8 @@ class CRTRenderer {
     std::mutex updateMutex;
     int finishedBuckets =0;
     private:
+
+    
     CRTScene* scene;
     std::unique_ptr<CRTScene> scene2;
     CRTVector traceCameraRay(const CRTRay& ray);

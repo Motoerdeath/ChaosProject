@@ -1,4 +1,5 @@
 #include "../headers/camera.hpp"
+#include <cmath>
 
 /*
     void pan(float degs);
@@ -54,7 +55,10 @@ CRTRay CRTCamera::generateCameraRay(int row, int column) {
     float screenX = ndcX *2.0f -1.0f;
     float screenY = 1.0f - (2.0f*ndcY);
     screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
-
+    //apply FOV
+    float FOVrads = FOV*M_PI/180;
+    screenX *= std::tan(FOVrads/2.f);
+    screenY *= std::tan(FOVrads/2.f);
     CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
     return CRTRay(cameraPosition,normalizedVector);
 }

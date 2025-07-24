@@ -279,7 +279,7 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
         }
     } else {
         Material mat;
-        CRTVector albedo(0.5f);
+        CRTVector albedo(1.f,0.f,1.f);
         MaterialType matType;
         RenderingStyle style = flat;
         bool backFaceCulling = false;
