@@ -92,7 +92,7 @@ void AccelerationStructure::buildAS() {
 }
 
 void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<CRTTriangle> triangles) {
-    if(triangles.size() <= MAXTRIANGLESPERLEAF || depth >= MAXTREEDEPTH) {
+    if(triangles.size() <= TRIPERLEAF || depth >= MAXTREEDEPTH) {
         //build leaf node
         accTree[parentIdx].triangles = triangles;
         return;
@@ -137,7 +137,7 @@ void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<C
     }
 }
 void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<int> triangleSoupIndexes) {
-    if(triangleSoupIndexes.size() <= MAXTRIANGLESPERLEAF || depth >= MAXTREEDEPTH) {
+    if(triangleSoupIndexes.size() <= TRIPERLEAF || depth >= MAXTREEDEPTH) {
         //build leaf node
         accTree[parentIdx].triangleSoupIdx = triangleSoupIndexes;
         return;

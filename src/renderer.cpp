@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <thread>
+#include "../headers/globalSettings.hpp"
 
 
 CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
@@ -21,10 +22,7 @@ void CRTRenderer::setupTriangleAccessStructure() {
     as.buildAS();
 }
 void CRTRenderer::render() {
-    CRTVector a(0.f,0.f,-2.f);
-    scene->sceneCamera.move(a);
-    bool Multithreading = true;
-    if(Multithreading) {
+    if(MULTITHREADING) {
         renderMultiThreaded();
     } else {
         renderSingleThreaded();
@@ -42,8 +40,8 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
             auto start = std::chrono::steady_clock::now();//timing
             CRTVector finalColor{0.f};
 
-            for(int i = 0; i < samplesPerPixel; i++) {
-                CRTRay cameraRay = scene->sceneCamera.generateCameraRay(actualY, actualX,true);
+            for(int i = 0; i < SAMPLESPERPIXEL; i++) {
+                CRTRay cameraRay = scene->sceneCamera.generateCameraRay(actualY, actualX,CAMERAJITTER);
                 cameraRay.rayDepth = 0;
                 cameraRay.type = CameraRay;
                 finalColor = finalColor + traceRay(cameraRay);
@@ -55,7 +53,7 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
                     finalColor =  finalColor +temperature(time);
                 }
             }
-            finalColor = finalColor/samplesPerPixel;
+            finalColor = finalColor/SAMPLESPERPIXEL;
             image.setPixel(finalColor,actualX,actualY);
 
         }
@@ -63,11 +61,11 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
 }
 
 CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
-    if(ray.rayDepth >= maxDepth) return scene->getBackgroundColor();
+    if(ray.rayDepth >= MAXPATHDEPTH) return scene->getBackgroundColor();
 
     Intersection isect;
 
-    if(useAccelerationStructure) {
+    if(ACCELERATION) {
         if(as.findIntersection(ray, isect)) {
             Material mat = scene->sceneMaterials[isect.materialIDx];
             return calculateShading(ray, isect);
@@ -86,16 +84,6 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
     }
 }
 
-bool CRTRenderer::traceShadowRay(const CRTRay& ray, const float maxT) {
-
-    Intersection isect;
-    if(useAccelerationStructure) {
-        return as.findIntersection(ray, isect);
-    } else {
-        return intersect(ray, isect);
-    }
-}
-
 bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float maxT) {
     bool foundIntersection = false;
     float closestIntersectionDistance = FLT_MAX;
@@ -108,9 +96,6 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
     CRTVector baryCoords;
     CRTVector position;
     CRTVector textureCoords{0.f};
-    if(!CRTRay::intersectBoundingBox(ray, entireSceneBB)) {
-        return false;
-    }
     for(int i = 0; i < scene->sceneObjects.size(); i++) {
         CRTMesh* object = &(scene->sceneObjects[i]);
         for(int k = 0; k < object->triangleVertIndices.size();k+=3) {
@@ -120,7 +105,7 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
             float t;
             bool hitCondition = false;
             Material mat = scene->getMaterial(object->materialID);
-            bool hitBackSide = mat.backFaceCulling;
+            bool hitBackSide = !mat.backFaceCulling;
             //shoot shadowRay
             hitCondition = CRTRay::intersectTriangle(ray,triangle,t, hitBackSide) && t < closestIntersectionDistance && t < maxT;
 
@@ -175,12 +160,16 @@ CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     } else if (debug == TriangleView) {
 
     } else {
-        if(ray.rayDepth>= maxDepth) {
+        if(ray.rayDepth>= MAXPATHDEPTH) {
             return scene->getBackgroundColor();  
         } else if(mat.type == constant) {
             return constantShading(ray, isect);
         } else if(mat.type == diffuse) {
-            return diffuseShadingGI(ray, isect);
+            if(GLOBALILLUMINATION) {
+                return diffuseShadingGI(ray, isect);
+            } else {
+                return diffuseShading(ray, isect);
+            }
         } else if(mat.type == reflective) {
             return reflectiveShading(ray, isect);
         } else if(mat.type == refractive) {
@@ -272,8 +261,16 @@ CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
         diffReflRay.rayDepth = ray.rayDepth+1;
         final_color = final_color + traceRay(diffReflRay);
     }
+    
     final_color = final_color + diffuseShading(ray, isect);
     return final_color / (diffuseReflectionRaysCount+1);
+    
+
+    /*
+    finalCOlor = finalColor /diffuseReflectionRaysCount;
+    finalColor = (finalColor + diffuseShading) * getAlbedo(mat,isect)/M_PI;
+    
+    */
 }
 
 CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) {
@@ -394,7 +391,7 @@ void CRTRenderer::renderSingleThreaded() {
 
 
             auto start = std::chrono::steady_clock::now();//timing
-            CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x);
+            CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x,CAMERAJITTER);
             cameraRay.rayDepth = 0;
             cameraRay.type = CameraRay;
             CRTVector color = traceRay(cameraRay);

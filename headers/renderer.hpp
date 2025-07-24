@@ -82,6 +82,7 @@ class CRTRenderer {
     void renderSingleThreaded(); 
     void renderMultiThreaded();
     bool useAccelerationStructure = true;
+    bool useGlobalIllumination = false;
     std::mt19937 mt;
     std::uniform_real_distribution<float> dist;
 };

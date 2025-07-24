@@ -1,16 +1,6 @@
 #include "../headers/camera.hpp"
 #include <cmath>
-
-/*
-    void pan(float degs);
-    void tilt(float degs);
-    void roll(float degs);
-    void truck(float movDistance);
-    void dolly(float movDistance);
-    void pedestal(float movDistance);
-    void move(CRTVector movVector);
-    void rotate(float degs,CRTVector rotationAxis);
-*/
+#include "../headers/globalSettings.hpp"
 
 void CRTCamera::dolly(float movDistance) {
     cameraPosition + CRTVector(0.f,0.f,movDistance);

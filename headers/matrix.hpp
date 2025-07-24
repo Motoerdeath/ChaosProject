@@ -6,6 +6,17 @@
 #include <complex>
 class CRTMatrix{
     public:
+    CRTMatrix() {
+        matrix[0][0] = 1.f;
+        matrix[0][1] = 0.f;
+        matrix[0][2] = 0.f;
+        matrix[1][0] = 0.f;
+        matrix[1][1] = 1.f;
+        matrix[1][2] = 0.f;
+        matrix[2][0] = 0.f;
+        matrix[2][1] = 0.f;
+        matrix[2][2] = 1.f;
+    }
     CRTMatrix(CRTVector vector1,CRTVector vector2,CRTVector vector3) {
         matrix[0][0] = vector1.x;
         matrix[0][1] = vector1.y;

@@ -36,7 +36,7 @@ class CRTCamera {
         CRTRay generateCameraRay(int row, int column, bool jitter);
         void lookAt(CRTVector target);
         CRTMatrix rotationMatrix;
-        float FOV = 90.f;
+        float fov = 90.f;
     
     private:
     CRTVector cameraPosition;

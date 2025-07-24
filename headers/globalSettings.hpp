@@ -7,11 +7,16 @@
 #define SAMPLESPERPIXEL 1
 #define CAMERAJITTER 0
 #define MAXPATHDEPTH 5
+
 //Settings for Acceleration structures
 #define ACCELERATION 1 //
 #define TRIPERLEAF 4
 #define MAXTREEDEPTH 10
 
-
 //Camera Settings
+#define FOV 90
+
+//Global illumination Settings
+#define GLOBALILLUMINATION 0
+#define DIFFUSEREFLECTIONSCOUNT 1
 #endif

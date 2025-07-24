@@ -8,22 +8,13 @@
 #include <cassert>
 #include <cstdio>
 
-#include <mutex>
-#include <queue>
-#include <stack>
 #include <string>
-#include <thread>
 #include "../headers/scene.hpp"
 #include "../headers/renderer.hpp"
 #include <iostream>
-#include <vector>
 #include <chrono>
-#include "../headers/bucket.hpp"
-#include "../headers/accelerationStructure.hpp"
 
 
-#define MULTITHREADING 0;
-#define DEBUGLEVEL 0;
 
 
 int main() {
@@ -35,8 +26,6 @@ int main() {
   const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
-
-  std::cout << glm::tan(45*M_PI/180) << std::endl;
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
   CRTRenderer renderer(&scene);
