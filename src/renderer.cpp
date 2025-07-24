@@ -4,6 +4,7 @@
 #include <cfloat>
 #include <cmath>
 #include <iostream>
+#include <random>
 #include <stdexcept>
 #include <chrono>
 #include <thread>
@@ -38,7 +39,7 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
             int actualX = startX+x;
             auto start = std::chrono::steady_clock::now();//timing
 
-            for(int i = 0; i < raysPerPixel; i++) {
+            for(int i = 0; i < samplesPerPixel; i++) {
 
             }
             CRTRay cameraRay = scene->sceneCamera.generateCameraRay(actualY, actualX);
@@ -229,8 +230,11 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
         const CRTVector shadowRayOrigin = isect.intersectionPoint + normal * shadowbias;
         CRTRay shadowRay(shadowRayOrigin,lD.normalize());
         shadowRay.type= ShadowRay;
-        if(traceShadowRay(shadowRay,lD.length())) {
-            continue;
+        Intersection shadowIsect;
+        if(as.findIntersection(shadowRay, shadowIsect,lD.length())) {
+            Material shadowMat = scene->getMaterial(shadowIsect.materialIDx);
+            if(shadowMat.type != refractive) continue;
+            //continue;
         }
         float lDLength = lD.length();
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), normal));
@@ -241,6 +245,30 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
     //final_color = CRTVector(glm::clamp(final_color.x,0.f,1.f),glm::clamp(final_color.y,0.f,1.f),glm::clamp(final_color.z,0.f,1.f));
 
     return final_color;
+}
+
+CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
+    Material mat = scene->getMaterial(isect.materialIDx);
+    CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
+    CRTVector final_color(0.f);
+    int diffuseReflectionRaysCount = 1;
+    for(int i = 0; i < diffuseReflectionRaysCount;i++) {
+        //construct local hit matrix
+        CRTVector rightAxis = ray.rayDirection.cross(normal).normalize();
+        CRTVector upAxis = normal;
+        CRTVector forwardAxis = rightAxis.cross(upAxis);
+        CRTMatrix localHitMatrix{rightAxis,upAxis,forwardAxis};
+        float randAngleinXY = M_PI*dist(mt);
+        CRTVector randVectorInXY{std::cos(randAngleinXY),std::sin(randAngleinXY),0.f};
+        float randAngleinXZ = 2.f*M_PI*dist(mt);
+        CRTMatrix rotateAroundY = CRTMatrix::getRotationMatrixAroundY(randAngleinXZ);
+        CRTVector randVEctorInXYRotated = randVectorInXY*rotateAroundY;
+        CRTVector diffReflRayDir = randVEctorInXYRotated*localHitMatrix;
+        CRTRay diffReflRay(isect.intersectionPoint + normal*0.001f,diffReflRayDir);
+        final_color = final_color + traceRay(diffReflRay);
+    }
+    final_color = final_color + diffuseShading(ray, isect);
+    return final_color / (diffuseReflectionRaysCount+1);
 }
 
 CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) {
@@ -425,4 +453,12 @@ void CRTRenderer::renderMultiThreaded() {
     for(std::thread& t : threads) {
         t.join();
     }
+}
+
+void CRTRenderer::setupRNG() {
+
+    std::random_device rd;
+    mt = std::mt19937(rd());
+    dist = std::uniform_real_distribution<float>(0.f,1.f);
+
 }

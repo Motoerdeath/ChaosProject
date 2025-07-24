@@ -67,7 +67,8 @@ CRTRay CRTCamera::generateCameraRay(int row, int column, bool jitter) {
     float offsetX = 0.f;
     float offsetY = 0.f;
     if(jitter) {
-
+        offsetX = dist(mt);
+        offsetY = dist(mt);
     }
     float x = static_cast<float>(column) +0.5f + offsetX;
     float y = static_cast<float>(row) +0.5f + offsetY;
@@ -79,6 +80,17 @@ CRTRay CRTCamera::generateCameraRay(int row, int column, bool jitter) {
     float screenY = 1.0f - (2.0f*ndcY);
     screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
 
+    float FOVrads = FOV*M_PI/180;
+    screenX *= std::tan(FOVrads/2.f);
+    screenY *= std::tan(FOVrads/2.f);
     CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
     return CRTRay(cameraPosition,normalizedVector);
+}
+
+void CRTCamera::setupRNG() {
+
+    std::random_device rd;
+    mt = std::mt19937(rd());
+    dist = std::uniform_real_distribution<float>(-0.5f,0.5f);
+
 }

@@ -13,6 +13,7 @@
 #include "../headers/bucket.hpp"
 
 #include <mutex>
+#include <random>
 
 
 enum DebugMode {
@@ -37,6 +38,7 @@ class CRTRenderer {
     std::mutex bucketMutex;
     std::mutex updateMutex;
     int finishedBuckets =0;
+    void setupRNG();
     private:
 
     
@@ -57,6 +59,7 @@ class CRTRenderer {
     bool intersect(const CRTRay& ray,Intersection& isect,const float maxT=std::numeric_limits<float>::max());
     int maxDepth = 10;
     CRTVector diffuseShading(const CRTRay& ray,Intersection& isect);
+    CRTVector diffuseShadingGI(const CRTRay& ray,Intersection& isect);
     CRTVector reflectiveShading(const CRTRay& ray,Intersection& isect);
     CRTVector refractiveShading(const CRTRay& ray,Intersection& isect);
     CRTVector refract(const CRTRay& ray,const CRTVector normal, const float relativeIOR);
@@ -75,10 +78,11 @@ class CRTRenderer {
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
     DebugMode debug = None;
-    int raysPerPixel = 1;
+    int samplesPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
     bool useAccelerationStructure = true;
-
+    std::mt19937 mt;
+    std::uniform_real_distribution<float> dist;
 };
 #endif

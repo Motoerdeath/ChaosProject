@@ -31,9 +31,9 @@ class CRTMatrix{
     CRTMatrix static getRotationMatrixAroundY(float degs) {
         const float rads = degs*(M_PI/180.f);
         return CRTMatrix(
-            CRTVector(std::cos(rads),0.0f,std::sin(rads)),
+            CRTVector(std::cos(rads),0.0f,-std::sin(rads)),
             CRTVector(0.0f,1.0f,0.0f),
-            CRTVector(-std::sin(rads),0.0f,std::cos(rads))
+            CRTVector(std::sin(rads),0.0f,std::cos(rads))
         );
     }
     CRTMatrix static getRotationMatrixAroundZ(float degs) {

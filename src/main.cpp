@@ -32,7 +32,7 @@ int main() {
   //Homework12  homework12;
   //homework12.execute();
       
-  const std::string filename = "../inputs/Homework9_Shading1/scene3.crtscene";
+  const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
 

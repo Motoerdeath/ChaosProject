@@ -16,14 +16,14 @@ enum Axis{
 class CRTCamera {
 
     public:
-        CRTCamera() : cameraPosition(CRTVector(0.f)),rotationMatrix(CRTMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f))), imageWidth(1920), imageHeight(1080){}
+        CRTCamera() : cameraPosition(CRTVector(0.f)),rotationMatrix(CRTMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f))), imageWidth(1920), imageHeight(1080){setupRNG();}
 
         CRTCamera(CRTVector pos, CRTMatrix rotMatrix,int width, int height) : 
         cameraPosition(pos),
         rotationMatrix(rotMatrix) {imageWidth = width; imageHeight =height;};
         CRTCamera(CRTVector pos,int width, int height) : 
         cameraPosition(pos),
-        rotationMatrix(CRTMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f))) {imageWidth = width; imageHeight =height;};
+        rotationMatrix(CRTMatrix(CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f))) {imageWidth = width; imageHeight =height;setupRNG();};
         void pan(float degs);
         void tilt(float degs);
         void roll(float degs);
@@ -43,6 +43,9 @@ class CRTCamera {
     
     int imageWidth;
     int imageHeight;
+    void setupRNG();
+    std::uniform_real_distribution<float> dist;
+    std::mt19937 mt;
 };
 
 
