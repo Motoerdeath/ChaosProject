@@ -34,7 +34,7 @@ void CRTRenderer::setupTriangleAccessStructure() {
 
 
     if(ENVIRONMENTMAP) {
-        
+
     }
 }
 void CRTRenderer::render() {
@@ -487,7 +487,7 @@ float CRTRenderer::fresnel(const CRTRay& ray,const CRTVector& normal) {
     return 0.5f*(std::pow(1.f+dotIN,5));
 }
 
-float fresnel_schlick(const CRTRay& ray,const CRTVector& normal,const float etai,const float eta2) {
+float CRTRenderer::fresnel_schlick(const CRTRay& ray,const CRTVector& normal,const float etai,const float eta2) {
     float r0 = (etai-eta2)/(etai+eta2);
     r0 = r0*r0;
     return r0+((1.f-r0)*pow((1.f - CRTVector::dot(ray.rayDirection.normalize(), normal)),5));

@@ -1,0 +1,32 @@
+Chaos Camp homework todo:
+
+Fundamentals
+11_Shading3
+
+Optimizations1&2 double check results
+
+
+15: prepare and finish animations for display
+
+Final Animation/s:
+features to show off:
+
+-Camera movement
+-object movement
+-light Movement
+-Textures
+-reflection
+-refraction
+-optimization techniques
+-anit-aliasing via via repeated sampling + Camera Jitter
+-FOV changes
+
+
+
+-Global Illumination
+
+
+
+Extra features to do:
+
+Environment mapping

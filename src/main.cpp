@@ -21,7 +21,7 @@ int main() {
   //Homework12  homework12;
   //homework12.execute();
       
-  const std::string filename = "../inputs/Homework15_Conclusion/AnimationScene2.crtscene";
+  const std::string filename = "../inputs/Homework11_Shading3/scene8.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
