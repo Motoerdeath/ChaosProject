@@ -30,6 +30,9 @@ class CRTVector {
     CRTVector operator- (const CRTVector& rhs) const {
         return CRTVector(x-rhs.x,y-rhs.y,z-rhs.z);
     }
+    CRTVector operator* (const CRTVector& rhs) const {
+        return CRTVector(x*rhs.x,y*rhs.y,z*rhs.z);
+    }
     CRTVector operator*(const float scalar) const {
         return CRTVector(x*scalar,y*scalar,z*scalar);
     }

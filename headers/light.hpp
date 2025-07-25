@@ -10,6 +10,7 @@ class Light {
 
         float lightIntensity;
         CRTVector lightPosition;
+        CRTVector lightColor{1.f};
     private:
 
 };

@@ -66,6 +66,7 @@ class CRTRenderer {
     CRTVector refract(const CRTRay& ray,const CRTVector normal, const float relativeIOR);
     CRTRay createReflectionRay(const CRTRay& ray, const CRTVector& position, const CRTVector& normal);
     const float shadowbias = 0.01f;
+    const float diffuseRayBias = 0.0001f;
     const float reflectionBias = 0.001f;
     const float refractionBias = 0.001f;
 
@@ -78,7 +79,7 @@ class CRTRenderer {
     AccelerationStructure access;
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
-    DebugMode debug = TriangleView;
+    DebugMode debug = None;
     int samplesPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
@@ -87,5 +88,6 @@ class CRTRenderer {
     std::mt19937 mt;
     std::uniform_real_distribution<float> dist;
     CRTVector triIDtoColor(int triIdx);
+    CRTVector directIllumination(Intersection& isect);
 };
 #endif
