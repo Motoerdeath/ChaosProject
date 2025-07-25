@@ -23,11 +23,16 @@ int main() {
   //Homework12  homework12;
   //homework12.execute();
       
-  const std::string filename = "../inputs/Homework7_Scene/scene4.crtscene";
+  const std::string filename = "../inputs/Homework6_Camera/scene1.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
+  CRTVector truck(1.f,0.f,0.f);
+  CRTVector dolly(0.f,0.f,1.f);
+  CRTVector pedestal(0.f,1.f,0.f);
+  //scene.sceneCamera.move(pedestal);
+  scene.sceneCamera.tilt(20);
   CRTRenderer renderer(&scene);
   renderer.setupTriangleAccessStructure();
   std::printf("finished importing scene.\n");

@@ -380,10 +380,11 @@ std::ifstream ifs(sceneFileName);
     doc.ParseStream(isw);
 
     importSettings(doc);
+    std::printf("heyoooo");
     importCamera(doc, sceneSettings.imageWidth, sceneSettings.imageHeight);
 
     importObjects(doc);
-
+    
     importLights(doc);
     importMaterials(doc);
     //import materials

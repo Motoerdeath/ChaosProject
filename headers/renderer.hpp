@@ -78,7 +78,7 @@ class CRTRenderer {
     AccelerationStructure access;
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
-    DebugMode debug = HeatMap;
+    DebugMode debug = TriangleView;
     int samplesPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
