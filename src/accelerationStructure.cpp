@@ -7,7 +7,10 @@
 #include <stack>
 #include <cassert>
 
-
+void AccelerationStructure::clear() {
+    triangleSoup.clear();
+    accTree.clear();
+}
 
 void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
     for(int i = 0; i < objects.size();i++) {

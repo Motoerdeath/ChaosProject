@@ -27,6 +27,7 @@ class AccelerationStructure{
         void createTriangleSoup(std::vector<CRTMesh> objects);
         void createTriangleSoup(std::vector<CRTObject> objects);
         static bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri, int i);
+        void clear();
     private:
         std::vector<CRTTriangle> triangleSoup;
         std::vector<ASNode> accTree;

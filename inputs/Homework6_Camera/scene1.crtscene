@@ -1,7 +1,7 @@
 {
 	"settings": {
 		"background_color": [
-			0, 0, 0
+			0.3, 0.3, 0.3
 		],
 		"image_settings": {
 			"width": 1920,

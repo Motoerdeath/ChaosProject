@@ -24,6 +24,7 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
 };
 void CRTRenderer::setupTriangleAccessStructure() {
+    as.clear();
     if(MOVABLEOBJECTS) {
         as.createTriangleSoup(scene->fullObjects);
     } else {
