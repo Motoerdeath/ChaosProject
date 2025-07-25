@@ -371,6 +371,9 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
 }
 void CRTScene::parseSceneFile(const std::string& sceneFileName){
 std::ifstream ifs(sceneFileName);
+    if(!ifs.is_open()) {
+        std::printf("file could not be opened");
+    }
     assert(ifs.is_open());
     rapidjson::IStreamWrapper isw(ifs);
     rapidjson::Document doc;

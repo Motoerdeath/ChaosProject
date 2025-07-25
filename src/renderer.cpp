@@ -10,6 +10,13 @@
 #include <thread>
 #include "../headers/globalSettings.hpp"
 
+std::vector<CRTVector> prebuildColors{CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f),
+                            CRTVector(0.f,0.f,0.f),CRTVector(1.f,1.f,0.f),CRTVector(1.f,0.f,1.f),
+                            CRTVector(0.f,1.f,1.f),CRTVector(0.7f,0.3f,0.f),CRTVector(0.7f,0.f,0.3f),
+                            CRTVector(0.3f,0.7f,0.f),CRTVector(0.f,0.7f,0.3f),CRTVector(0.f,0.3f,0.7f),
+                            CRTVector(0.3f,0.f,0.7f),CRTVector(1.f,1.f,1.f)
+};
+
 
 CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
     scene2 = std::unique_ptr<CRTScene>(scene);
@@ -42,8 +49,9 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
         for(int x = 0; x < regionWidth;x++) { 
             int actualY = startY+y;
             int actualX = startX+x;
-            auto start = std::chrono::steady_clock::now();//timing
+            auto start = std::chrono::high_resolution_clock::now();//timing
             CRTVector finalColor{0.f};
+
 
             for(int i = 0; i < SAMPLESPERPIXEL; i++) {
                 CRTRay cameraRay = scene->sceneCamera.generateCameraRay(actualY, actualX,CAMERAJITTER);
@@ -51,12 +59,17 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
                 cameraRay.type = CameraRay;
                 finalColor = finalColor + traceRay(cameraRay);
 
-                if(debug == HeatMap) {
-                    auto finish = std::chrono::steady_clock::now();
-                    const std::chrono::duration<float> elapsed_seconds{finish - start};
-                    float time = glm::clamp(elapsed_seconds.count()/heatMapHigh,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
-                    finalColor =  finalColor +temperature(time);
-                }
+
+            }
+            if(debug == HeatMap) {
+                auto finish = std::chrono::high_resolution_clock::now();
+                const std::chrono::duration<float> elapsed_seconds{finish - start};
+                std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);
+                float seconds = dur.count()/1'000'000.0;
+                float time = glm::clamp(seconds,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
+                finalColor =  temperature(time);
+                image.setPixel(finalColor,actualX,actualY);
+                break;
             }
             finalColor = finalColor/SAMPLESPERPIXEL;
             image.setPixel(finalColor,actualX,actualY);
@@ -131,7 +144,7 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
                 closestIntersectionDistance = t;
                 materialID = object->materialID;
                 objectID = i;
-                triangleID = k;
+                triangleID = k/3;
                 geoNormal = triangle.normal;
                 position = ray.rayOrigin + ray.rayDirection*t;
                 baryCoords = CRTTriangle::calculateBarycentricCoordinates(triangle,position);
@@ -235,7 +248,7 @@ CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     } else if(debug == TextureCoordinates) {
         return isect.textureCoords;
     } else if (debug == TriangleView) {
-
+        return triIDtoColor(isect.triangleIDx);
     } else {
         if(ray.rayDepth>= MAXPATHDEPTH) {
             return scene->getBackgroundColor();  
@@ -540,4 +553,10 @@ void CRTRenderer::setupRNG() {
     mt = std::mt19937(rd());
     dist = std::uniform_real_distribution<float>(0.f,1.f);
 
+}
+
+
+
+CRTVector CRTRenderer::triIDtoColor(int triIdx)  {
+    return prebuildColors[triIdx%prebuildColors.size()];
 }

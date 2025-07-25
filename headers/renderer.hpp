@@ -7,13 +7,13 @@
 #include "ray.hpp"
 #include "scene.hpp"
 #include "intersection.hpp"
-#include "texture.hpp"
 #include <limits>
 #include <memory>
 #include "../headers/bucket.hpp"
 
 #include <mutex>
 #include <random>
+#include <vector>
 
 
 enum DebugMode {
@@ -23,7 +23,7 @@ enum DebugMode {
     BarycentricCoordinates,
     TextureCoordinates,
     HeatMap,
-    TriangleView
+    TriangleView,
 };
 class CRTRenderer {
     public:
@@ -78,7 +78,7 @@ class CRTRenderer {
     AccelerationStructure access;
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
-    DebugMode debug = None;
+    DebugMode debug = HeatMap;
     int samplesPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
@@ -86,5 +86,6 @@ class CRTRenderer {
     bool useGlobalIllumination = false;
     std::mt19937 mt;
     std::uniform_real_distribution<float> dist;
+    CRTVector triIDtoColor(int triIdx);
 };
 #endif

@@ -23,13 +23,12 @@ int main() {
   //Homework12  homework12;
   //homework12.execute();
       
-  const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
+  const std::string filename = "../inputs/Homework7_Scene/scene4.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
   CRTRenderer renderer(&scene);
-  scene.fullObjects[0].offset = CRTVector(0.f,1.f,0.f);
   renderer.setupTriangleAccessStructure();
   std::printf("finished importing scene.\n");
   std::printf("Begin rendering scene.\n");
