@@ -13,9 +13,7 @@
 #include "../headers/renderer.hpp"
 #include <iostream>
 #include <chrono>
-
-
-
+#include "../headers/environmentMap.hpp"
 
 int main() {
 

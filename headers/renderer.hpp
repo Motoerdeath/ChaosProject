@@ -3,6 +3,7 @@
 
 #include "accelerationStructure.hpp"
 #include "crtVector.hpp"
+#include "environmentMap.hpp"
 #include "ppmImage.hpp"
 #include "ray.hpp"
 #include "scene.hpp"
@@ -13,8 +14,8 @@
 
 #include <mutex>
 #include <random>
+#include "../headers/environmentMap.hpp"
 #include <vector>
-
 
 enum DebugMode {
     None,

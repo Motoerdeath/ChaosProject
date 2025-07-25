@@ -20,4 +20,5 @@
 //Global illumination Settings
 #define GLOBALILLUMINATION 0
 #define DIFFUSEREFLECTIONSCOUNT 1
+#define ENVIRONMENTMAP 1
 #endif

@@ -30,9 +30,12 @@ void CRTRenderer::setupTriangleAccessStructure() {
     } else {
         as.createTriangleSoup(scene->sceneObjects);
     }
-    
-    
     as.buildAS();
+
+
+    if(ENVIRONMENTMAP) {
+        
+    }
 }
 void CRTRenderer::render() {
     if(MULTITHREADING) {

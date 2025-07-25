@@ -12,6 +12,6 @@ class EnvironmentMap {
         CRTVector sampleEnvironmentMap(const CRTRay& ray);
 
     private:
-    Texture cubeMap[6]; //order: right-left-top-bottom-back-front
+        Texture cubeMap[6]; //order: right-left-top-bottom-back-front
 };
 #endif
