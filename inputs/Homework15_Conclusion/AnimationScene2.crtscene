@@ -46,6 +46,12 @@
 			]
 		}
 	],
+	"textures": [{
+		"name": "Dragon Texture",
+		"type": "bitmap",
+		"file_path": "/textures/dragon.jpg"
+		}
+	],
 
 	"materials": [{
 		"type": "diffuse",
@@ -102,6 +108,11 @@
 				0.9,0.6,0.9
 			],
 			"smooth_shading": true
+		},
+		{
+			"type": "diffuse",
+			"albedo": "Dragon Texture",
+			"smooth_shading": false
 		}
 	],
 
@@ -149,12 +160,18 @@
 			]
 		},
 		{
-			"material_index": 5,
+			"material_index": 8,
 			"vertices": [
 				15, -5, -15,
 				15, 20, -15,
 				-15, -5, -15,
 				-15, 20, -15
+			],
+			"uvs": [
+				1, 0, 0,
+				1, 1, 0,
+				0, 0, 0,
+				0, 1, 0
 			],
 
 			"triangles": [

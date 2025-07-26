@@ -18,7 +18,7 @@
 int main() {
 
 
-   /*  
+     
   const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
@@ -44,32 +44,25 @@ int main() {
   renderer.storeImage("../output.ppm");
   std::printf("finished storing output.\n");
   
-*/
 
-  const std::string inputFilePath = "../inputs/Homework15_Conclusion/scene2.crtscene";
-  const std::string outputFilePath = "../outputs/15_Conclusion/Scene3/Frame_";
+/*
+  const std::string inputFilePath = "../inputs/Homework15_Conclusion/AnimationScene2.crtscene";
+  const std::string outputFilePath = "../outputs/15_Conclusion/Scene2/Frame_";
 
-  int nFrames = 240;
+  int nFrames = 120;
   CRTScene scene(inputFilePath);
   scene.parseSceneFile(inputFilePath);
   CRTRenderer renderer(&scene);
-  CRTVector center{0.f,0.f,-3.f};
+  CRTVector dolly{0.f,0.f,-0.1f};
   for(int i = 0; i < nFrames; i++) {
     renderer.setupTriangleAccessStructure();
     renderer.render();
     std::string outputPath = outputFilePath + std::to_string(i) + ".ppm";
     renderer.storeImage(outputPath);
-
-    //update Scene
-    CRTVector truck(0.2f,0.f,0.f);
-    scene.sceneCamera.move(truck);
-    scene.sceneCamera.lookAt(center);
-
-
-    
-    
+    scene.sceneCamera.move(dolly);
+    scene.sceneCamera.fov += 0.25f;
   }
-  
+  */
 
   return 0;
 }

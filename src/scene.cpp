@@ -335,7 +335,7 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
                 std::string textureFilePath = textureVal.FindMember("file_path")->value.GetString();
                 int width, height;
                 //TODO change where and how texture files will be accessed to be more generalizable
-                newTexture.buffer = loadImageFromFile("../inputs/Homework12_Textures"+ textureFilePath,width,height);
+                newTexture.buffer = loadImageFromFile(".."+ textureFilePath,width,height);
                 newTexture.bitmapHeight = height;
                 newTexture.bitmapWidth = width;
 
