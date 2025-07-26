@@ -1,8 +1,5 @@
 Chaos Camp homework todo:
 
-Fundamentals
-11_Shading3
-
 Optimizations1&2 double check results
 
 

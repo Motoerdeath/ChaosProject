@@ -32,11 +32,11 @@ class CRTCamera {
         void pedestal(float movDistance);
         void move(CRTVector& movVector);
         void rotate(float degs,CRTVector rotationAxis);
+        void rotateCameraHorizontalAroundPoint(CRTVector target, float degs);
         CRTRay generateCameraRay(int row, int column);
         CRTRay generateCameraRay(int row, int column, bool jitter);
         void lookAt(CRTVector target);
         CRTMatrix rotationMatrix;
-        float fov = 90.f;
     
     private:
     CRTVector cameraPosition;

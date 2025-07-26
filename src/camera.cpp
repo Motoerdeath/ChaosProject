@@ -21,6 +21,24 @@ void CRTCamera::tilt(float degs) {
 void CRTCamera::roll(float degs) {
     rotationMatrix = rotationMatrix * CRTMatrix::getRotationMatrixAroundZ(degs);
 }
+void CRTCamera::rotateCameraHorizontalAroundPoint(CRTVector target, float degs) {
+    //determine current spherical coordinates
+    CRTVector diff = cameraPosition-target;
+    float distance = (target-cameraPosition).length();
+    float theta = std::acos(diff.y/distance);
+    float phi= acos(diff.x/sqrt(diff.x*diff.x + diff.z*diff.z));
+    if(diff.y < 0) {
+        phi *= -1.f;
+    }
+    phi += degs*(M_PI/180.f);
+
+    float newX = distance* std::sin(theta) * cos(phi);
+    float newY = distance * cos(theta);
+    float newZ = distance* std::sin(theta) * sin(phi);
+
+
+    cameraPosition = CRTVector{newX,newY,newZ};
+}
 CRTMatrix generalRotationMatrix(const CRTVector& axis,const float degs) {
     const float cosTheta = cos(degs);
     const float sinTheta = sin(degs);

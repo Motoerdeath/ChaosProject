@@ -11,7 +11,8 @@ class Homework2 : public Homework {
             cleanup();
         }
     private:
-    std::string resultFilePath = "../outputs/02_Fundamentals/output.ppm";
+    std::string resultFilePath1 = "../outputs/02_Fundamentals/Task1.ppm";
+    std::string resultFilePath2 = "../outputs/02_Fundamentals/Task2.ppm";
     PPMImage image;
 
     void setup() override {
@@ -32,8 +33,23 @@ class Homework2 : public Homework {
     }
     void run() override {
         image.renderRandomizedBackground();
-        image.storeImageToFile(resultFilePath);
-    }
+        image.storeImageToFile(resultFilePath1);
+        //image.clear();
+
+        int radius = 200;
+        CRTVector circleColor(1.f,0.f,0.f);
+        CRTVector backgroundColor(0.f,0.5f,0.f);
+        for(int y =0; y < 1080;y++) {
+            for(int x = 0; x < 1920; x++) {
+                if((x-960)*(x-960) + (y-540)* (y-540) <= radius*radius) {
+                    image.setPixel(circleColor,x,y);
+                } else {
+                    image.setPixel(backgroundColor,x,y);
+                }
+            }
+        }
+        image.storeImageToFile(resultFilePath2);
+    }   
     void cleanup() override {
         image.clear();
     }

@@ -18,14 +18,17 @@
 int main() {
 
 
-  //Homework12  homework12;
-  //homework12.execute();
-      
-  const std::string filename = "../inputs/Homework11_Shading3/scene8.crtscene";
+   /*  
+  const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
+  CRTVector center{0.f,0.f,-3.f};
+  CRTVector dolly{0.f,0.f,-1.f};
+  //scene.sceneCamera.move(dolly);
+  //scene.sceneCamera.rotateCameraHorizontalAroundPoint(center, -119);
+  //scene.sceneCamera.lookAt(center);
   CRTRenderer renderer(&scene);
   renderer.setupTriangleAccessStructure();
   std::printf("finished importing scene.\n");
@@ -41,7 +44,32 @@ int main() {
   renderer.storeImage("../output.ppm");
   std::printf("finished storing output.\n");
   
+*/
 
+  const std::string inputFilePath = "../inputs/Homework15_Conclusion/scene2.crtscene";
+  const std::string outputFilePath = "../outputs/15_Conclusion/Scene3/Frame_";
+
+  int nFrames = 240;
+  CRTScene scene(inputFilePath);
+  scene.parseSceneFile(inputFilePath);
+  CRTRenderer renderer(&scene);
+  CRTVector center{0.f,0.f,-3.f};
+  for(int i = 0; i < nFrames; i++) {
+    renderer.setupTriangleAccessStructure();
+    renderer.render();
+    std::string outputPath = outputFilePath + std::to_string(i) + ".ppm";
+    renderer.storeImage(outputPath);
+
+    //update Scene
+    CRTVector truck(0.2f,0.f,0.f);
+    scene.sceneCamera.move(truck);
+    scene.sceneCamera.lookAt(center);
+
+
+    
+    
+  }
+  
 
   return 0;
 }

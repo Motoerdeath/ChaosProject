@@ -33,9 +33,6 @@ void CRTRenderer::setupTriangleAccessStructure() {
     as.buildAS();
 
 
-    if(ENVIRONMENTMAP) {
-
-    }
 }
 void CRTRenderer::render() {
     if(MULTITHREADING) {
@@ -328,7 +325,6 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
         float distanceFallOff = 4*M_PI*lDLength*lDLength;
         final_color = final_color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
     }
-    //final_color = CRTVector(glm::clamp(final_color.x,0.f,1.f),glm::clamp(final_color.y,0.f,1.f),glm::clamp(final_color.z,0.f,1.f));
 
     return final_color;
 }
@@ -362,6 +358,7 @@ CRTVector CRTRenderer::directIllumination(Intersection& isect) {
 }
 
 CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
+
     Material mat = scene->getMaterial(isect.materialIDx);
     CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
     CRTVector final_color(0.f);
@@ -373,7 +370,7 @@ CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
         CRTVector upAxis = normal;
         CRTVector forwardAxis = rightAxis.cross(upAxis);
         CRTMatrix localHitMatrix{rightAxis,upAxis,forwardAxis};
-
+        /*
         //sample hemisphere
         const float r1 = dist(mt);
         const float r2 = dist(mt);
@@ -389,23 +386,23 @@ CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
         }
         CRTVector diffReflRayDir2  = vec * localHitMatrix;
         float cosLaw = CRTVector::dot(vec,normal);
-
+*/
         float randAngleinXY = M_PI*dist(mt);
         CRTVector randVectorInXY{std::cos(randAngleinXY),std::sin(randAngleinXY),0.f};
         float randAngleinXZ = 2.f*M_PI*dist(mt);
-        CRTMatrix rotateAroundY = CRTMatrix::getRotationMatrixAroundY(randAngleinXZ);
+        CRTMatrix rotateAroundY = CRTMatrix::getRotationMatrixAroundY(randAngleinXZ*((float)180)/M_PI);
         CRTVector randVectorInXYRotated = randVectorInXY*rotateAroundY;
         CRTVector diffReflRayDir = randVectorInXYRotated*localHitMatrix;
         CRTRay diffReflRay(isect.intersectionPoint + normal*diffuseRayBias,diffReflRayDir);
         diffReflRay.type = CameraRay;
         diffReflRay.rayDepth = ray.rayDepth+1;
-        //final_color = final_color + traceRay(diffReflRay);
-        final_color = final_color + traceRay(diffReflRay)*std::cos(randAngleinXZ);
+        final_color = final_color + traceRay(diffReflRay);
+        //final_color = final_color + traceRay(diffReflRay)*std::cos(randAngleinXZ);
     }
-    final_color = final_color/DIFFUSEREFLECTIONSCOUNT;
-    return (final_color + directIllumination(isect)) * albedo/M_PI;
-    //final_color = final_color + diffuseShading(ray, isect);
-    //return final_color / (diffuseReflectionRaysCount+1);
+    //final_color = final_color/DIFFUSEREFLECTIONSCOUNT;
+    //return (final_color + directIllumination(isect)) * albedo/M_PI;
+    final_color = final_color + diffuseShading(ray, isect);
+    return final_color / (DIFFUSEREFLECTIONSCOUNT+1);
     
 
     /*
