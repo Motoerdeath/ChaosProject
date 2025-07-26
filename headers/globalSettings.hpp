@@ -7,12 +7,12 @@
 #define SAMPLESPERPIXEL 8
 #define CAMERAJITTER 1
 #define MAXPATHDEPTH 5
-#define MOVABLEOBJECTS 1
+#define MOVABLEOBJECTS 0
 
 //Settings for Acceleration structures
 #define ACCELERATION 1 //
-#define TRIPERLEAF 4
-#define MAXTREEDEPTH 10
+#define TRIPERLEAF 2
+#define MAXTREEDEPTH 15
 
 //Camera Settings
 #define FOV 90
