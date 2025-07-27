@@ -1,10 +1,3 @@
-#include "../src/Tasks/homework2.cpp"
-#include "../src/Tasks/homework3.cpp"
-#include "../src/Tasks/homework4.cpp"
-#include "../src/Tasks/homework5.cpp"
-#include "../src/Tasks/homework12.cpp"
-
-
 #include <cassert>
 #include <cstdio>
 
