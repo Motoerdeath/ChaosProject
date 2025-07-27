@@ -21,7 +21,7 @@ class CRTRay {
     CRTRay(CRTVector origin, CRTVector direction) :  rayOrigin(origin), rayDirection(direction) {}
     bool intersectTriangle(CRTTriangle triangle, float& t, bool hitBackside) {
 
-        constexpr float EPSILON = 0.0001f;
+        constexpr float EPSILON = 0.001f;
         CRTVector normal = triangle.calculateTriangleNormal();
         //check if Ray is not parallel and if ray hits it from the front
         bool keepIsect;
@@ -73,7 +73,7 @@ class CRTRay {
     static bool intersectBoundingBox(const CRTRay& ray, const AABB& aabb);
     static bool intersectTriangle(const CRTRay& ray,CRTTriangle triangle, float& t, bool hitBackside) {
 
-        constexpr float EPSILON = 0.00001f;
+        constexpr float EPSILON = 0.0001f;
         CRTVector normal = triangle.calculateTriangleNormal();
         //check if Ray is not parallel and if ray hits it from the front
         bool keepIsect;
@@ -102,15 +102,6 @@ class CRTRay {
             CRTVector v1p = intersection-triangle.v1;
             CRTVector v2p = intersection-triangle.v2;
 
-            //use barycentric coordinates to determine whether point lies within triangle
-            /*
-            
-            std::vector<float> uvCoords = CRTTriangle::calculateBarycentricCoordinates(triangle, intersection);
-            if(uvCoords[0] >=0.f && uvCoords[1]>=0.f && uvCoords[0] <= 1.f && uvCoords[1] <= 1.f && uvCoords[0]+uvCoords[1]<= 1.f) {
-                t = t1;
-                return true;
-            }
-            */
 
             //check if intersection point is in triangle, by checking whether it is "on the left" of each triangle side
             if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >=-EPSILON && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >=-EPSILON && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >=-EPSILON ) {

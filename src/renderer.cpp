@@ -1,6 +1,7 @@
 #include "../headers/renderer.hpp"
 #include "../include/glm/geometric.hpp"
 #include <algorithm>
+#include <cassert>
 #include <cfloat>
 #include <cmath>
 #include <iostream>
@@ -25,11 +26,11 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
 };
 void CRTRenderer::setupTriangleAccessStructure() {
     as.clear();
-    if(MOVABLEOBJECTS) {
-        as.createTriangleSoup(scene->fullObjects);
-    } else {
+    //if(MOVABLEOBJECTS) {
+        //as.createTriangleSoup(scene->fullObjects);
+    //} else {
         as.createTriangleSoup(scene->sceneObjects);
-    }
+    //}
     as.buildAS();
 
 
@@ -239,18 +240,7 @@ bool CRTRenderer::intersect2(const CRTRay& ray,Intersection& isect, const float 
 }
 CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     Material mat = scene->sceneMaterials[isect.materialIDx];
-    
-    if(debug == GeometricNormals){
-        return isect.geomNormal;
-    } else if(debug == ShadingNormals) {
-        return isect.shadingNormal;
-    } else if(debug == BarycentricCoordinates) {
-        return CRTVector(isect.baryCoords.x,isect.baryCoords.y,0.f);
-    } else if(debug == TextureCoordinates) {
-        return isect.textureCoords;
-    } else if (debug == TriangleView) {
-        return triIDtoColor(isect.triangleIDx);
-    } else {
+    if(debug == None || HeatMap) {
         if(ray.rayDepth>= MAXPATHDEPTH) {
             return scene->getBackgroundColor();  
         } else if(mat.type == constant) {
@@ -266,9 +256,22 @@ CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
         } else if(mat.type == refractive) {
             return refractiveShading(ray, isect);
         } else {
-            throw std::runtime_error("invalid Rendering Style");
+            throw std::runtime_error("invalid Rendering type");
         }
         
+        return CRTVector(0.f);
+    } else if(debug == GeometricNormals){
+        return isect.geomNormal;
+    } else if(debug == ShadingNormals) {
+        return isect.shadingNormal;
+    } else if(debug == BarycentricCoordinates) {
+        return CRTVector(isect.baryCoords.x,isect.baryCoords.y,0.f);
+    } else if(debug == TextureCoordinates) {
+        return isect.textureCoords;
+    } else if (debug == TriangleView) {
+        return triIDtoColor(isect.triangleIDx);
+    } else {
+        assert(false);
         return CRTVector(0.f);
     }
 
@@ -364,12 +367,13 @@ CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
     CRTVector final_color(0.f);
     CRTVector albedo = getAlbedo(mat, isect);
     int diffuseReflectionRaysCount = 1;
+    CRTVector rightAxis = ray.rayDirection.cross(normal).normalize();
+    CRTVector upAxis = normal;
+    CRTVector forwardAxis = rightAxis.cross(upAxis);
+    CRTMatrix localHitMatrix{rightAxis,upAxis,forwardAxis};
     for(int i = 0; i < DIFFUSEREFLECTIONSCOUNT;i++) {
         //construct local hit matrix
-        CRTVector rightAxis = ray.rayDirection.cross(normal).normalize();
-        CRTVector upAxis = normal;
-        CRTVector forwardAxis = rightAxis.cross(upAxis);
-        CRTMatrix localHitMatrix{rightAxis,upAxis,forwardAxis};
+
         /*
         //sample hemisphere
         const float r1 = dist(mt);

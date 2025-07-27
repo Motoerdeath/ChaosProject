@@ -4,7 +4,7 @@
 
 
 void EnvironmentMap::buildEnvironmentMap(std::vector<std::string> filePaths) {
-    assert(filePaths.size==6);
+    assert(filePaths.size()==6);
 
 
     for(int i = 0; i < filePaths.size(); i++) {
