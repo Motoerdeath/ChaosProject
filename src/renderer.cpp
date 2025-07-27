@@ -26,17 +26,17 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
 };
 void CRTRenderer::setupTriangleAccessStructure() {
     as.clear();
-    //if(MOVABLEOBJECTS) {
-        //as.createTriangleSoup(scene->fullObjects);
-    //} else {
+    if(MOVABLEOBJECTS) {
+        as.createTriangleSoup(scene->fullObjects);
+    } else {
         as.createTriangleSoup(scene->sceneObjects);
-    //}
+    }
     as.buildAS();
 
 
 }
 void CRTRenderer::render() {
-    if(MULTITHREADING) {
+    if(useMultiThreading) {
         renderMultiThreaded();
     } else {
         renderSingleThreaded();
@@ -67,11 +67,11 @@ void CRTRenderer::renderRegion(const int startX,const int startY,const int regio
                 auto finish = std::chrono::high_resolution_clock::now();
                 const std::chrono::duration<float> elapsed_seconds{finish - start};
                 std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);
-                float seconds = dur.count()/1'000'000.0;
+                float seconds = dur.count()/(100.0*SAMPLESPERPIXEL);
                 float time = glm::clamp(seconds,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
                 finalColor =  temperature(time);
                 image.setPixel(finalColor,actualX,actualY);
-                break;
+                continue;
             }
             finalColor = finalColor/SAMPLESPERPIXEL;
             image.setPixel(finalColor,actualX,actualY);
@@ -85,7 +85,7 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
 
     Intersection isect;
 
-    if(ACCELERATION) {
+    if(useAccelerationStructure) {
         if(as.findIntersection(ray, isect)) {
             Material mat = scene->sceneMaterials[isect.materialIDx];
             return calculateShading(ray, isect);
@@ -200,8 +200,11 @@ bool CRTRenderer::intersect2(const CRTRay& ray,Intersection& isect, const float 
             Material mat = scene->getMaterial(object->materialID);
             bool hitBackSide = !mat.backFaceCulling;
             //shoot shadowRay
-            hitCondition = CRTRay::intersectTriangle(ray,triangle,t, hitBackSide) && t < closestIntersectionDistance && t < maxT;
-
+                    if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
+                        hitCondition = CRTRay::intersectTriangle(ray,triangle,t, true) && t < closestIntersectionDistance && t < maxT;
+                    } else {
+                        hitCondition = CRTRay::intersectTriangle(ray,triangle,t, false) && t < closestIntersectionDistance && t < maxT;
+                    }
             if(hitCondition) {
 
                 foundIntersection = true;
@@ -240,13 +243,13 @@ bool CRTRenderer::intersect2(const CRTRay& ray,Intersection& isect, const float 
 }
 CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
     Material mat = scene->sceneMaterials[isect.materialIDx];
-    if(debug == None || HeatMap) {
+    if(debug == None || debug == HeatMap) {
         if(ray.rayDepth>= MAXPATHDEPTH) {
             return scene->getBackgroundColor();  
         } else if(mat.type == constant) {
             return constantShading(ray, isect);
         } else if(mat.type == diffuse) {
-            if(GLOBALILLUMINATION) {
+            if(useGlobalIllumination) {
                 return diffuseShadingGI(ray, isect);
             } else {
                 return diffuseShading(ray, isect);
@@ -261,9 +264,9 @@ CRTVector CRTRenderer::calculateShading(const CRTRay& ray,Intersection& isect) {
         
         return CRTVector(0.f);
     } else if(debug == GeometricNormals){
-        return isect.geomNormal;
+        return CRTVector(std::abs(isect.geomNormal.x),std::abs(isect.geomNormal.y),std::abs(isect.geomNormal.z));
     } else if(debug == ShadingNormals) {
-        return isect.shadingNormal;
+        return CRTVector(std::abs(isect.shadingNormal.x),std::abs(isect.shadingNormal.y),std::abs(isect.shadingNormal.z));
     } else if(debug == BarycentricCoordinates) {
         return CRTVector(isect.baryCoords.x,isect.baryCoords.y,0.f);
     } else if(debug == TextureCoordinates) {
@@ -326,7 +329,7 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
         float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), normal));
         if(cosLaw ==0.f) continue;
         float distanceFallOff = 4*M_PI*lDLength*lDLength;
-        final_color = final_color +(albedo*(cosLaw*source.lightIntensity/distanceFallOff));
+        final_color = final_color +(albedo*(cosLaw*source.lightIntensity*source.lightColor/distanceFallOff));
     }
 
     return final_color;
@@ -494,19 +497,6 @@ float CRTRenderer::fresnel_schlick(const CRTRay& ray,const CRTVector& normal,con
     return r0+((1.f-r0)*pow((1.f - CRTVector::dot(ray.rayDirection.normalize(), normal)),5));
 }
 
-void CRTRenderer::generateBoundingBox() {
-    for(CRTMesh object : scene->sceneObjects) {
-        for(int i = 0; i < object.triangleVertIndices.size();i+=3) {
-            CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[i]],
-                            object.triangleVertices[object.triangleVertIndices[i+1]],
-                            object.triangleVertices[object.triangleVertIndices[i+2]]);
-
-            entireSceneBB.include(triangle);
-        }
-    }
-}
-
-
 float CRTRenderer::fade(float low, float high, float value) {
     float mid = (low+high)*0.5f;
     float range = (high-low)*0.5f;
@@ -533,22 +523,34 @@ void CRTRenderer::renderSingleThreaded() {
         for(int x = 0; x < settings->imageWidth;x++) { 
 
 
-            auto start = std::chrono::steady_clock::now();//timing
-            CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x,CAMERAJITTER);
-            cameraRay.rayDepth = 0;
-            cameraRay.type = CameraRay;
-            CRTVector color = traceRay(cameraRay);
+            auto start = std::chrono::high_resolution_clock::now();//timing
+            CRTVector finalColor{0.f};
+
+
+            for(int i = 0; i < SAMPLESPERPIXEL; i++) {
+                CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x,CAMERAJITTER);
+                cameraRay.rayDepth = 0;
+                cameraRay.type = CameraRay;
+                finalColor = finalColor + traceRay(cameraRay);
+
+
+            }
 
             if(debug == HeatMap) {
-                auto finish = std::chrono::steady_clock::now();
+                auto finish = std::chrono::high_resolution_clock::now();
                 const std::chrono::duration<float> elapsed_seconds{finish - start};
-                float time = glm::clamp(elapsed_seconds.count()*heatMapHigh,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
-                color = temperature(time);
+                std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);
+                float seconds = dur.count()/(100.0*samplesPerPixel);
+                float time = glm::clamp(seconds,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
+                finalColor =  temperature(time);
+                image.setPixel(finalColor,x,y); 
+                continue;
             }
             //Heatmap and timing stuff
-            image.setPixel(color,x,y);       
+            finalColor = finalColor/SAMPLESPERPIXEL;
+            image.setPixel(finalColor,x,y);       
         }
-        std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
+        //std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
     }
 }
 void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {

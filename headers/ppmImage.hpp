@@ -3,10 +3,15 @@
 #define PPMIMAGE
 #include <vector>
 #include <string>
-#include "../headers/globals.h"
+
 #include "../headers/ray.hpp"
 #include "crtVector.hpp"
+#include "../include/glm/glm.hpp"
 
+struct GridCell {
+    glm::vec3 colorValue;
+    bool randomize;
+};
 enum ShapeType {
     Circle,
     Triangle,

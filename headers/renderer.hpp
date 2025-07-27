@@ -3,7 +3,7 @@
 
 #include "accelerationStructure.hpp"
 #include "crtVector.hpp"
-#include "environmentMap.hpp"
+#include "globalSettings.hpp"
 #include "ppmImage.hpp"
 #include "ray.hpp"
 #include "scene.hpp"
@@ -14,7 +14,6 @@
 
 #include <mutex>
 #include <random>
-#include "../headers/environmentMap.hpp"
 #include <vector>
 
 enum DebugMode {
@@ -40,6 +39,12 @@ class CRTRenderer {
     std::mutex updateMutex;
     int finishedBuckets =0;
     void setupRNG();
+
+    bool useAccelerationStructure = ACCELERATION;
+    bool useGlobalIllumination = GLOBALILLUMINATION;
+    bool useMultiThreading = MULTITHREADING;
+    DebugMode debug = None;
+
     private:
 
     
@@ -71,8 +76,6 @@ class CRTRenderer {
     const float reflectionBias = 0.001f;
     const float refractionBias = 0.001f;
 
-    AABB entireSceneBB;
-    void generateBoundingBox();
     float fade(float low, float high, float value);
     CRTVector temperature(float intensity);
     float heatMapHigh = 100.f;
@@ -80,12 +83,11 @@ class CRTRenderer {
     AccelerationStructure access;
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
-    DebugMode debug = None;
+    
     int samplesPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
-    bool useAccelerationStructure = true;
-    bool useGlobalIllumination = false;
+
     std::mt19937 mt;
     std::uniform_real_distribution<float> dist;
     CRTVector triIDtoColor(int triIdx);

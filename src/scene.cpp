@@ -25,7 +25,7 @@ void CRTScene::importSettings(rapidjson::Document& doc){
     CRTVector bgColor(0.f);
     int imageWidth = 0;
     int imageHeight = 0;
-    int bucketSize = 0;
+    int bucketSize = 24;
     bool globalIllumination = false;
     bool reflections = true;
     bool refractions = true;
@@ -35,6 +35,7 @@ void CRTScene::importSettings(rapidjson::Document& doc){
     //load image settings
     if(!settingsVal.IsNull() && settingsVal.IsObject()) 
     {
+        std::printf("heyoooo");
         assert(settingsVal.HasMember("background_color"));
         const rapidjson::Value& bgColorVal = settingsVal.FindMember("background_color")->value;
         if(!bgColorVal.IsNull() && bgColorVal.IsArray()) {
@@ -157,7 +158,11 @@ void CRTScene::importLights(rapidjson::Document& doc){
                 if(!intensitytVal.IsNull() ) {
                     intensity = static_cast<float> (intensitytVal.GetDouble());
                 } 
-                lights.push_back(Light(pos,intensity));
+                CRTVector lightAlbedo{1.f,1.f,1.f};
+                if(lightVal.HasMember("albedo")) {
+                    lightAlbedo = loadVector(lightVal.FindMember("albedo")->value.GetArray());
+                }
+                lights.push_back(Light(pos,intensity,lightAlbedo));
             }
         }
     }
@@ -286,7 +291,7 @@ void CRTScene::importMaterials(rapidjson::Document& doc){
         }
     } else {
         Material mat;
-        CRTVector albedo(1.f,0.f,1.f);
+        CRTVector albedo(0.4f);
         MaterialType matType;
         RenderingStyle style = flat;
         bool backFaceCulling = false;
@@ -378,9 +383,8 @@ std::ifstream ifs(sceneFileName);
     rapidjson::IStreamWrapper isw(ifs);
     rapidjson::Document doc;
     doc.ParseStream(isw);
-
     importSettings(doc);
-    std::printf("heyoooo");
+    
     importCamera(doc, sceneSettings.imageWidth, sceneSettings.imageHeight);
 
     importObjects(doc);

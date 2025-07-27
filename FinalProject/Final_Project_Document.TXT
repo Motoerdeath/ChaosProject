@@ -1,0 +1,35 @@
+My final projects consist of 3 short videos, on based on each scene provided by the final lecture.
+
+The scenes have been modified by me to show as many of the courses features I have implemented as possible.
+The individual Frames for these animations are accessible under outputs/15_Conclusion/.. .
+
+The first scene(scene1.mkv), consist of a single flatly shaded sphere that slowly moves left and right in a room, 3 differently colored lights(red, green, blue) illuminate it.
+The first 60 frames, show simply the sphere moving back and forth, and afterwards in 30 frame intervals, the animation swaps between different Debugging views while the scene behavior stays the same.
+In order, these debugging views are:
+  -Geometric Normals of each triangles
+  -Interpolated normals used for smooth shading
+  -Barycentric Coordinates
+  -A Triangle view where each triangle is colored based on its index
+  -And a Heatmap, which visualizes for each pixel how long it took to compute, the scale goes from purple(very fast to render) to bright red(slow to render).
+   For this scene slow means taking more than 100 microseconds.
+  The Heatmap visualization is split up into four sections:
+    -First without any Optimizations.
+    -Then with Bucket rendering enabled (you notice that the visualizer looks considerably more red, however the actual render time is much faster, this is likely caused by the additional overhead and scheduling work necessary when all available are set on this one task)
+    -Then with only a full Kd-Acceleration tree used, with a max depth of 10 and 4 triangles per leaf
+    -Then with all optimizations combined.
+
+
+The second scene(scene2.gif) displays a smooth-diffuse dragon in a room with a reflective floor and a textured background.
+The motion in this scene comes by continuously increasing the FOV while also moving the camera closer to the center of the scene.
+The background is textured with a bitmap read by the stbi image load library.
+
+
+The third Scene (scene3.gif) shows a small room filled with multiple diffuse objects as well as a refractive glass sphere and a reflective sphere.
+This scene is rendered using the Global Illumination algorithm presented in the course to calculate indirect lighting for diffuse intersections.
+The camera slowly rotates around the scene.
+This scene contains 74 frames, each rendered with 128 Rays per pixel to remove most of the noise.
+All Optimization techniques were used to improve rendering times, Bucket rendering and an Kd-Acceleration tree with a max depth of 15 and 2 triangles per leaf node. In testing this configuration yielded the best results for me in this scene.
+Anti-aliasing is achieved by jittering the origin of the primary ray.
+
+To display that my implementation can also produce mostly noise free images, I've also rendered a single frame with 2048 Rays shot per pixel (scene3_2048samples.ppm).
+Otherwise the configuration was exactly the same as for the animation.

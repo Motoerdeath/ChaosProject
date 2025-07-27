@@ -19,16 +19,12 @@ int main() {
 
 
     
-  const std::string filename = "../inputs/Homework11_Shading3/scene1.crtscene";
+  const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
   scene.parseSceneFile(filename);
-  CRTVector center{0.f,0.f,-3.f};
-  CRTVector dolly{0.f,0.f,-1.f};
-  //scene.sceneCamera.move(dolly);
-  //scene.sceneCamera.rotateCameraHorizontalAroundPoint(center, -119);
-  //scene.sceneCamera.lookAt(center);
+
   CRTRenderer renderer(&scene);
   renderer.setupTriangleAccessStructure();
   std::printf("finished importing scene.\n");
@@ -43,27 +39,62 @@ int main() {
   std::printf("finished rendering scene.\n");
   renderer.storeImage("../output.ppm");
   std::printf("finished storing output.\n");
-  
+ 
 
 /*
-  const std::string inputFilePath = "../inputs/Homework15_Conclusion/scene2.crtscene";
-  const std::string outputFilePath = "../outputs/15_Conclusion/Scene3/Frame_";
+  const std::string inputFilePath = "../inputs/Homework15_Conclusion/scene0.crtscene";
+  const std::string outputFilePath = "../outputs/15_Conclusion/Scene1/Frame_";
 
-  int nFrames = 72;
+  int nFrames = 300;
   CRTScene scene(inputFilePath);
   scene.parseSceneFile(inputFilePath);
   CRTRenderer renderer(&scene);
-  CRTVector truck{0.3f,0.f,0.f};
+  CRTVector truck{0.2f,0.f,0.f};
   CRTVector center{0.f,0.f,-3.f};
+  scene.fullObjects[1].offset =scene.fullObjects[1].offset+ CRTVector(-1.f,0.f,0.f);
   for(int i = 0; i < nFrames; i++) {
     renderer.setupTriangleAccessStructure();
     renderer.render();
     std::string outputPath = outputFilePath + std::to_string(i) + ".ppm";
     renderer.storeImage(outputPath);
-    scene.sceneCamera.move(truck);
-    scene.sceneCamera.lookAt(center);
+
+    if(i >= 270) {
+      renderer.debug = HeatMap;
+      renderer.useAccelerationStructure = true;
+      renderer.useMultiThreading = true;
+    }else if(i >= 240) {
+      renderer.debug = HeatMap;
+      renderer.useAccelerationStructure = true;
+      renderer.useMultiThreading = false;
+    }else if(i >= 210) {
+      renderer.debug = HeatMap;
+      renderer.useAccelerationStructure = false;
+      renderer.useMultiThreading = true;
+    }else if(i >= 180) {
+      renderer.debug = HeatMap;
+      renderer.useAccelerationStructure = false;
+      renderer.useMultiThreading = false;
+    } else if( i >= 150) {
+      renderer.debug = TriangleView;
+    } else if( i >= 120) {
+      renderer.debug = BarycentricCoordinates;
+    } else if( i >= 90) {
+      renderer.debug = ShadingNormals;
+    } else if( i >= 60) {
+      renderer.debug = GeometricNormals;
+    }
+    
+
+    if(i % 20 <10) {
+      scene.fullObjects[1].offset =scene.fullObjects[1].offset+ truck;
+    } else {
+      scene.fullObjects[1].offset =scene.fullObjects[1].offset- truck;
+    }
+    //update Ball position
+    // 
+
   }
-*/  
+*/
 
   return 0;
 }
