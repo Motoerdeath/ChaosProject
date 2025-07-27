@@ -35,7 +35,6 @@ void CRTScene::importSettings(rapidjson::Document& doc){
     //load image settings
     if(!settingsVal.IsNull() && settingsVal.IsObject()) 
     {
-        std::printf("heyoooo");
         assert(settingsVal.HasMember("background_color"));
         const rapidjson::Value& bgColorVal = settingsVal.FindMember("background_color")->value;
         if(!bgColorVal.IsNull() && bgColorVal.IsArray()) {
@@ -391,11 +390,8 @@ std::ifstream ifs(sceneFileName);
     
     importLights(doc);
     importMaterials(doc);
-    //import materials
     
     importTextures(doc);
-    std::cout << "j" << std::endl;
-    //textureImage = loadImageFromFile("../inputs/Homework12_Textures/textures/dragon.jpg");
 }
 
 Material CRTScene::getMaterial(int materialIDx) {

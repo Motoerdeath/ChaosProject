@@ -23,8 +23,6 @@ set(CCP_SOURCE_FILES
   ${CMAKE_SOURCE_DIR}/src/bucketqueue.cpp
   ${CMAKE_SOURCE_DIR}/src/AABB.cpp
   ${CMAKE_SOURCE_DIR}/src/accelerationStructure.cpp
-  ${CMAKE_SOURCE_DIR}/src/environmentMap.cpp
-
 )
 
 
