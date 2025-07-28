@@ -27,14 +27,34 @@ class CRTVector {
     CRTVector operator+ (const CRTVector& rhs) const {
         return CRTVector(x+rhs.x,y+rhs.y,z+rhs.z);
     }
+    inline void operator+=(CRTVector& rhs) {
+        x = x +rhs.x;
+        y = y +rhs.y;
+        z = z +rhs.z;
+    }
     CRTVector operator- (const CRTVector& rhs) const {
         return CRTVector(x-rhs.x,y-rhs.y,z-rhs.z);
+    }
+    inline void operator-=(CRTVector& rhs) {
+        x = x -rhs.x;
+        y = y -rhs.y;
+        z = z -rhs.z;
     }
     CRTVector operator* (const CRTVector& rhs) const {
         return CRTVector(x*rhs.x,y*rhs.y,z*rhs.z);
     }
     CRTVector operator*(const float scalar) const {
         return CRTVector(x*scalar,y*scalar,z*scalar);
+    }
+    inline void operator*=(CRTVector& rhs) {
+        x = x *rhs.x;
+        y = y *rhs.y;
+        z = z *rhs.z;
+    }
+    inline void operator*=(const float scalar) {
+        x = x *scalar;
+        y = y *scalar;
+        z = z *scalar;
     }
     friend CRTVector operator*(const float scalar,const CRTVector& rhs) {
         return CRTVector(rhs.x*scalar,rhs.y*scalar,rhs.z*scalar);
@@ -44,6 +64,19 @@ class CRTVector {
     }
     CRTVector operator/(const CRTVector& rhs) const {
         return CRTVector(x/rhs.x,y/rhs.y,z/rhs.z);
+    }
+    CRTVector operator/(const float scalar) const {
+        return CRTVector(x/scalar,y/scalar,z/scalar);
+    }
+    inline void operator/=(CRTVector& rhs) {
+        x = x /rhs.x;
+        y = y /rhs.y;
+        z = z /rhs.z;
+    }
+    inline void operator/=(const float scalar) {
+        x = x /scalar;
+        y = y /scalar;
+        z = z /scalar;
     }
     float* operator[](int index) {
         if(index == 0) {

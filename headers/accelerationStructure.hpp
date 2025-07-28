@@ -26,26 +26,14 @@ class AccelerationStructure{
         bool findIntersection(const CRTRay& ray, Intersection& isect, const float maxT=std::numeric_limits<float>::max());
         void createTriangleSoup(std::vector<CRTMesh> objects);
         void createTriangleSoup(std::vector<CRTObject> objects);
-        static bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri, int i);
         void clear();
     private:
         std::vector<CRTTriangle> triangleSoup;
         std::vector<ASNode> accTree;
-        int MAXTRIANGLESPERLEAF = 4;
-        //int MAXTREEDEPTH = 10;
         bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri);
-        
+
         void AABBSplitting(const AABB& toSplit, AABB& a, AABB& b, int axis); //axis: 0 = x; 1=y; 2= z;
-        void buildAccTree(int parentIdx, int depth, std::vector<CRTTriangle> triangles);
         void buildAccTree(int parentIdx, int depth, std::vector<int> triangleSoupIndexes);
-
-};
-
-class kdTree : public AccelerationStructure{
-
-};
-
-class BVHTree : public AccelerationStructure{
 
 };
 

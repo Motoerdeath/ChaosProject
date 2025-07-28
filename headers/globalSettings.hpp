@@ -4,7 +4,7 @@
 //Rendering Settings
 #define MULTITHREADING 1  // 0: no multithreading; 1: multithreading on
 #define DEBUGLEVEL 0 //0: no debug view aka normal rendering
-#define SAMPLESPERPIXEL 128
+#define SAMPLESPERPIXEL 1
 #define CAMERAJITTER 1
 #define MAXPATHDEPTH 5
 #define MOVABLEOBJECTS 1
@@ -18,6 +18,6 @@
 #define FOV 90
 
 //Global illumination Settings
-#define GLOBALILLUMINATION 1
+#define GLOBALILLUMINATION 0
 #define DIFFUSEREFLECTIONSCOUNT 1
 #endif

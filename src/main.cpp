@@ -9,9 +9,8 @@
 
 int main() {
 
-
-    
-  const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
+//set scenefile that you want to render
+const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
