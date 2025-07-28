@@ -129,8 +129,9 @@ class CRTRay {
                         */
                         return CRTVector(0.f);
     }
-    static CRTVector reflect(const CRTVector& ray, CRTVector normal);
-    static CRTVector refract(const CRTVector& ray,const CRTVector& normal,const float relativeIOR);
+    const CRTVector refract(const CRTVector& normal,const float relativeIOR) const;
+    const CRTVector reflect(const CRTVector& normal) const;
+    const bool isTotallyInternallyReflected(const CRTVector& normal,const float entryIOR, const float exitIOR) const;
     int rayDepth = 0;
     RayType type;
     private:

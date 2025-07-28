@@ -50,10 +50,6 @@ class CRTRenderer {
     
     CRTScene* scene;
     std::unique_ptr<CRTScene> scene2;
-    CRTVector traceCameraRay(const CRTRay& ray);
-    bool traceShadowRay(const CRTRay& ray,const float maxT=std::numeric_limits<float>::max());
-    CRTVector traceReflectionRay(const CRTRay& ray);
-    CRTVector traceRefractionRay(const CRTRay& ray);
     CRTVector traceRay(const CRTRay& ray,const float maxT=std::numeric_limits<float>::max());
 
     CRTVector calculateShading(const CRTRay& ray,Intersection& isect);
@@ -63,14 +59,13 @@ class CRTRenderer {
     void createRenderImage();
     PPMImage image;
     bool intersect(const CRTRay& ray,Intersection& isect,const float maxT=std::numeric_limits<float>::max());
-    bool intersect2(const CRTRay& ray,Intersection& isect,const float maxT=std::numeric_limits<float>::max());
     int maxDepth = 5;
     CRTVector diffuseShading(const CRTRay& ray,Intersection& isect);
     CRTVector diffuseShadingGI(const CRTRay& ray,Intersection& isect);
     CRTVector reflectiveShading(const CRTRay& ray,Intersection& isect);
     CRTVector refractiveShading(const CRTRay& ray,Intersection& isect);
-    CRTVector refract(const CRTRay& ray,const CRTVector normal, const float relativeIOR);
     CRTRay createReflectionRay(const CRTRay& ray, const CRTVector& position, const CRTVector& normal);
+    CRTRay createRefractionRay(const CRTRay& ray, const CRTVector& position, const CRTVector& normal, const float relativeIOR);
     const float shadowbias = 0.01f;
     const float diffuseRayBias = 0.0001f;
     const float reflectionBias = 0.001f;

@@ -48,7 +48,7 @@ void CRTScene::importSettings(rapidjson::Document& doc){
             imageHeight = heightValue.GetInt();
         }
         if(settingsVal.FindMember("image_settings")->value.HasMember("bucketSize")) {
-            bucketSize =  settingsVal.FindMember("image_settings")->value.FindMember("bucketSize")->value.GetInt();
+            bucketSize =  settingsVal.FindMember("image_settings")->value.FindMember("bucket_size")->value.GetInt();
         }
         if(settingsVal.HasMember("gi_on")) {
             globalIllumination = settingsVal.FindMember("gi_on")->value.GetBool();
@@ -60,7 +60,7 @@ void CRTScene::importSettings(rapidjson::Document& doc){
             refractions = settingsVal.FindMember("refractions_on")->value.GetBool();
         }
     }
-    CRTSettings settings(bgColor,imageWidth,imageHeight);
+    CRTSettings settings(bgColor,imageWidth,imageHeight,bucketSize);
     sceneSettings = settings;
     PPMImage image(imageWidth,imageHeight);
     image.backgroundColor = bgColor;

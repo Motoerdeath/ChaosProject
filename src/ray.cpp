@@ -3,30 +3,28 @@
 #include <iostream>
 #include <limits>
 
-
-CRTVector CRTRay::reflect(const CRTVector& rayDirection, CRTVector normal) {
-    CRTVector reflectedRay(0.f);
-
+const CRTVector CRTRay::reflect(const CRTVector& normal)  const {
     float dotRN = CRTVector::dot(rayDirection, normal);
     return rayDirection-normal*2.f*dotRN;
 }
+const CRTVector CRTRay::refract(const CRTVector& normal,const float relativeIOR) const {
 
-CRTVector CRTRay::refract(const CRTVector& rayDirection,const CRTVector& normal,const float relativeIOR) {
-
-    //check if Ray is exiting an object
-
-
-    //calculate entry angle
-    float cosAlpha = -CRTVector::dot(normal,rayDirection.normalize());
-    float sinBeta = sqrt(1.f-(cosAlpha*cosAlpha))*relativeIOR;
-    float cosBeta = cos(asin(sinBeta));
-    //std::cout << acos(cosAlpha) << std::endl;
-    //std::cout << asin(sinBeta) << std::endl;
-    CRTVector R =cosBeta*(normal*(-1.f)) + ((rayDirection + cosAlpha*normal).normalize()*sinBeta);
-    return R;
+    CRTVector I = rayDirection.normalize();
+    float cosAlpha = -1.f*CRTVector::dot(I, normal);
+    float sinBeta = sqrt(1-cosAlpha*cosAlpha) *relativeIOR;
+    float cosBeta = sqrt(1-sinBeta*sinBeta);
+    CRTVector C = (I +  cosAlpha*normal).normalize();
+    CRTVector B = C*sinBeta;
+    CRTVector A = cosBeta * -1.f * normal;
+    return A +B;
 }
 
+const bool CRTRay::isTotallyInternallyReflected(const CRTVector& normal,const float entryIOR, const float exitIOR) const {
+    CRTVector I = rayDirection.normalize();
+    float cosAlpha = -1.f*CRTVector::dot(I, normal);
+    return sqrt(1-cosAlpha*cosAlpha)> exitIOR/entryIOR;
 
+}
 
 
 bool CRTRay::intersectBoundingBox(const CRTRay &ray, const AABB &aabb) {

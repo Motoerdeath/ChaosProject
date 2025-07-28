@@ -1,10 +1,3 @@
-#include "../src/Tasks/homework2.cpp"
-#include "../src/Tasks/homework3.cpp"
-#include "../src/Tasks/homework4.cpp"
-#include "../src/Tasks/homework5.cpp"
-#include "../src/Tasks/homework12.cpp"
-
-
 #include <cassert>
 #include <cstdio>
 
@@ -16,9 +9,8 @@
 
 int main() {
 
-
-    
-  const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
+//set scenefile that you want to render
+const std::string filename = "../inputs/Homework15_Conclusion/scene2.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");

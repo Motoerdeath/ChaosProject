@@ -1,0 +1,19 @@
+Hardware:
+Intel core i7-7700K @4.20GHZ (8 Cores)
+32 GB RAM
+
+
+scene0 Results:
+
+Bucket Rendering(8 threads) & AABB :0.143051 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 5, max Triangles per leaf 4) : 0.129379 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 10, max Triangles per leaf 4) : 0.1284015 seconds
+
+scene 1 Results:
+
+Bucket Rendering(8 threads) & AABB : 33.9381 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 5, max Triangles per leaf 4) : 6.37152 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 10, max Triangles per leaf 4) : 1.43687 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 15, max Triangles per leaf 4) : 0.879894 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 15, max Triangles per leaf 2) : 0.842572 seconds
+Bucket Rendering(8 threads) & acceleration tree(max depth 20, max Triangles per leaf 2) : 1.28114 seconds

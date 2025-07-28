@@ -1,0 +1,13 @@
+Optimizations_1
+Hardware:
+Intel core i7-7700K @4.20GHZ (8 Cores)
+32 GB RAM
+
+
+Scene0:
+Debug: 1947.94 seconds
+Release: 268.262 seconds
+AABB-testing: 185.656 seconds
+Region-Rendering(8 Threads->4 regions): 160.365
+Bucket Rendering(8 threads): 80.293 seconds
+AABB&Bucket rendering(8 threads): 36.0141 seconds

@@ -7,29 +7,38 @@
 #include <stack>
 #include <cassert>
 
+
+AccelerationStructure::AccelerationStructure(CRTScene* scene) : scene(scene) {
+     clear();
+     createTriangleSoup();
+     buildKDTree();
+}
+//removes all data from acceleration Structure in situations where it has to be rebuilt
 void AccelerationStructure::clear() {
     triangleSoup.clear();
     accTree.clear();
 }
-
-void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
-    for(int i = 0; i < objects.size();i++) {
-        CRTMesh object = objects[i];
-        for(int j = 0; j < object.triangleVertIndices.size();j+=3) {
-            CRTTriangle triangle(object.triangleVertices[object.triangleVertIndices[j]],
-                            object.triangleVertices[object.triangleVertIndices[j+1]],
-                            object.triangleVertices[object.triangleVertIndices[j+2]]);
+// build the triangle data set from the scene data and stores it in triangle soup.
+// other functions index into this vector to reference the scene object data
+// this reduces the amount of data that needs to be stored as triangles have high memory requirements
+void AccelerationStructure::createTriangleSoup() {
+    for(int i = 0; i < scene->fullObjects.size();i++) {
+        CRTObject object = scene->fullObjects[i];
+        CRTMesh mesh = object.mesh;
+        for(int j = 0; j < mesh.triangleVertIndices.size();j+=3) {
+            CRTTriangle triangle(mesh.triangleVertices[mesh.triangleVertIndices[j]]+ object.offset,
+                            mesh.triangleVertices[mesh.triangleVertIndices[j+1]]+ object.offset,
+                            mesh.triangleVertices[mesh.triangleVertIndices[j+2]]+ object.offset);
 
             triangle.objectID = i;
-            triangle.geoNormal = triangle.normal;
-            triangle.materialID = object.materialID;
-            triangle.vertexNormal0 = object.vertexNormals[object.triangleVertIndices[j]];
-            triangle.vertexNormal1 = object.vertexNormals[object.triangleVertIndices[j+1]];
-            triangle.vertexNormal2 = object.vertexNormals[object.triangleVertIndices[j+2]];
-            if(object.textureCoords.size() == object.triangleVertices.size()) {
-                triangle.texCoords0 = object.textureCoords[object.triangleVertIndices[j]];
-                triangle.texCoords1 = object.textureCoords[object.triangleVertIndices[j+1]];
-                triangle.texCoords2 = object.textureCoords[object.triangleVertIndices[j+2]];
+            triangle.materialID = mesh.materialID;
+            triangle.vertexNormal0 = mesh.vertexNormals[mesh.triangleVertIndices[j]];
+            triangle.vertexNormal1 = mesh.vertexNormals[mesh.triangleVertIndices[j+1]];
+            triangle.vertexNormal2 = mesh.vertexNormals[mesh.triangleVertIndices[j+2]];
+            if(mesh.textureCoords.size() == mesh.triangleVertices.size()) {
+                triangle.texCoords0 = mesh.textureCoords[mesh.triangleVertIndices[j]];
+                triangle.texCoords1 = mesh.textureCoords[mesh.triangleVertIndices[j+1]];
+                triangle.texCoords2 = mesh.textureCoords[mesh.triangleVertIndices[j+2]];
             } else {
                 triangle.texCoords0 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j]];
                 triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
@@ -39,7 +48,7 @@ void AccelerationStructure::createTriangleSoup(std::vector<CRTMesh> objects) {
         }
     }
 }
-
+//
 void AccelerationStructure::createTriangleSoup(std::vector<CRTObject> objects) {
     for(int i = 0; i < objects.size();i++) {
         CRTObject object = objects[i];
@@ -50,7 +59,6 @@ void AccelerationStructure::createTriangleSoup(std::vector<CRTObject> objects) {
                             mesh.triangleVertices[mesh.triangleVertIndices[j+2]]+ object.offset);
 
             triangle.objectID = i;
-            triangle.geoNormal = triangle.normal;
             triangle.materialID = mesh.materialID;
             triangle.vertexNormal0 = mesh.vertexNormals[mesh.triangleVertIndices[j]];
             triangle.vertexNormal1 = mesh.vertexNormals[mesh.triangleVertIndices[j+1]];
@@ -69,8 +77,8 @@ void AccelerationStructure::createTriangleSoup(std::vector<CRTObject> objects) {
     }
 }
 
-//for he moemnt we only build a kd tree
-bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri) {
+// computes if a given triangle and AABB intersect
+const bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri) {
     AABB triaabb{tri};
     CRTVector v1 = triaabb.min-aabb.max;
     CRTVector v2 = aabb.min - triaabb.max;
@@ -78,14 +86,7 @@ bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTrian
     return true;
 }
 
-bool AccelerationStructure::AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri,int i) {
-    AABB triaabb{tri};
-    CRTVector v1 = triaabb.min-aabb.max;
-    CRTVector v2 = aabb.min - triaabb.max;
-    if(v1.x > 0.f|| v1.y >0.f || v1.z >0.f || v2.x >0.f || v2.y >0.f || v2.z >0.f) return false;
-    return true;
-}
-
+//splits an AABB along a certain axis into two evenly large AABBs. used by the Kd tree
 void AccelerationStructure::AABBSplitting(const AABB& toSplit, AABB& a, AABB& b, int axis) {
     float mid = (toSplit.max[axis] - toSplit.min[axis]) /2.f;
     float splitCoordinatePoint = toSplit.min[axis] + mid;
@@ -104,7 +105,9 @@ void AccelerationStructure::AABBSplitting(const AABB& toSplit, AABB& a, AABB& b,
         b.min.z = splitCoordinatePoint;
     }
 }
-void AccelerationStructure::buildAS() {
+
+//begins the process of building an 
+void AccelerationStructure::buildKDTree() {
     ASNode root;
     root.child1 =-1;
     root.child2 =-1;
@@ -120,52 +123,6 @@ void AccelerationStructure::buildAS() {
 
     buildAccTree(0, 0, triangleIndexes);
 
-}
-
-void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<CRTTriangle> triangles) {
-    if(triangles.size() <= TRIPERLEAF || depth >= MAXTREEDEPTH) {
-        //build leaf node
-        accTree[parentIdx].triangles = triangles;
-        return;
-    } else {
-        int splittingAxis = depth% 3;
-        AABB child1AABB;
-        AABB child2AABB;
-        AABBSplitting(accTree[parentIdx].boundingBox, child1AABB, child2AABB, splittingAxis);
-        std::vector<CRTTriangle> child1triangles;
-        std::vector<CRTTriangle> child2triangles;
-        for(CRTTriangle tri : triangles) {
-            if(AABBTriIntersection(child1AABB, tri)) {
-                child1triangles.push_back(tri);
-            }
-            if(AABBTriIntersection(child2AABB, tri)) {
-                child2triangles.push_back(tri);
-            }
-        }
-        //if there are triangles in child 1 then build that subnode
-        if(child1triangles.size()>0) {  
-            ASNode child1;
-            child1.child1  = -1;
-            child1.child2  = -1;
-            child1.boundingBox = child1AABB;
-            child1.parentIDx = parentIdx;
-            int child1Idx = accTree.size();
-            accTree.push_back(child1);
-            accTree[parentIdx].child1 =child1Idx;
-            buildAccTree(child1Idx, depth+1, child1triangles);
-        }
-        if(child2triangles.size() > 0) {
-            ASNode child2;
-            child2.child1  = -1;
-            child2.child2  = -1;
-            child2.boundingBox = child2AABB;
-            child2.parentIDx = parentIdx;
-            int child2Idx = accTree.size();
-            accTree.push_back(child2);
-            accTree[parentIdx].child2 =child2Idx;
-            buildAccTree(child2Idx, depth+1, child2triangles);
-        }
-    }
 }
 void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<int> triangleSoupIndexes) {
     if(triangleSoupIndexes.size() <= TRIPERLEAF || depth >= MAXTREEDEPTH) {
@@ -259,7 +216,7 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     isect.intersectionPoint = ray.rayOrigin + ray.rayDirection * minT;
     //offset intersectionPoint
 
-    isect.geomNormal = closestTriangle.geoNormal;
+    isect.geomNormal = closestTriangle.normal;
     isect.triangleIDx = triangleIDx;
     isect.materialIDx = closestTriangle.materialID;
     isect.objectIDx = closestTriangle.objectID;
@@ -271,14 +228,3 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
 
     return true;
 }
-
-/*
-        isect.intersectionPoint = position;
-        isect.baryCoords = baryCoords;
-        isect.geomNormal = geoNormal;
-        isect.shadingNormal = shadingNormal;
-        isect.materialIDx = materialID;
-        isect.objectIDx = objectID;
-        isect.triangleIDx = triangleID;
-        isect.t = closestIntersectionDistance;
-        */

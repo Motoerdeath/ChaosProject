@@ -16,6 +16,7 @@ void BucketQueue::generateBucketQueue(int imageWidth, int imageHeight, int bucke
     }
 }
 
+
 void BucketQueue::generateRegionQueue(int imageWidth, int imageHeight, int numThreads) {
     
     int regionsX = std::floor(sqrt(numThreads));
