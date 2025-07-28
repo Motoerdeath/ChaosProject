@@ -31,7 +31,6 @@ void AccelerationStructure::createTriangleSoup() {
                             mesh.triangleVertices[mesh.triangleVertIndices[j+2]]+ object.offset);
 
             triangle.objectID = i;
-            triangle.geoNormal = triangle.normal;
             triangle.materialID = mesh.materialID;
             triangle.vertexNormal0 = mesh.vertexNormals[mesh.triangleVertIndices[j]];
             triangle.vertexNormal1 = mesh.vertexNormals[mesh.triangleVertIndices[j+1]];
@@ -60,7 +59,6 @@ void AccelerationStructure::createTriangleSoup(std::vector<CRTObject> objects) {
                             mesh.triangleVertices[mesh.triangleVertIndices[j+2]]+ object.offset);
 
             triangle.objectID = i;
-            triangle.geoNormal = triangle.normal;
             triangle.materialID = mesh.materialID;
             triangle.vertexNormal0 = mesh.vertexNormals[mesh.triangleVertIndices[j]];
             triangle.vertexNormal1 = mesh.vertexNormals[mesh.triangleVertIndices[j+1]];
@@ -218,7 +216,7 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     isect.intersectionPoint = ray.rayOrigin + ray.rayDirection * minT;
     //offset intersectionPoint
 
-    isect.geomNormal = closestTriangle.geoNormal;
+    isect.geomNormal = closestTriangle.normal;
     isect.triangleIDx = triangleIDx;
     isect.materialIDx = closestTriangle.materialID;
     isect.objectIDx = closestTriangle.objectID;

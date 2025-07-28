@@ -526,7 +526,7 @@ void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {
 
 void CRTRenderer::renderMultiThreaded() {
     CRTSettings* settings = scene->getSettings();
-    renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, 24);
+    renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, settings->bucketSize);
     const auto nThreads = std::thread::hardware_concurrency();
 
     std::vector<std::thread> threads;

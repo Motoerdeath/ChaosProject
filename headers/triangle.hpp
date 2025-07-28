@@ -6,24 +6,17 @@
 
 class CRTTriangle {
     public:
-        CRTTriangle() : v0(CRTVector(0.f)), v1(CRTVector(0.f)), v2(CRTVector(0.f)), normal((v1-v0).cross(v2-v0).normalize()), color({0,0,0}) { normal = calculateTriangleNormal();}
-        CRTTriangle(CRTVector vall) : v0(vall), v1(vall), v2(vall), normal(CRTVector(0.0f)), color({0,0,0}) {normal = calculateTriangleNormal();}
-        CRTTriangle(CRTVector v0,CRTVector v1,CRTVector v2) : v0(v0), v1(v1), v2(v2), normal(CRTVector(0.0f)), color({0,0,0}) {normal = calculateTriangleNormal();}
+        CRTTriangle() : v0(CRTVector(0.f)), v1(CRTVector(0.f)), v2(CRTVector(0.f)), normal((v1-v0).cross(v2-v0).normalize()) { normal = calculateTriangleNormal();}
+        CRTTriangle(CRTVector vall) : v0(vall), v1(vall), v2(vall), normal(CRTVector(0.0f)) {normal = calculateTriangleNormal();}
+        CRTTriangle(CRTVector v0,CRTVector v1,CRTVector v2) : v0(v0), v1(v1), v2(v2), normal(CRTVector(0.0f)) {normal = calculateTriangleNormal();}
         static CRTVector calculateBarycentricCoordinates(const CRTTriangle& triangle,const CRTVector& position);
         CRTVector calculateTriangleNormal() {
             return (v1-v0).cross(v2-v0).normalize();
         }
-        CRTVector determineHitLocation(CRTVector rayOrigin,CRTVector rayDirection,float rayDistance);
         CRTVector v0;
         CRTVector v1;
         CRTVector v2;
         CRTVector normal;
-        std::vector<int> color;
-        CRTVector color2 = CRTVector(0.f);
-
-        CRTVector getTexCoords(const CRTVector uvCoordinates);
-
-        CRTVector geoNormal;
         CRTVector vertexNormal0;
         CRTVector vertexNormal1;
         CRTVector vertexNormal2;
