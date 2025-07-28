@@ -6,6 +6,7 @@
 #include "mesh.hpp"
 #include "object.hpp"
 #include "ray.hpp"
+#include "scene.hpp"
 #include "triangle.hpp"
 #include <vector>
 #include "../headers/globalSettings.hpp"
@@ -22,19 +23,20 @@ struct ASNode{
 class AccelerationStructure{
     public:
         AccelerationStructure() {}
-        void buildAS();
+        AccelerationStructure(CRTScene* scene);
         bool findIntersection(const CRTRay& ray, Intersection& isect, const float maxT=std::numeric_limits<float>::max());
-        void createTriangleSoup(std::vector<CRTMesh> objects);
-        void createTriangleSoup(std::vector<CRTObject> objects);
-        void clear();
     private:
         std::vector<CRTTriangle> triangleSoup;
         std::vector<ASNode> accTree;
-        bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri);
+        CRTScene* scene;
 
+        const bool AABBTriIntersection(const AABB& aabb, const CRTTriangle& tri);
         void AABBSplitting(const AABB& toSplit, AABB& a, AABB& b, int axis); //axis: 0 = x; 1=y; 2= z;
         void buildAccTree(int parentIdx, int depth, std::vector<int> triangleSoupIndexes);
-
+        void createTriangleSoup(std::vector<CRTObject> objects);
+        void createTriangleSoup();
+        void clear();
+        void buildKDTree();
 };
 
 #endif

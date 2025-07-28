@@ -53,24 +53,6 @@ void CRTCamera::lookAt(CRTVector target) {
     rotationMatrix = rotationMatrix * generalRotationMatrix(rotationVector.normalize(), angle);
 }
 
-CRTRay CRTCamera::generateCameraRay(int row, int column) {
-    float x = static_cast<float>(column) +0.5f;
-    float y = static_cast<float>(row) +0.5f;
-                
-    float ndcX = x/imageWidth;
-    float ndcY = y/imageHeight;
-
-    float screenX = ndcX *2.0f -1.0f;
-    float screenY = 1.0f - (2.0f*ndcY);
-    screenX *= static_cast<float>(imageWidth)/static_cast<float>(imageHeight);
-    //apply FOV
-    float FOVrads = fov*M_PI/180;
-    screenX *= std::tan(FOVrads/2.f);
-    screenY *= std::tan(FOVrads/2.f);
-    CRTVector normalizedVector =(CRTVector(screenX,screenY,-1.0f) * rotationMatrix).normalize();
-    return CRTRay(cameraPosition,normalizedVector);
-}
-
 CRTRay CRTCamera::generateCameraRay(int row, int column, bool jitter) {
     float offsetX = 0.f;
     float offsetY = 0.f;

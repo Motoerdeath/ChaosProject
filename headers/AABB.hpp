@@ -11,8 +11,10 @@ class AABB {
         void include(CRTTriangle triangle);
         void include(AABB boundingBox);
 
+
         CRTVector min{std::numeric_limits<float>::max()};
         CRTVector max{std::numeric_limits<float>::lowest()};
+
     private:
 
 };

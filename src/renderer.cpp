@@ -18,23 +18,15 @@ std::vector<CRTVector> prebuildColors{CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0
                             CRTVector(0.3f,0.f,0.7f),CRTVector(1.f,1.f,1.f)
 };
 
-
 CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
     scene2 = std::unique_ptr<CRTScene>(scene);
+    as = AccelerationStructure{scene};
     CRTSettings* settings = scene->getSettings();
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
 };
-void CRTRenderer::setupTriangleAccessStructure() {
-    as.clear();
-    if(MOVABLEOBJECTS) {
-        as.createTriangleSoup(scene->fullObjects);
-    } else {
-        as.createTriangleSoup(scene->sceneObjects);
-    }
-    as.buildAS();
 
-
-}
+//begins the rendering process
+//selects which
 void CRTRenderer::render() {
     if(useMultiThreading) {
         renderMultiThreaded();
@@ -43,6 +35,14 @@ void CRTRenderer::render() {
     }
 
 }
+
+
+void CRTRenderer::setupTriangleAccessStructure() {
+    //as.clear();
+    //as.createTriangleSoup(scene->fullObjects);
+    //as.buildAS();
+}
+
 void CRTRenderer::renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight) {
 
     //iterate over all pixels in the region
@@ -94,89 +94,18 @@ CRTVector CRTRenderer::traceRay(const CRTRay& ray, const float maxT) {
             return scene->sceneSettings.backgroundColor;
         }
     } else {
-        if(MOVABLEOBJECTS) {
-            if(intersect2(ray, isect)) {
-                Material mat = scene->sceneMaterials[isect.materialIDx];
-                return calculateShading(ray, isect);
+        if(intersect(ray, isect)) {
+            Material mat = scene->sceneMaterials[isect.materialIDx];
+            return calculateShading(ray, isect);
 
-            } else {
-                return scene->sceneSettings.backgroundColor;
-            }
         } else {
-            if(intersect(ray, isect)) {
-                Material mat = scene->sceneMaterials[isect.materialIDx];
-                return calculateShading(ray, isect);
-
-            } else {
-                return scene->sceneSettings.backgroundColor;
-            }
+            return scene->sceneSettings.backgroundColor;
         }
 
     }
 }
 
 bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float maxT) {
-    bool foundIntersection = false;
-    float closestIntersectionDistance = FLT_MAX;
-    int materialID;
-    int objectID;
-    int triangleID;
-    int textureID{0};
-    CRTVector geoNormal;
-    CRTVector shadingNormal;
-    CRTVector baryCoords;
-    CRTVector position;
-    CRTVector textureCoords{0.f};
-    for(int i = 0; i < scene->sceneObjects.size(); i++) {
-        CRTMesh* object = &(scene->sceneObjects[i]);
-        for(int k = 0; k < object->triangleVertIndices.size();k+=3) {
-            CRTTriangle triangle(object->triangleVertices[object->triangleVertIndices[k]],
-                                object->triangleVertices[object->triangleVertIndices[k+1]],
-                                object->triangleVertices[object->triangleVertIndices[k+2]]);
-            float t;
-            bool hitCondition = false;
-            Material mat = scene->getMaterial(object->materialID);
-            bool hitBackSide = !mat.backFaceCulling;
-            //shoot shadowRay
-            hitCondition = CRTRay::intersectTriangle(ray,triangle,t, hitBackSide) && t < closestIntersectionDistance && t < maxT;
-
-            if(hitCondition) {
-
-                foundIntersection = true;
-                closestIntersectionDistance = t;
-                materialID = object->materialID;
-                objectID = i;
-                triangleID = k/3;
-                geoNormal = triangle.normal;
-                position = ray.rayOrigin + ray.rayDirection*t;
-                baryCoords = CRTTriangle::calculateBarycentricCoordinates(triangle,position);
-                shadingNormal = object->vertexNormals[object->triangleVertIndices[k]]*baryCoords.z +object->vertexNormals[object->triangleVertIndices[k+1]]*baryCoords.x + object->vertexNormals[object->triangleVertIndices[k+2]]*baryCoords.y;
-
-                if(ray.type == ShadowRay) {
-                    Material mat = scene->getMaterial(materialID);
-                    if (mat.type != refractive) {
-                        return true;
-                    } else {
-                        foundIntersection = false;
-                        continue;
-                    }
-                }
-            }
-        }
-    }
-    if(foundIntersection) {
-        isect.intersectionPoint = position;
-        isect.baryCoords = baryCoords;
-        isect.geomNormal = geoNormal;
-        isect.shadingNormal = shadingNormal;
-        isect.materialIDx = materialID;
-        isect.objectIDx = objectID;
-        isect.triangleIDx = triangleID;
-        isect.t = closestIntersectionDistance;
-    }
-    return foundIntersection;
-}
-bool CRTRenderer::intersect2(const CRTRay& ray,Intersection& isect, const float maxT) {
     bool foundIntersection = false;
     float closestIntersectionDistance = FLT_MAX;
     int materialID;
@@ -433,6 +362,21 @@ CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) 
 }
 
 
+CRTVector refract(const CRTVector& rayDir, const CRTVector& normal, float entryIOR, float exitIOR) {
+
+    CRTVector I = rayDir.normalize();
+
+    float relativeIOR = entryIOR/exitIOR;
+
+    float cosAlpha = -1.f*CRTVector::dot(I, normal);
+    float sinBeta = sqrt(1-cosAlpha*cosAlpha) *entryIOR / exitIOR;
+    float cosBeta = sqrt(1-sinBeta*sinBeta);
+    CRTVector C = (I +  cosAlpha*normal).normalize();
+    CRTVector B = C*sinBeta;
+    CRTVector A = cosBeta * -1.f * normal;
+    return A +B;
+}
+
 CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) {
     
     Material mat = scene->getMaterial(isect.materialIDx);
@@ -452,37 +396,33 @@ CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) 
         entryIOR = mat.ior;
         exitIOR = 1.f;
     }
-    float relativeIOR = entryIOR/exitIOR;
-
-    float cosAlpha = -1.f*CRTVector::dot(I, normal);
+    const float relativeIOR = entryIOR/exitIOR;
+    CRTRay reflectionRay= createReflectionRay(ray, isect.intersectionPoint, normal);
+    CRTVector reflectionContrib = traceRay(reflectionRay);
     //Total Internal Reflection check
-    if(sqrt(1-cosAlpha*cosAlpha)> exitIOR/entryIOR) {
-        return traceRay(createReflectionRay(ray, isect.intersectionPoint, normal));
+    if(ray.isTotallyInternallyReflected(normal, entryIOR, exitIOR)) {
+        //only shoot a reflection ray if the angle of the ray tot he surface is too steep
+        return reflectionContrib;
     }
-    float sinBeta = sqrt(1-cosAlpha*cosAlpha) *entryIOR / exitIOR;
-    float cosBeta = sqrt(1-sinBeta*sinBeta);
-    CRTVector C = (I +  cosAlpha*normal).normalize();
-    CRTVector B = C*sinBeta;
-    CRTVector A = cosBeta * -1.f * normal;
-    CRTVector R = A +B;
-    CRTRay refractionRay(isect.intersectionPoint + -1.f*refractionBias*normal,R);
-    //glm::refract(ray.rayDirection)
-    refractionRay.rayDepth = ray.rayDepth+1;
-    refractionRay.type = RefractionRay;
+    CRTRay refractionRay = createRefractionRay(ray, isect.intersectionPoint, normal, relativeIOR);
     float f = fresnel(ray,normal);
-    CRTVector combinedTerm = f * traceRay(createReflectionRay(ray, isect.intersectionPoint, normal)) +  (1.f-f)* traceRay(refractionRay);
-    return CRTVector(albedo.x*combinedTerm.x,albedo.y*combinedTerm.y,albedo.z*combinedTerm.z);
+    CRTVector combinedTerm = f * reflectionContrib +  (1.f-f)* traceRay(refractionRay);
+    return albedo*combinedTerm;
 }
 CRTRay CRTRenderer::createReflectionRay(const CRTRay& ray, const CRTVector& position, const CRTVector& normal) {
     const CRTVector reflectionOrigin = position + normal * reflectionBias;
-    CRTRay reflectionRay(reflectionOrigin,CRTRay::reflect(ray.rayDirection, normal));
+    CRTRay reflectionRay(reflectionOrigin,ray.reflect(normal));
     reflectionRay.type = ReflectionRay;
     reflectionRay.rayDepth = ray.rayDepth+1;
     return reflectionRay;
 }
 
-CRTVector refract(const CRTRay& ray,const CRTVector normal, const float relativeIOR) {
-    return CRTVector{0.f};
+CRTRay CRTRenderer::createRefractionRay(const CRTRay& ray, const CRTVector& position, const CRTVector& normal, const float relativeIOR) {
+    const CRTVector refractionOrigin = position + -1.f*  normal * refractionBias;
+    CRTRay refractionRay(refractionOrigin,ray.refract(normal, relativeIOR));
+    refractionRay.type = RefractionRay;
+    refractionRay.rayDepth = ray.rayDepth+1;
+    return refractionRay;
 }
 
 //this represents a simplified version of the Fresnel Equation
