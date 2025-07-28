@@ -17,7 +17,7 @@ const std::string filename = "../inputs/Homework15_Conclusion/scene1.crtscene";
   scene.parseSceneFile(filename);
 
   CRTRenderer renderer(&scene);
-  renderer.setupTriangleAccessStructure();
+  renderer.rebuildAccelerationStructure();
   std::printf("finished importing scene.\n");
   std::printf("Begin rendering scene.\n");
   auto start = std::chrono::high_resolution_clock::now();

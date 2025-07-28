@@ -170,7 +170,11 @@ void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<i
         }
     }
 }
-
+void AccelerationStructure::rebuild() {
+    clear();
+    createTriangleSoup();
+    buildKDTree();
+}
 bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& isect, const float maxT) {
     int depth = 0;
     int roodIDx = 0; //for now the root of the AS is always at index 0

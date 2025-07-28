@@ -15,7 +15,7 @@ enum TextureType {
 class Texture {
     public:
         CRTVector sample(CRTVector uvCoordinates);
-                std::string name="";
+        std::string name="";
         TextureType type=invalidTexture;
 
         //TExture type specific sampling methods

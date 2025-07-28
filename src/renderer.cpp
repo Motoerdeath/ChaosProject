@@ -19,7 +19,6 @@ std::vector<CRTVector> prebuildColors{CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0
 };
 
 CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
-    scene2 = std::unique_ptr<CRTScene>(scene);
     as = AccelerationStructure{scene};
     CRTSettings* settings = scene->getSettings();
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
@@ -37,10 +36,8 @@ void CRTRenderer::render() {
 }
 
 
-void CRTRenderer::setupTriangleAccessStructure() {
-    //as.clear();
-    //as.createTriangleSoup(scene->fullObjects);
-    //as.buildAS();
+void CRTRenderer::rebuildAccelerationStructure() {
+    as.rebuild();
 }
 
 void CRTRenderer::renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight) {
@@ -264,34 +261,6 @@ CRTVector CRTRenderer::diffuseShading(const CRTRay& ray,Intersection& isect ) {
     return final_color;
 }
 
-CRTVector CRTRenderer::directIllumination(Intersection& isect) {
-    Material mat = scene->getMaterial(isect.materialIDx);
-    CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
-    CRTVector lightContrib{0.f};
-    
-
-    for(Light source : scene->sceneLights) {
-        //determine vector to light source from intersectionPoint
-        CRTVector lD = (source.lightPosition - isect.intersectionPoint);
-        //adjust the shadow ray origin in direction of the triangle normal to avoid self-intersection and shadow acne
-        const CRTVector shadowRayOrigin = isect.intersectionPoint + normal * shadowbias;
-        CRTRay shadowRay(shadowRayOrigin,lD.normalize());
-        shadowRay.type= ShadowRay;
-        Intersection shadowIsect;
-        if(as.findIntersection(shadowRay, shadowIsect,lD.length())) {
-            Material shadowMat = scene->getMaterial(shadowIsect.materialIDx);
-            if(shadowMat.type != refractive) continue;
-            //continue;
-        }
-        float lDLength = lD.length();
-        float cosLaw = std::max(0.f,CRTVector::dot(lD.normalize(), normal));
-        if(cosLaw ==0.f) continue;
-        float distanceFallOff = 4*M_PI*lDLength*lDLength;
-        lightContrib = lightContrib +cosLaw*source.lightIntensity*source.lightColor;
-    }
-    return lightContrib;
-}
-
 CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
 
     Material mat = scene->getMaterial(isect.materialIDx);
@@ -480,7 +449,7 @@ void CRTRenderer::renderSingleThreaded() {
                 auto finish = std::chrono::high_resolution_clock::now();
                 const std::chrono::duration<float> elapsed_seconds{finish - start};
                 std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);
-                float seconds = dur.count()/(100.0*samplesPerPixel);
+                float seconds = dur.count()/(100.0*SAMPLESPERPIXEL);
                 float time = glm::clamp(seconds,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
                 finalColor =  temperature(time);
                 image.setPixel(finalColor,x,y); 

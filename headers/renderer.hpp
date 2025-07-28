@@ -32,7 +32,7 @@ class CRTRenderer {
     void render();
     void renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight);
     void storeImage(std::string filePathName){ image.storeImageToFile(filePathName);};
-    void setupTriangleAccessStructure();
+    void rebuildAccelerationStructure();
 
         BucketQueue renderQueue;
     std::mutex bucketMutex;
@@ -46,10 +46,10 @@ class CRTRenderer {
     DebugMode debug = None;
 
     private:
-
-    
+    PPMImage image;
     CRTScene* scene;
-    std::unique_ptr<CRTScene> scene2;
+
+
     CRTVector traceRay(const CRTRay& ray,const float maxT=std::numeric_limits<float>::max());
 
     CRTVector calculateShading(const CRTRay& ray,Intersection& isect);
@@ -57,9 +57,8 @@ class CRTRenderer {
     static float fresnel(const CRTRay& ray,const CRTVector& normal);
     static float fresnel_schlick(const CRTRay& ray,const CRTVector& normal,const float etai,const float eta2);
     void createRenderImage();
-    PPMImage image;
+    
     bool intersect(const CRTRay& ray,Intersection& isect,const float maxT=std::numeric_limits<float>::max());
-    int maxDepth = 5;
     CRTVector diffuseShading(const CRTRay& ray,Intersection& isect);
     CRTVector diffuseShadingGI(const CRTRay& ray,Intersection& isect);
     CRTVector reflectiveShading(const CRTRay& ray,Intersection& isect);
@@ -73,19 +72,15 @@ class CRTRenderer {
 
     float fade(float low, float high, float value);
     CRTVector temperature(float intensity);
-    float heatMapHigh = 100.f;
     AccelerationStructure as;
-    AccelerationStructure access;
     
     CRTVector getAlbedo(Material mat, Intersection& isect);
     
-    int samplesPerPixel = 1;
     void renderSingleThreaded(); 
     void renderMultiThreaded();
 
     std::mt19937 mt;
     std::uniform_real_distribution<float> dist;
     CRTVector triIDtoColor(int triIdx);
-    CRTVector directIllumination(Intersection& isect);
 };
 #endif

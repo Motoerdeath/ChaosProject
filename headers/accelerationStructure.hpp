@@ -25,6 +25,7 @@ class AccelerationStructure{
         AccelerationStructure() {}
         AccelerationStructure(CRTScene* scene);
         bool findIntersection(const CRTRay& ray, Intersection& isect, const float maxT=std::numeric_limits<float>::max());
+        void rebuild();
     private:
         std::vector<CRTTriangle> triangleSoup;
         std::vector<ASNode> accTree;
