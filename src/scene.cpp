@@ -10,14 +10,25 @@
 #include <string>
 #include <vector>
 
-void CRTScene::parse() {
-    for(CRTMesh m : sceneObjects) {
-        std::cout << m.vertexNormals.size() << std::endl;
-        std::cout << m.triangleVertices.size() << std::endl;
-        for(CRTVector t : m.triangleVertices) {
-            //std::cout << t.x << ","  << t.y << "," << t.z << std::endl;
-        }
+void CRTScene::parseSceneFile(const std::string& sceneFileName){
+std::ifstream ifs(sceneFileName);
+    if(!ifs.is_open()) {
+        std::printf("file could not be opened");
     }
+    assert(ifs.is_open());
+    rapidjson::IStreamWrapper isw(ifs);
+    rapidjson::Document doc;
+    doc.ParseStream(isw);
+    importSettings(doc);
+    
+    importCamera(doc, sceneSettings.imageWidth, sceneSettings.imageHeight);
+
+    importObjects(doc);
+    
+    importLights(doc);
+    importMaterials(doc);
+    
+    importTextures(doc);
 }
 
 void CRTScene::importSettings(rapidjson::Document& doc){
@@ -167,7 +178,39 @@ void CRTScene::importLights(rapidjson::Document& doc){
     }
     sceneLights = lights;
 }
-
+void CRTScene::importMaterials(rapidjson::Document& doc){
+    
+    if(doc.HasMember("materials")) {
+        const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
+        for(int i = 0; i < materialsVal.Size();i++) {   
+            Material mat;
+            const rapidjson::Value& materialVal = materialsVal[i];
+            if(materialVal.HasMember("albedo")) {
+                if(materialVal.FindMember("albedo")->value.IsString()) {
+                    mat = importTextureMaterial(doc, i);
+                } else {
+                    mat = importBasicMaterial(doc, i);
+                }
+            } else {
+                mat = importBasicMaterial(doc, i);
+            }
+            sceneMaterials.push_back(mat);
+        }
+    } else {
+        Material mat;
+        CRTVector albedo(0.4f);
+        MaterialType matType;
+        RenderingStyle style = flat;
+        bool backFaceCulling = false;
+        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
+                matType = diffuse;
+        } else {
+                matType = constant;
+        }
+        mat = Material(matType,albedo,style,backFaceCulling);
+        sceneMaterials.push_back(mat);
+    }
+}
 Material CRTScene::importBasicMaterial(rapidjson::Document& doc, int mIdx) {
     Material mat;
     CRTVector albedo(1.f);
@@ -270,39 +313,7 @@ Material CRTScene::importTextureMaterial(rapidjson::Document& doc, int mIdx) {
     mat = Material(matType,albedoTex,style,ior,backFaceCulling);
     return mat;
 }
-void CRTScene::importMaterials(rapidjson::Document& doc){
-    
-    if(doc.HasMember("materials")) {
-        const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
-        for(int i = 0; i < materialsVal.Size();i++) {   
-            Material mat;
-            const rapidjson::Value& materialVal = materialsVal[i];
-            if(materialVal.HasMember("albedo")) {
-                if(materialVal.FindMember("albedo")->value.IsString()) {
-                    mat = importTextureMaterial(doc, i);
-                } else {
-                    mat = importBasicMaterial(doc, i);
-                }
-            } else {
-                mat = importBasicMaterial(doc, i);
-            }
-            sceneMaterials.push_back(mat);
-        }
-    } else {
-        Material mat;
-        CRTVector albedo(0.4f);
-        MaterialType matType;
-        RenderingStyle style = flat;
-        bool backFaceCulling = false;
-        if(doc.HasMember("lights") && doc.FindMember("lights")->value.IsArray() && doc.FindMember("lights")->value.Size() >0) {
-                matType = diffuse;
-        } else {
-                matType = constant;
-        }
-        mat = Material(matType,albedo,style,backFaceCulling);
-        sceneMaterials.push_back(mat);
-    }
-}
+
 
 void CRTScene::importTextures(rapidjson::Document& doc) {
     if(doc.HasMember("textures") ) {
@@ -338,7 +349,6 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
                 newTexture.type = bitmapTexture;
                 std::string textureFilePath = textureVal.FindMember("file_path")->value.GetString();
                 int width, height;
-                //TODO change where and how texture files will be accessed to be more generalizable
                 newTexture.buffer = loadImageFromFile(".."+ textureFilePath,width,height);
                 newTexture.bitmapHeight = height;
                 newTexture.bitmapWidth = width;
@@ -373,26 +383,7 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
         }
     }
 }
-void CRTScene::parseSceneFile(const std::string& sceneFileName){
-std::ifstream ifs(sceneFileName);
-    if(!ifs.is_open()) {
-        std::printf("file could not be opened");
-    }
-    assert(ifs.is_open());
-    rapidjson::IStreamWrapper isw(ifs);
-    rapidjson::Document doc;
-    doc.ParseStream(isw);
-    importSettings(doc);
-    
-    importCamera(doc, sceneSettings.imageWidth, sceneSettings.imageHeight);
 
-    importObjects(doc);
-    
-    importLights(doc);
-    importMaterials(doc);
-    
-    importTextures(doc);
-}
 
 Material CRTScene::getMaterial(int materialIDx) {
     return sceneMaterials[materialIDx];

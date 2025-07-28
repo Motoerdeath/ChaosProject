@@ -11,6 +11,24 @@
 #include <thread>
 #include "../headers/globalSettings.hpp"
 
+void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {
+  //
+  while(true) {
+    renderer->bucketMutex.lock();
+    if(buckets->size() > 0) {
+      Bucket temp = buckets->front();
+      buckets->pop();
+      renderer->bucketMutex.unlock();
+      renderer->renderRegion(temp.startX, temp.startY, temp.width, temp.height);
+    } else {
+      renderer->bucketMutex.unlock();
+      return;
+    }
+  }
+  return;
+}
+
+
 std::vector<CRTVector> prebuildColors{CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0.f),CRTVector(0.f,0.f,1.f),
                             CRTVector(0.f,0.f,0.f),CRTVector(1.f,1.f,0.f),CRTVector(1.f,0.f,1.f),
                             CRTVector(0.f,1.f,1.f),CRTVector(0.7f,0.3f,0.f),CRTVector(0.7f,0.f,0.3f),
@@ -34,7 +52,54 @@ void CRTRenderer::render() {
     }
 
 }
+void CRTRenderer::renderMultiThreaded() {
+    CRTSettings* settings = scene->getSettings();
+    const auto nThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
 
+    renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, settings->bucketSize);
+    //renderQueue.generateRegionQueue(settings->imageWidth, settings->imageHeight, nThreads);
+    
+    for(int i = 0; i < nThreads;i++) {
+        threads.push_back(std::thread(threadFunc,&renderQueue.buckets,this));
+        //threads.push_back(std::thread(&threadFunc));
+    }
+        
+
+    for(std::thread& t : threads) {
+        t.join();
+    }
+}
+void CRTRenderer::renderSingleThreaded() {
+    CRTSettings* settings = scene->getSettings();
+    for(int y = 0; y < settings->imageHeight;y++) {
+        for(int x = 0; x < settings->imageWidth;x++) { 
+
+            auto start = std::chrono::high_resolution_clock::now();//timing
+            CRTVector finalColor{0.f};
+
+            for(int i = 0; i < SAMPLESPERPIXEL; i++) {
+                CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x,CAMERAJITTER);
+                cameraRay.rayDepth = 0;
+                cameraRay.type = CameraRay;
+                finalColor = finalColor + traceRay(cameraRay);
+            }
+            if(debug == HeatMap) {
+                auto finish = std::chrono::high_resolution_clock::now();
+                const std::chrono::duration<float> elapsed_seconds{finish - start};
+                std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);
+                float seconds = dur.count()/(100.0*SAMPLESPERPIXEL);
+                float time = glm::clamp(seconds,0.f,1.f);
+                finalColor =  temperature(time);
+                image.setPixel(finalColor,x,y); 
+                continue;
+            }
+            //Heatmap and timing stuff
+            finalColor = finalColor/SAMPLESPERPIXEL;
+            image.setPixel(finalColor,x,y);       
+        }
+    }
+}
 
 void CRTRenderer::rebuildAccelerationStructure() {
     as.rebuild();
@@ -267,54 +332,33 @@ CRTVector CRTRenderer::diffuseShadingGI(const CRTRay& ray,Intersection& isect){
     CRTVector normal = mat.style == flat ? isect.geomNormal : isect.shadingNormal;
     CRTVector final_color(0.f);
     CRTVector albedo = getAlbedo(mat, isect);
-    int diffuseReflectionRaysCount = 1;
+    //construct local Hit amtrix
     CRTVector rightAxis = ray.rayDirection.cross(normal).normalize();
     CRTVector upAxis = normal;
     CRTVector forwardAxis = rightAxis.cross(upAxis);
     CRTMatrix localHitMatrix{rightAxis,upAxis,forwardAxis};
+
     for(int i = 0; i < DIFFUSEREFLECTIONSCOUNT;i++) {
-        //construct local hit matrix
-
-        /*
-        //sample hemisphere
-        const float r1 = dist(mt);
-        const float r2 = dist(mt);
-        const float phi = 2.f*M_PI*r1;
-        const float cosTheta = 1-r2;
-
-        const float y = cosTheta;
-        const float x = sin(acos(cosTheta)) * cos(phi);
-        const float z = sin(acos(cosTheta)) * sin(phi);
-        CRTVector vec(x,y,z);
-        if(CRTVector::dot(normal,vec) < 0.f) {
-            vec = CRTVector{-x,-y,-z};
-        }
-        CRTVector diffReflRayDir2  = vec * localHitMatrix;
-        float cosLaw = CRTVector::dot(vec,normal);
-*/
+        //sample Ray randomly in upper hemisphere of the intersection point
         float randAngleinXY = M_PI*dist(mt);
         CRTVector randVectorInXY{std::cos(randAngleinXY),std::sin(randAngleinXY),0.f};
         float randAngleinXZ = 2.f*M_PI*dist(mt);
         CRTMatrix rotateAroundY = CRTMatrix::getRotationMatrixAroundY(randAngleinXZ*((float)180)/M_PI);
         CRTVector randVectorInXYRotated = randVectorInXY*rotateAroundY;
         CRTVector diffReflRayDir = randVectorInXYRotated*localHitMatrix;
+
+        //trace this diffuse ray and add it's contribution to the final color
         CRTRay diffReflRay(isect.intersectionPoint + normal*diffuseRayBias,diffReflRayDir);
         diffReflRay.type = CameraRay;
         diffReflRay.rayDepth = ray.rayDepth+1;
         final_color = final_color + traceRay(diffReflRay);
-        //final_color = final_color + traceRay(diffReflRay)*std::cos(randAngleinXZ);
+
     }
-    //final_color = final_color/DIFFUSEREFLECTIONSCOUNT;
-    //return (final_color + directIllumination(isect)) * albedo/M_PI;
+    //add direct lighting and average it out.
     final_color = final_color + diffuseShading(ray, isect);
     return final_color / (DIFFUSEREFLECTIONSCOUNT+1);
     
 
-    /*
-    finalCOlor = finalColor /diffuseReflectionRaysCount;
-    finalColor = (finalColor + diffuseShading) * getAlbedo(mat,isect)/M_PI;
-    
-    */
 }
 
 CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) {
@@ -330,21 +374,6 @@ CRTVector CRTRenderer::reflectiveShading(const CRTRay& ray,Intersection& isect) 
     return CRTVector(albedo.x*shadingResult.x,albedo.y*shadingResult.y,albedo.z*shadingResult.z);
 }
 
-
-CRTVector refract(const CRTVector& rayDir, const CRTVector& normal, float entryIOR, float exitIOR) {
-
-    CRTVector I = rayDir.normalize();
-
-    float relativeIOR = entryIOR/exitIOR;
-
-    float cosAlpha = -1.f*CRTVector::dot(I, normal);
-    float sinBeta = sqrt(1-cosAlpha*cosAlpha) *entryIOR / exitIOR;
-    float cosBeta = sqrt(1-sinBeta*sinBeta);
-    CRTVector C = (I +  cosAlpha*normal).normalize();
-    CRTVector B = C*sinBeta;
-    CRTVector A = cosBeta * -1.f * normal;
-    return A +B;
-}
 
 CRTVector CRTRenderer::refractiveShading(const CRTRay& ray,Intersection& isect) {
     
@@ -424,91 +453,6 @@ CRTVector CRTRenderer::temperature(float intensity) {
                         +fade(0.25f, 0.75f, intensity)*green
                         +fade(0.5f, 1.f, intensity)*yellow
                         +std::lerp(0.75f, 1.f, intensity)*red);
-}
-
-void CRTRenderer::renderSingleThreaded() {
-    CRTSettings* settings = scene->getSettings();
-    for(int y = 0; y < settings->imageHeight;y++) {
-        for(int x = 0; x < settings->imageWidth;x++) { 
-
-
-            auto start = std::chrono::high_resolution_clock::now();//timing
-            CRTVector finalColor{0.f};
-
-
-            for(int i = 0; i < SAMPLESPERPIXEL; i++) {
-                CRTRay cameraRay = scene->sceneCamera.generateCameraRay(y, x,CAMERAJITTER);
-                cameraRay.rayDepth = 0;
-                cameraRay.type = CameraRay;
-                finalColor = finalColor + traceRay(cameraRay);
-
-
-            }
-
-            if(debug == HeatMap) {
-                auto finish = std::chrono::high_resolution_clock::now();
-                const std::chrono::duration<float> elapsed_seconds{finish - start};
-                std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(finish-start);
-                float seconds = dur.count()/(100.0*SAMPLESPERPIXEL);
-                float time = glm::clamp(seconds,0.f,1.f);//(elapsed_seconds.count()/heatMapHigh,0.f,1.f);
-                finalColor =  temperature(time);
-                image.setPixel(finalColor,x,y); 
-                continue;
-            }
-            //Heatmap and timing stuff
-            finalColor = finalColor/SAMPLESPERPIXEL;
-            image.setPixel(finalColor,x,y);       
-        }
-        //std::cout << "row:" << y+1 <<"/" <<settings->imageHeight << " finished" << std::endl;
-    }
-}
-void threadFunc(std::queue<Bucket>* buckets, CRTRenderer* renderer) {
-  //
-  while(true) {
-    renderer->bucketMutex.lock();
-    if(buckets->size() > 0) {
-      Bucket temp = buckets->front();
-      buckets->pop();
-      //std::cout << "Thread " << threadIndex<<" acquired lock on value " << temp.width<<std::endl;
-      renderer->bucketMutex.unlock();
-      //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      renderer->renderRegion(temp.startX, temp.startY, temp.width, temp.height);
-      //std::cout << "Bucket " << temp.bucketIDx<<" finished!"<<std::endl;
-
-      /* //get updates for when a bucket has been finished and how many
-      renderer->updateMutex.lock();
-      renderer->finishedBuckets++;
-      std::cout << renderer->finishedBuckets<<" Buckets finished!"<<std::endl;
-      renderer->updateMutex.unlock();
-      */
-    } else {
-      renderer->bucketMutex.unlock();
-      return;
-    }
-
-  }
-
-  //
-
-  return;
-}
-
-void CRTRenderer::renderMultiThreaded() {
-    CRTSettings* settings = scene->getSettings();
-    renderQueue.generateBucketQueue(settings->imageWidth, settings->imageHeight, settings->bucketSize);
-    const auto nThreads = std::thread::hardware_concurrency();
-
-    std::vector<std::thread> threads;
-    //renderQueue.generateRegionQueue(settings->imageWidth, settings->imageHeight, nThreads);
-    for(int i = 0; i < nThreads;i++) {
-        threads.push_back(std::thread(threadFunc,&renderQueue.buckets,this));
-        //threads.push_back(std::thread(&threadFunc));
-    }
-        
-
-    for(std::thread& t : threads) {
-        t.join();
-    }
 }
 
 void CRTRenderer::setupRNG() {
