@@ -130,9 +130,9 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
             bool hitBackSide = !mat.backFaceCulling;
             //shoot shadowRay
                     if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
-                        hitCondition = CRTRay::intersectTriangle(ray,triangle,t, true) && t < closestIntersectionDistance && t < maxT;
+                        hitCondition = ray.intersectTriangle(triangle, t, true) && t < closestIntersectionDistance && t < maxT;
                     } else {
-                        hitCondition = CRTRay::intersectTriangle(ray,triangle,t, false) && t < closestIntersectionDistance && t < maxT;
+                        hitCondition = ray.intersectTriangle(triangle, t, false) && t < closestIntersectionDistance && t < maxT;
                     }
             if(hitCondition) {
 

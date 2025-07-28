@@ -183,7 +183,7 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     while(!nodeStack.empty()) {
         ASNode* currentNode = &accTree[nodeStack.top()];
         nodeStack.pop();
-        if(CRTRay::intersectBoundingBox(ray, currentNode->boundingBox)) {
+        if(ray.intersectBoundingBox(currentNode->boundingBox)) {
             if(currentNode->triangleSoupIdx.size() > 0) {
                 
 
@@ -193,9 +193,9 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
                     float t;
                     bool hitCondition = false;
                     if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
-                        hitCondition = CRTRay::intersectTriangle(ray,tri,t, true) && t < minT && t < maxT;
+                        hitCondition = ray.intersectTriangle(tri, t, true) && t < minT && t < maxT;
                     } else {
-                        hitCondition = CRTRay::intersectTriangle(ray,tri,t, false) && t < minT && t < maxT;
+                        hitCondition = ray.intersectTriangle(tri, t, false) && t < minT && t < maxT;
                     }
                     if(hitCondition) {
                             triangleIDx = currentNode->triangleSoupIdx[i];
