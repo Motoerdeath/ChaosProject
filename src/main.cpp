@@ -1,16 +1,28 @@
 #include <cassert>
 #include <cstdio>
 
+#include <qtypes.h>
+#include <qwidget.h>
 #include <string>
 #include "../headers/scene.hpp"
 #include "../headers/renderer.hpp"
 #include <iostream>
 #include <chrono>
+#include <QWidget>
+#include <QApplication>
+#include <QMainWindow>
+#include "../headers/mainwindow.hpp"
 
-int main() {
+int main(int argc, char *argv[]) {
 
+    QApplication a(argc, argv);
+    MainWindow w;
+  
+    w.show();
+    return a.exec();
+  /*
 //set scenefile that you want to render
-const std::string filename = "../inputs/Homework15_Conclusion/scene1.crtscene";
+  const std::string filename = "../inputs/Homework15_Conclusion/scene1.crtscene";
 
   CRTScene scene(filename);
   std::printf("Begin importing scene.\n");
@@ -30,8 +42,7 @@ const std::string filename = "../inputs/Homework15_Conclusion/scene1.crtscene";
   std::printf("finished rendering scene.\n");
   renderer.storeImage("../output.ppm");
   std::printf("finished storing output.\n");
- 
-
+ */
 /*
   const std::string inputFilePath = "../inputs/Homework15_Conclusion/scene0.crtscene";
   const std::string outputFilePath = "../outputs/15_Conclusion/Scene1/Frame_";

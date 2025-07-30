@@ -555,3 +555,13 @@ void CRTRenderer::setupRNG() {
 CRTVector CRTRenderer::triIDtoColor(int triIdx)  {
     return prebuildColors[triIdx%prebuildColors.size()];
 }
+
+
+void CRTRenderer::loadScene(CRTScene* newScene) {
+    scene = newScene;
+    as = AccelerationStructure{scene};
+    setupTriangleAccessStructure();
+    CRTSettings* settings = scene->getSettings();
+    image.clear();
+    image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
+}

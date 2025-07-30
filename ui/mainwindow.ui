@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGraphicsView" name="renderView">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>611</width>
+      <height>361</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="SelectSceneFile">
+    <property name="statusTip">
+     <string>Select File to render</string>
+    </property>
+    <property name="title">
+     <string>Select Scene</string>
+    </property>
+    <addaction name="loadCRTScene"/>
+   </widget>
+   <widget class="QMenu" name="RenderConfiguration">
+    <property name="title">
+     <string>Configure</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="openAct">
+    <property name="title">
+     <string>open</string>
+    </property>
+    <property name="icon">
+     <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+    </property>
+   </widget>
+   <addaction name="SelectSceneFile"/>
+   <addaction name="RenderConfiguration"/>
+   <addaction name="openAct"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="loadCRTScene">
+   <property name="text">
+    <string>Load CRTScene</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

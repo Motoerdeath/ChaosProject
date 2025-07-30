@@ -30,6 +30,7 @@ class CRTRenderer {
     CRTRenderer() {}
     CRTRenderer(CRTScene* scene);
     void render();
+    void loadScene(CRTScene* scene);
     void renderRegion(const int startX,const int startY,const int regionWidth, const int regionHeight);
     void storeImage(std::string filePathName){ image.storeImageToFile(filePathName);};
     void setupTriangleAccessStructure();
