@@ -11,6 +11,7 @@
 #include <limits>
 #include <memory>
 #include "../headers/bucket.hpp"
+#include "triangle.hpp"
 
 #include <mutex>
 #include <random>
@@ -47,10 +48,8 @@ class CRTRenderer {
     DebugMode debug = None;
 
     private:
-
     
     CRTScene* scene;
-    std::unique_ptr<CRTScene> scene2;
     CRTVector traceRay(const CRTRay& ray,const float maxT=std::numeric_limits<float>::max());
 
     CRTVector calculateShading(const CRTRay& ray,Intersection& isect);

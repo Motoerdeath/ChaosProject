@@ -10,16 +10,6 @@
 #include <string>
 #include <vector>
 
-void CRTScene::parse() {
-    for(CRTMesh m : sceneObjects) {
-        std::cout << m.vertexNormals.size() << std::endl;
-        std::cout << m.triangleVertices.size() << std::endl;
-        for(CRTVector t : m.triangleVertices) {
-            //std::cout << t.x << ","  << t.y << "," << t.z << std::endl;
-        }
-    }
-}
-
 void CRTScene::importSettings(rapidjson::Document& doc){
 
     CRTVector bgColor(0.f);
@@ -90,7 +80,6 @@ void CRTScene::importCamera(rapidjson::Document& doc, int width, int height){
 }
 void CRTScene::importObjects(rapidjson::Document& doc){
 
-    std::vector<CRTMesh> objects;
     
     assert(doc.HasMember("objects"));
     const rapidjson::Value& objectsVal = doc.FindMember("objects")->value;
@@ -122,18 +111,15 @@ void CRTScene::importObjects(rapidjson::Document& doc){
                 textureCoords = loadTextureCoordinates(uvVal.GetArray());
                 CRTMesh newMesh(triangleVertices,triangleVertIndices,mID,textureCoords);
                 CRTObject newObject(newMesh);
-                fullObjects.push_back(newObject);
-                objects.push_back(newMesh);
+                objects.push_back(newObject);
             } else {
                 CRTMesh newMesh(triangleVertices,triangleVertIndices,mID);
                 CRTObject newObject(newMesh);
-                fullObjects.push_back(newObject);
-                objects.push_back(newMesh);
+                objects.push_back(newObject);
             }
             
         }
     }
-    sceneObjects = objects;
 
 }
 void CRTScene::importLights(rapidjson::Document& doc){
@@ -392,6 +378,7 @@ std::ifstream ifs(sceneFileName);
     importMaterials(doc);
     
     importTextures(doc);
+    createTriangleSoup();
 }
 
 Material CRTScene::getMaterial(int materialIDx) {
@@ -406,4 +393,34 @@ CRTSettings* CRTScene::getSettings() {
 }
 CRTCamera* CRTScene::getCamera() {
     return &sceneCamera;
+}
+
+
+
+void CRTScene::createTriangleSoup() {
+    for(int i = 0; i < objects.size();i++) {
+        CRTObject object = objects[i];
+        CRTMesh mesh = object.mesh;
+        for(int j = 0; j < mesh.triangleVertIndices.size();j+=3) {
+            CRTTriangle triangle(mesh.triangleVertices[mesh.triangleVertIndices[j]]+ object.offset,
+                            mesh.triangleVertices[mesh.triangleVertIndices[j+1]]+ object.offset,
+                            mesh.triangleVertices[mesh.triangleVertIndices[j+2]]+ object.offset);
+
+            triangle.objectID = i;
+            triangle.materialID = mesh.materialID;
+            triangle.vertexNormal0 = mesh.vertexNormals[mesh.triangleVertIndices[j]];
+            triangle.vertexNormal1 = mesh.vertexNormals[mesh.triangleVertIndices[j+1]];
+            triangle.vertexNormal2 = mesh.vertexNormals[mesh.triangleVertIndices[j+2]];
+            if(mesh.textureCoords.size() == mesh.triangleVertices.size()) {
+                triangle.texCoords0 = mesh.textureCoords[mesh.triangleVertIndices[j]];
+                triangle.texCoords1 = mesh.textureCoords[mesh.triangleVertIndices[j+1]];
+                triangle.texCoords2 = mesh.textureCoords[mesh.triangleVertIndices[j+2]];
+            } else {
+                triangle.texCoords0 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j]];
+                triangle.texCoords1 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+1]];
+                triangle.texCoords2 = CRTVector(0.f);//object.textureCoords[object.triangleVertIndices[j+2]];
+            }
+            triangleSoup.push_back(triangle);
+        }
+    }
 }

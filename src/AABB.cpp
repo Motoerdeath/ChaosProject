@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-void AABB::include(CRTTriangle triangle) {
+void AABB::include(const CRTTriangle& triangle) {
 
     min = CRTVector(std::min(min.x,triangle.v0.x),std::min(min.y,triangle.v0.y),std::min(min.z,triangle.v0.z));
     min = CRTVector(std::min(min.x,triangle.v1.x),std::min(min.y,triangle.v1.y),std::min(min.z,triangle.v1.z));

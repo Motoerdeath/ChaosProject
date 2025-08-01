@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1600</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,9 +19,21 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>611</width>
-      <height>361</height>
+      <width>1681</width>
+      <height>1031</height>
      </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Shadow::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>2</number>
+    </property>
+    <property name="dragMode">
+     <enum>QGraphicsView::DragMode::NoDrag</enum>
     </property>
    </widget>
   </widget>
@@ -30,7 +42,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1920</width>
+     <width>1600</width>
      <height>22</height>
     </rect>
    </property>
@@ -48,17 +60,8 @@
      <string>Configure</string>
     </property>
    </widget>
-   <widget class="QMenu" name="openAct">
-    <property name="title">
-     <string>open</string>
-    </property>
-    <property name="icon">
-     <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
-    </property>
-   </widget>
    <addaction name="SelectSceneFile"/>
    <addaction name="RenderConfiguration"/>
-   <addaction name="openAct"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="loadCRTScene">

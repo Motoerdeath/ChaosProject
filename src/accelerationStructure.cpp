@@ -22,8 +22,8 @@ void AccelerationStructure::clear() {
 // other functions index into this vector to reference the scene object data
 // this reduces the amount of data that needs to be stored as triangles have high memory requirements
 void AccelerationStructure::createTriangleSoup() {
-    for(int i = 0; i < scene->fullObjects.size();i++) {
-        CRTObject object = scene->fullObjects[i];
+    for(int i = 0; i < scene->objects.size();i++) {
+        CRTObject object = scene->objects[i];
         CRTMesh mesh = object.mesh;
         for(int j = 0; j < mesh.triangleVertIndices.size();j+=3) {
             CRTTriangle triangle(mesh.triangleVertices[mesh.triangleVertIndices[j]]+ object.offset,
@@ -113,12 +113,12 @@ void AccelerationStructure::buildKDTree() {
     root.child2 =-1;
     root.parentIDx =-1;
     AABB rootBB;
-    for(CRTTriangle tri : triangleSoup) {
+    for(CRTTriangle tri : scene->triangleSoup) {
         rootBB.include(tri);
     }
     root.boundingBox = rootBB;
     accTree.push_back(root);
-    std::vector<int> triangleIndexes(triangleSoup.size());
+    std::vector<int> triangleIndexes(scene->triangleSoup.size());
     std::iota(triangleIndexes.begin(), triangleIndexes.end(), 0);
 
     buildAccTree(0, 0, triangleIndexes);
@@ -138,10 +138,10 @@ void AccelerationStructure::buildAccTree(int parentIdx, int depth, std::vector<i
         std::vector<int> child2triangles;
         for(int triIdx : triangleSoupIndexes) {
             
-            if(AABBTriIntersection(child1AABB, triangleSoup[triIdx])) {
+            if(AABBTriIntersection(child1AABB, scene->triangleSoup[triIdx])) {
                 child1triangles.push_back(triIdx);
             }
-            if(AABBTriIntersection(child2AABB, triangleSoup[triIdx])) {
+            if(AABBTriIntersection(child2AABB, scene->triangleSoup[triIdx])) {
                 child2triangles.push_back(triIdx);
             }
         }
@@ -176,7 +176,7 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     int roodIDx = 0; //for now the root of the AS is always at index 0
     std::stack<int> nodeStack;
     nodeStack.push(roodIDx); //the root of the AS is always checked first
-    CRTTriangle closestTriangle;
+    CRTTriangle* closestTriangle;
     int triangleIDx;
     bool foundIntersection = false;
     float minT = std::numeric_limits<float>::max();
@@ -189,7 +189,7 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
 
                 for(int i = 0; i < currentNode->triangleSoupIdx.size();i++) {
 
-                    CRTTriangle tri = triangleSoup[currentNode->triangleSoupIdx[i]];
+                    CRTTriangle* tri = &scene->triangleSoup[currentNode->triangleSoupIdx[i]];
                     float t;
                     bool hitCondition = false;
                     if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
@@ -216,14 +216,14 @@ bool AccelerationStructure::findIntersection(const CRTRay& ray, Intersection& is
     isect.intersectionPoint = ray.rayOrigin + ray.rayDirection * minT;
     //offset intersectionPoint
 
-    isect.geomNormal = closestTriangle.normal;
+    isect.geomNormal = closestTriangle->normal;
     isect.triangleIDx = triangleIDx;
-    isect.materialIDx = closestTriangle.materialID;
-    isect.objectIDx = closestTriangle.objectID;
+    isect.materialIDx = closestTriangle->materialID;
+    isect.objectIDx = closestTriangle->objectID;
     isect.t = minT;
-    isect.baryCoords = CRTTriangle::calculateBarycentricCoordinates(closestTriangle, isect.intersectionPoint);
-    isect.shadingNormal = closestTriangle.vertexNormal0 * isect.baryCoords.z + closestTriangle.vertexNormal1 * isect.baryCoords.x + closestTriangle.vertexNormal2 * isect.baryCoords.y;
-    isect.textureCoords = closestTriangle.texCoords0 * isect.baryCoords.z + closestTriangle.texCoords1 * isect.baryCoords.x + closestTriangle.texCoords2 * isect.baryCoords.y;
+    isect.baryCoords = closestTriangle->calculateBarycentricCoordinates(isect.intersectionPoint);
+    isect.shadingNormal = closestTriangle->vertexNormal0 * isect.baryCoords.z + closestTriangle->vertexNormal1 * isect.baryCoords.x + closestTriangle->vertexNormal2 * isect.baryCoords.y;
+    isect.textureCoords = closestTriangle->texCoords0 * isect.baryCoords.z + closestTriangle->texCoords1 * isect.baryCoords.x + closestTriangle->texCoords2 * isect.baryCoords.y;
 
 
     return true;

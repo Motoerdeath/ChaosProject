@@ -19,7 +19,6 @@ std::vector<CRTVector> prebuildColors{CRTVector(1.f,0.f,0.f),CRTVector(0.f,1.f,0
 };
 
 CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
-    scene2 = std::unique_ptr<CRTScene>(scene);
     as = AccelerationStructure{scene};
     CRTSettings* settings = scene->getSettings();
     image = PPMImage(settings->imageWidth,settings->imageHeight,255.f);
@@ -39,7 +38,7 @@ void CRTRenderer::render() {
 
 void CRTRenderer::setupTriangleAccessStructure() {
     //as.clear();
-    //as.createTriangleSoup(scene->fullObjects);
+    //as.createTriangleSoup(scene->objects);
     //as.buildAS();
 }
 
@@ -117,8 +116,46 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
     CRTVector baryCoords;
     CRTVector position;
     CRTVector textureCoords{0.f};
-    for(int i = 0; i < scene->fullObjects.size(); i++) {
-        CRTObject fullObject = scene->fullObjects[i];
+
+    for(int i = 0; i < scene->triangleSoup.size();i++) {
+        CRTTriangle* triangle = &scene->triangleSoup[i];
+        float t;
+        bool hitCondition = false;
+        Material mat = scene->getMaterial(triangle->materialID);
+        bool hitBackSide = !mat.backFaceCulling;
+        //shoot shadowRay
+                if(ray.type == ShadowRay ||ray.type == RefractionRay ||ray.type == ReflectionRay){
+                    hitCondition = ray.intersectTriangle(triangle, t, true) && t < closestIntersectionDistance && t < maxT;
+                } else {
+                    hitCondition = ray.intersectTriangle(triangle, t, false) && t < closestIntersectionDistance && t < maxT;
+                }
+        if(hitCondition) {
+
+            foundIntersection = true;
+            closestIntersectionDistance = t;
+            materialID = triangle->materialID;
+            objectID = triangle->objectID;
+            triangleID = i;
+            geoNormal = triangle->normal;
+            position = ray.rayOrigin + ray.rayDirection*t;
+            //baryCoords = CRTTriangle::calculateBarycentricCoordinates(*triangle,position);
+            baryCoords = triangle->calculateBarycentricCoordinates(position);
+            shadingNormal = triangle->vertexNormal0*baryCoords.z +triangle->vertexNormal1*baryCoords.x + triangle->vertexNormal2*baryCoords.y;
+
+            if(ray.type == ShadowRay) {
+                Material mat = scene->getMaterial(materialID);
+                if (mat.type != refractive) {
+                    return true;
+                } else {
+                    foundIntersection = false;
+                    continue;
+                }
+            }
+        }
+    }
+    /*
+    for(int i = 0; i < scene->objects.size(); i++) {
+        CRTObject fullObject = scene->objects[i];
         CRTMesh* object = &fullObject.mesh;
         for(int k = 0; k < object->triangleVertIndices.size();k+=3) {
             CRTTriangle triangle(object->triangleVertices[object->triangleVertIndices[k]]+fullObject.offset,
@@ -158,6 +195,7 @@ bool CRTRenderer::intersect(const CRTRay& ray,Intersection& isect, const float m
             }
         }
     }
+    */
     if(foundIntersection) {
         isect.intersectionPoint = position;
         isect.baryCoords = baryCoords;

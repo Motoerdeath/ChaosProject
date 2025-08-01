@@ -28,13 +28,14 @@ public:
 private slots:
     void open();
     void loadScene(QAction* action);
+    void resizeEvent(QResizeEvent * event);
 
 private:
     Ui::MainWindow *ui;
     CRTRenderer* renderer;
     QImage* renderResult;
 
-    QGraphicsScene *scene;
+    QGraphicsScene *scene2;
     QPixmap image;
 
     

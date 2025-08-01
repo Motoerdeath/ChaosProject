@@ -19,3 +19,22 @@ CRTVector CRTTriangle::calculateBarycentricCoordinates(const CRTTriangle &triang
     float z = 1.f-u-v;
     return CRTVector(u,v,1.f-u-v);
 }
+CRTVector CRTTriangle::calculateBarycentricCoordinates(const CRTVector &position) {
+    CRTVector v0p = position-v0;
+    CRTVector v0v1 = v1-v0;
+    CRTVector v0v2 = v2-v0;
+    
+    /*
+    float areaTri = CRTVector::dot(triangle.normal, CRTVector::cross(v0v1,v0v2));
+    float areaU = CRTVector::dot(triangle.normal, CRTVector::cross(v0p,v0v2));
+    float areaV = CRTVector::dot(triangle.normal, CRTVector::cross(v0v1,v0p));
+    */
+    float areaTri = CRTVector::cross(v0v1,v0v2).length()/2.f;
+    float areaU = CRTVector::cross(v0p,v0v2).length()/2.f;
+    float areaV = CRTVector::cross(v0v1,v0p).length()/2.f;
+    
+    float u = areaU/areaTri;
+    float v = areaV/areaTri;
+    float z = 1.f-u-v;
+    return CRTVector(u,v,1.f-u-v);
+}

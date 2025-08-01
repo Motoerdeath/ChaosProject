@@ -1,7 +1,9 @@
 #include "../headers/mainwindow.hpp"
 #include "../ui/ui_mainwindow.h"
 #include <qaction.h>
+#include <qdebug.h>
 #include <qdir.h>
+#include <qframe.h>
 #include <qgraphicsscene.h>
 #include <qimage.h>
 #include <qmenu.h>
@@ -12,26 +14,20 @@
 #include <iostream>
 #include <QLabel>
 #include <qrgb.h>
+#include <QResizeEvent>
 #include "../headers/scene.hpp"
 #include "../headers/renderer.hpp"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),ui(new Ui::MainWindow)
 {   
     ui->setupUi(this);
-    connect(ui->openAct,&QMenu::aboutToShow,this,&MainWindow::open);
     connect(ui->SelectSceneFile,&QMenu::triggered,this,&MainWindow::loadScene);
 
     renderer = new CRTRenderer();
-    renderResult = new QImage();
-    renderResult->fill(0);
 
-    QLabel label;
-    image.fill(Qt::black);
-    image.load("../output.ppm");
-    scene = new QGraphicsScene(this);
-    scene->addPixmap(image);
-    scene->setSceneRect(image.rect());
-    ui->renderView->setScene(scene);
+
+
+
     //label.setPixmap(QPixmap::fromImage()); 
     //connect(ui->openAct,&QAction::triggered,this,&MainWindow::open); 
     /*
@@ -42,6 +38,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(openAct, &QAction::triggered, this, &MainWindow::open);
     ui->menubar->addAction(openAct);
     */
+}
+void MainWindow::resizeEvent(QResizeEvent * event)
+{
+    QMainWindow::resizeEvent(event);
+    
+    ui->renderView->setFixedWidth(event->size().height());
+    
+    if(ui->renderView->scene())
+        ui->renderView->fitInView(ui->renderView->scene()->sceneRect(), Qt::KeepAspectRatio);
 }
 
 MainWindow::~MainWindow()
@@ -92,6 +97,17 @@ void MainWindow::loadScene(QAction* action) {
             std::printf("finished rendering scene.\n");
             renderer->storeImage("../output.ppm");
             std::printf("finished storing output.\n");
+
+            image.load("../output.ppm");
+            qDebug() <<"Image: height: " <<image.rect().height() << "; width: " << image.rect().width();
+            scene2 = new QGraphicsScene(this);
+            scene2->addPixmap(image);
+            scene2->setSceneRect(image.rect());
+            qDebug() <<"scene: height: " <<scene2->sceneRect().height() << "; width: " << scene2->sceneRect().width();
+            ui->renderView->setSceneRect(scene2->sceneRect());
+            qDebug() <<"render: height: " <<ui->renderView->sceneRect().height() << "; width: " << ui->renderView->sceneRect().width();
+            ui->renderView->setScene(scene2);
+            ui->renderView->fitInView(scene2->sceneRect());
         }
     }
     

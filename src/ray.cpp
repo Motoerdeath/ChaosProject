@@ -129,3 +129,42 @@ const bool CRTRay::intersectTriangle(CRTTriangle triangle, float& t, bool hitBac
     }
     return false;
 }
+
+const bool CRTRay::intersectTriangle(CRTTriangle* triangle, float& t, bool hitBackside) const {
+
+    constexpr float EPSILON = 0.0001f;
+    CRTVector normal = triangle->normal;
+    //check if Ray is not parallel and if ray hits it from the front
+    bool keepIsect;
+    if(hitBackside) {
+        keepIsect = CRTVector::dot(rayDirection, normal) != 0;
+    } else {
+        keepIsect = CRTVector::dot(rayDirection, normal) < 0;
+    }
+    if(keepIsect) {
+        
+        //find intersection point
+        float rpLength = CRTVector::dot(triangle->v0-rayOrigin,normal);
+        float t1 = rpLength/CRTVector::dot(rayDirection,normal);
+        
+        if(t1 < EPSILON) {
+            return false;
+        }
+            
+        CRTVector intersection = rayOrigin + rayDirection*t1;
+
+        CRTVector e0 = triangle->v1 - triangle->v0;
+        CRTVector e1 = triangle->v2 - triangle->v1;
+        CRTVector e2 = triangle->v0 - triangle->v2;
+        CRTVector v0p = intersection-triangle->v0;
+        CRTVector v1p = intersection-triangle->v1;
+        CRTVector v2p = intersection-triangle->v2;
+        //check if intersection point is in triangle, by checking whether it is "on the left" of each triangle side
+        if(CRTVector::dot(normal,CRTVector::cross(e0,v0p)) >=-EPSILON && CRTVector::dot(normal,CRTVector::cross(e1,v1p)) >=-EPSILON && CRTVector::dot(normal,CRTVector::cross(e2,v2p)) >=-EPSILON ) {
+            t = t1;
+            return true;
+        }
+        
+    }
+    return false;
+}

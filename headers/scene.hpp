@@ -12,6 +12,7 @@
 #include "../include/rapidjson/document.h"
 #include "material.hpp"
 #include "texture.hpp"
+#include "triangle.hpp"
 
 
 
@@ -42,14 +43,17 @@ class CRTScene {
 
         CRTCamera sceneCamera;
         std::string sceneFilePath;
-        std::vector<CRTMesh> sceneObjects;
-        std::vector<CRTObject> fullObjects;
+        std::vector<CRTObject> objects;
         std::vector<Light> sceneLights;
-        std::vector<Material> sceneMaterials;
+        std::vector<Material> sceneMaterials; 
         std::vector<Texture> sceneTextures;
         PPMImage sceneImage;
         CRTSettings sceneSettings;
         std::vector<std::vector<CRTVector>> textureImage;
+
+        std::vector<CRTTriangle> triangleSoup;
         private:
+        void createTriangleSoup();
+        
 };
 #endif

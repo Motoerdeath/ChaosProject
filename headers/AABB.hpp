@@ -8,7 +8,7 @@ class AABB {
     public:
         AABB(){}
         AABB(CRTTriangle triangle){ include(triangle);}
-        void include(CRTTriangle triangle);
+        void include(const CRTTriangle& triangle);
         void include(AABB boundingBox);
 
 

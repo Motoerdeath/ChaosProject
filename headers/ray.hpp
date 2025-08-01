@@ -22,7 +22,8 @@ class CRTRay {
     //bool intersectTriangle(CRTTriangle triangle, float& t, bool hitBackside);
 
     const bool intersectBoundingBox(const AABB& aabb) const ;
-    const bool intersectTriangle(CRTTriangle triangle, float& t, bool hitBackside) const ;
+    const bool intersectTriangle(CRTTriangle triangle, float& t, bool hitBackside) const;
+    const bool intersectTriangle(CRTTriangle* triangle, float& t, bool hitBackside) const;
     static CRTVector offsetRay(const CRTVector& pos, const CRTVector& normal) {
         /*
         int x_i = int(256.f*normal.x);
