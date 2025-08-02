@@ -7,6 +7,7 @@
 #include "../include/rapidjson/istreamwrapper.h"
 #include "../headers/jsonUtilities.hpp"
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -304,20 +305,30 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
             if(!typeName.std::string::compare("albedo")) {
                 //load albedo texture
                 newTexture.type = albedoTexture;
-                newTexture.albedo = loadVector(textureVal.FindMember("albedo")->value.GetArray());
+                CRTVector albedo = loadVector(textureVal.FindMember("albedo")->value.GetArray());
+                newTexture.albedo = albedo;
+                sceneTex.push_back(std::make_unique<AlbedoTexture>(AlbedoTexture(textureName,albedo)));
             } else if(!typeName.std::string::compare("edges")) {
                 assert(textureVal.HasMember("inner_color") &&textureVal.HasMember("edge_color") && textureVal.HasMember("edge_width"));
                 newTexture.type = edgeTexture;
-                newTexture.innerColor = loadVector(textureVal.FindMember("inner_color")->value.GetArray());
-                newTexture.edgeColor = loadVector(textureVal.FindMember("edge_color")->value.GetArray());
-                newTexture.edgeWidth = static_cast<float>(textureVal.FindMember("edge_width")->value.GetDouble());
+                CRTVector innerColor = loadVector(textureVal.FindMember("inner_color")->value.GetArray());
+                CRTVector edgeColor = loadVector(textureVal.FindMember("edge_color")->value.GetArray());
+                float edgeWidth = static_cast<float>(textureVal.FindMember("edge_width")->value.GetDouble());
+                newTexture.innerColor = innerColor;
+                newTexture.edgeColor = edgeColor;
+                newTexture.edgeWidth = edgeWidth;
+                sceneTex.push_back(std::make_unique<EdgeTexture>(EdgeTexture(textureName,edgeWidth,innerColor,edgeColor)));
                 //load edges Texture
             } else if(!typeName.std::string::compare("checker")) {
                 assert(textureVal.HasMember("color_A") &&textureVal.HasMember("color_B") && textureVal.HasMember("square_size"));
                 newTexture.type = checkersTexture;
-                newTexture.colorA = loadVector(textureVal.FindMember("color_A")->value.GetArray());
-                newTexture.colorB = loadVector(textureVal.FindMember("color_B")->value.GetArray());
-                newTexture.squareSize = static_cast<float>(textureVal.FindMember("square_size")->value.GetDouble());
+                CRTVector colorA = loadVector(textureVal.FindMember("color_A")->value.GetArray());
+                CRTVector colorB = loadVector(textureVal.FindMember("color_B")->value.GetArray());
+                float squareSize = static_cast<float>(textureVal.FindMember("square_size")->value.GetDouble());
+                newTexture.colorA = colorA;
+                newTexture.colorB = colorB;
+                newTexture.squareSize = squareSize;
+                sceneTex.push_back(std::make_unique<CheckersTexture>(CheckersTexture(textureName,squareSize,colorA,colorB)));
 
             } else if (!typeName.std::string::compare("bitmap")) {
                 assert(textureVal.HasMember("file_path"));
@@ -325,9 +336,11 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
                 std::string textureFilePath = textureVal.FindMember("file_path")->value.GetString();
                 int width, height;
                 //TODO change where and how texture files will be accessed to be more generalizable
-                newTexture.buffer = loadImageFromFile(".."+ textureFilePath,width,height);
+                std::vector<std::vector<CRTVector>> buffer = loadImageFromFile(".."+ textureFilePath,width,height);
+                newTexture.buffer = buffer;
                 newTexture.bitmapHeight = height;
                 newTexture.bitmapWidth = width;
+                sceneTex.push_back(std::make_unique<BitmapTexture>(BitmapTexture(textureName,buffer,height,width)));
 
             } else {
                 std::cout << "unsupported texture type encountered" << std::endl;

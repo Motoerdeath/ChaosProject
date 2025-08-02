@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <stdexcept>
 #include <chrono>
@@ -27,6 +28,7 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
 //begins the rendering process
 //selects which
 void CRTRenderer::render() {
+    AlbedoTexture aTex("name", CRTVector{0.f});
     if(useMultiThreading) {
         renderMultiThreaded();
     } else {
@@ -251,14 +253,12 @@ CRTVector CRTRenderer::getAlbedo(Material mat,Intersection& isect)  {
     if(!mat.albedoTex.std::string::compare("invalid")) {
         return mat.albedo;
     } else {
-        for(Texture tex : scene->sceneTextures) {
-            if(!tex.name.std::string::compare(mat.albedoTex)) {
-                if(tex.type == checkersTexture || tex.type == bitmapTexture) {
-                    return tex.sample(isect.textureCoords);
-                } else {
-                    return tex.sample(isect.baryCoords);
-                }
+        for(int i = 0; i < scene->sceneTex.size();i++) {
+            auto tex = scene->sceneTex[i].get();
+            if(!tex->getName().std::string::compare(mat.albedoTex)) {
+                return tex->sample(isect);
             }
+            
         }
     }
     return CRTVector(0.f);

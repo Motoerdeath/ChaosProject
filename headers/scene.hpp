@@ -7,6 +7,7 @@
 #include "object.hpp"
 #include "ppmImage.hpp"
 #include "settings.hpp"
+#include <memory>
 #include <string>
 #include "light.hpp"
 #include "../include/rapidjson/document.h"
@@ -47,6 +48,8 @@ class CRTScene {
         std::vector<Light> sceneLights;
         std::vector<Material> sceneMaterials; 
         std::vector<Texture> sceneTextures;
+        std::vector<Texture2> sceneTextures2;
+        std::vector<std::unique_ptr<Texture2>> sceneTex;
         PPMImage sceneImage;
         CRTSettings sceneSettings;
         std::vector<std::vector<CRTVector>> textureImage;
