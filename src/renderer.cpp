@@ -28,7 +28,6 @@ CRTRenderer::CRTRenderer(CRTScene* scene) : scene(scene){
 //begins the rendering process
 //selects which
 void CRTRenderer::render() {
-    AlbedoTexture aTex("name", CRTVector{0.f});
     if(useMultiThreading) {
         renderMultiThreaded();
     } else {

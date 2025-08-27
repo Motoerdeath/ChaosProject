@@ -300,75 +300,52 @@ void CRTScene::importTextures(rapidjson::Document& doc) {
             assert(textureVal.HasMember("type") && textureVal.HasMember("name"));
             std::string typeName = textureVal.FindMember("type")->value.GetString();
             std::string textureName = textureVal.FindMember("name")->value.GetString();
-            Texture newTexture{};
-            newTexture.name = textureName;
             if(!typeName.std::string::compare("albedo")) {
                 //load albedo texture
-                newTexture.type = albedoTexture;
                 CRTVector albedo = loadVector(textureVal.FindMember("albedo")->value.GetArray());
-                newTexture.albedo = albedo;
                 sceneTex.push_back(std::make_unique<AlbedoTexture>(AlbedoTexture(textureName,albedo)));
             } else if(!typeName.std::string::compare("edges")) {
                 assert(textureVal.HasMember("inner_color") &&textureVal.HasMember("edge_color") && textureVal.HasMember("edge_width"));
-                newTexture.type = edgeTexture;
                 CRTVector innerColor = loadVector(textureVal.FindMember("inner_color")->value.GetArray());
                 CRTVector edgeColor = loadVector(textureVal.FindMember("edge_color")->value.GetArray());
                 float edgeWidth = static_cast<float>(textureVal.FindMember("edge_width")->value.GetDouble());
-                newTexture.innerColor = innerColor;
-                newTexture.edgeColor = edgeColor;
-                newTexture.edgeWidth = edgeWidth;
                 sceneTex.push_back(std::make_unique<EdgeTexture>(EdgeTexture(textureName,edgeWidth,innerColor,edgeColor)));
                 //load edges Texture
             } else if(!typeName.std::string::compare("checker")) {
                 assert(textureVal.HasMember("color_A") &&textureVal.HasMember("color_B") && textureVal.HasMember("square_size"));
-                newTexture.type = checkersTexture;
                 CRTVector colorA = loadVector(textureVal.FindMember("color_A")->value.GetArray());
                 CRTVector colorB = loadVector(textureVal.FindMember("color_B")->value.GetArray());
                 float squareSize = static_cast<float>(textureVal.FindMember("square_size")->value.GetDouble());
-                newTexture.colorA = colorA;
-                newTexture.colorB = colorB;
-                newTexture.squareSize = squareSize;
                 sceneTex.push_back(std::make_unique<CheckersTexture>(CheckersTexture(textureName,squareSize,colorA,colorB)));
 
             } else if (!typeName.std::string::compare("bitmap")) {
                 assert(textureVal.HasMember("file_path"));
-                newTexture.type = bitmapTexture;
                 std::string textureFilePath = textureVal.FindMember("file_path")->value.GetString();
                 int width, height;
                 //TODO change where and how texture files will be accessed to be more generalizable
                 std::vector<std::vector<CRTVector>> buffer = loadImageFromFile(".."+ textureFilePath,width,height);
-                newTexture.buffer = buffer;
-                newTexture.bitmapHeight = height;
-                newTexture.bitmapWidth = width;
                 sceneTex.push_back(std::make_unique<BitmapTexture>(BitmapTexture(textureName,buffer,height,width)));
 
             } else {
                 std::cout << "unsupported texture type encountered" << std::endl;
                 assert(false);
             }
-            sceneTextures.push_back(newTexture);
         }
     } else {
         if(doc.HasMember("materials")) {
             const rapidjson::Value& materialsVal = doc.FindMember("materials")->value;
             for(int i = 0; i < materialsVal.Size();i++) {
                 const rapidjson::Value& materialVal = materialsVal[i];
-                Texture newTexture;
-                newTexture.name = "Texture"+ std::to_string(i);
+
                 if(!materialVal.HasMember("albedo")) {
-                    newTexture.type = invalidTexture;
+                    assert(false);
                 } else {
-                    newTexture.type = albedoTexture;
-                    newTexture.albedo = loadVector(materialVal.FindMember("albedo")->value.GetArray());
+                    sceneTex.push_back(std::make_unique<AlbedoTexture>(AlbedoTexture("Texture"+ std::to_string(i),loadVector(materialVal.FindMember("albedo")->value.GetArray()))));
                 }
-                sceneTextures.push_back(newTexture);
             }
         } else {
-            Texture newTexture;
-            newTexture.name = "Texture0";
-            newTexture.albedo = CRTVector(0.4f);
-            newTexture.type = albedoTexture;
-            sceneTextures.push_back(newTexture);
+            sceneTex.push_back(std::make_unique<AlbedoTexture>(AlbedoTexture("Texture0",CRTVector(0.4f))));
+ 
         }
     }
 }

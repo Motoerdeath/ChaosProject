@@ -40,16 +40,13 @@ class CRTScene {
         CRTSettings* getSettings();
         CRTCamera* getCamera();
         Material getMaterial(int materialIDx);
-        Texture* getTexture(int textureIDx);
 
         CRTCamera sceneCamera;
         std::string sceneFilePath;
         std::vector<CRTObject> objects;
         std::vector<Light> sceneLights;
         std::vector<Material> sceneMaterials; 
-        std::vector<Texture> sceneTextures;
-        std::vector<Texture2> sceneTextures2;
-        std::vector<std::unique_ptr<Texture2>> sceneTex;
+        std::vector<std::unique_ptr<Texture>> sceneTex;
         PPMImage sceneImage;
         CRTSettings sceneSettings;
         std::vector<std::vector<CRTVector>> textureImage;
